@@ -2,13 +2,16 @@ package me.melontini.goodtea.behaviors;
 
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
+import me.melontini.goodtea.util.JavaRandomUtil;
 import me.melontini.goodtea.util.TextUtil;
 import me.melontini.goodtea.util.LogUtil;
 import net.minecraft.block.*;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.*;
@@ -21,16 +24,12 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.explosion.Explosion;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class TeaCupBehavior {
     public static TeaCupBehavior INSTANCE = new TeaCupBehavior();
@@ -76,20 +75,20 @@ public class TeaCupBehavior {
         addBehavior(Items.TNT_MINECART, (player, stack) -> player.world.createExplosion(null, player.getX(), player.getY(), player.getZ(), 4.0F, Explosion.DestructionType.DESTROY));
 
         addBehavior(Items.END_ROD, (player, stack) -> {
-            java.util.Random random = new java.util.Random();
+            Random random = new Random();
             ((ServerWorld) player.world).spawnParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1, player.getZ(), 35, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, 0.3);
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 600, 0));
         });
 
         addBehavior(Items.SPORE_BLOSSOM, (player, stack) -> {
-            Random random = Random.create();
+            Random random = new Random();
             BlockPos.Mutable mutable = new BlockPos.Mutable();
 
             int i = player.getBlockPos().getX();
             int j = player.getBlockPos().getY();
             int k = player.getBlockPos().getZ();
             for (int l = 0; l < 3; ++l) {
-                mutable.set(i + MathHelper.nextInt(random, -4, 4), j + 4, k + MathHelper.nextInt(random, -4, 4));
+                mutable.set(i + JavaRandomUtil.nextInt(random, -4, 4), j + 4, k + JavaRandomUtil.nextInt(random, -4, 4));
                 BlockState blockState = player.world.getBlockState(mutable);
                 if (!blockState.isFullCube(player.world, mutable)) {
                     ((ServerWorld) player.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + random.nextDouble(), mutable.getY() + random.nextDouble(), mutable.getZ() + random.nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
@@ -146,7 +145,7 @@ public class TeaCupBehavior {
             List<StatusEffectInstance> list = PotionUtil.getPotionEffects(stack);
             boolean bl = potion == Potions.WATER && list.isEmpty();
 
-            if (bl) entity.applyWater();
+            if (bl) this.damageEntitiesHurtByWater(entity);
             else if (!list.isEmpty()) entity.applySplashPotion(list, player);
 
             int i = potion.hasInstantEffect() ? WorldEvents.INSTANT_SPLASH_POTION_SPLASHED : WorldEvents.SPLASH_POTION_SPLASHED;
@@ -163,7 +162,7 @@ public class TeaCupBehavior {
             List<StatusEffectInstance> list = PotionUtil.getPotionEffects(stack);
             boolean bl = potion == Potions.WATER && list.isEmpty();
 
-            if (bl) entity.applyWater();
+            if (bl) this.damageEntitiesHurtByWater(entity);
             else if (!list.isEmpty()) entity.applyLingeringPotion(stack, potion);
 
             entity.discard();
@@ -262,6 +261,24 @@ public class TeaCupBehavior {
         addTooltip(Items.AXOLOTL_BUCKET, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.axolotl_tea"),Formatting.GRAY, Formatting.ITALIC));
         addTooltip(Items.WHEAT, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"),Formatting.GRAY, Formatting.ITALIC));
         addTooltip(Items.HAY_BLOCK, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"),Formatting.GRAY, Formatting.ITALIC));
+    }
+
+    private void damageEntitiesHurtByWater(PotionEntity entity) {
+        Box box = entity.getBoundingBox().expand(4.0, 2.0, 4.0);
+        List<LivingEntity> list = entity.world.getEntitiesByClass(LivingEntity.class, box, PotionEntity.WATER_HURTS);
+        if (!list.isEmpty()) {
+            for(LivingEntity livingEntity : list) {
+                double d = entity.squaredDistanceTo(livingEntity);
+                if (d < 16.0 && livingEntity.hurtByWater()) {
+                    livingEntity.damage(DamageSource.magic(entity, entity.getOwner()), 1.0F);
+                }
+            }
+        }
+
+        for(AxolotlEntity axolotlEntity : entity.world.getNonSpectatingEntities(AxolotlEntity.class, box)) {
+            axolotlEntity.hydrateFromPotion();
+        }
+
     }
 
     @FunctionalInterface
