@@ -49,11 +49,11 @@ public class TextUtil {//At the end of the day, just changing 2 lines of Text wo
     }
 
     public static  <T> T applyFormatting(T text, Formatting... formattings) {
-        var method = findMethod("class_5250", "method_27695", "([Lnet/minecraft/class_124;)Lnet/minecraft/class_5250;", Formatting.class);
+        var method = findMethod("class_5250", "method_27692", "([Lnet/minecraft/class_124;)Lnet/minecraft/class_5250;", findClass("class_124"));
         for (Formatting formatting1 : formattings) {
             try {
                 text = (T) method.invoke(text, formatting1);
-            } catch (IllegalAccessException | InvocationTargetException e) {
+            } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
         }
@@ -69,7 +69,14 @@ public class TextUtil {//At the end of the day, just changing 2 lines of Text wo
         }
     }
 
-
+    private static Class<?> findArrayClass(String className) {
+        MappingResolver resolver = FabricLoader.getInstance().getMappingResolver();
+        try {
+            return Class.forName(resolver.mapClassName("intermediary", "[Lnet.minecraft." + className + ";"));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static Method findMethod(String className, String methodName, String descriptors, Class<?>... classes) {
         MappingResolver resolver = FabricLoader.getInstance().getMappingResolver();
