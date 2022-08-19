@@ -4,7 +4,7 @@ import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.KettleBlockBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.screens.KettleScreenHandler;
-import me.melontini.goodtea.util.LogUtil;
+import me.melontini.goodtea.util.TextUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
@@ -26,13 +26,11 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -316,7 +314,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
     @Override
     public Text getDisplayName() {
-        return new TranslatableText("gui.good-tea.kettle");
+        return TextUtil.createTranslatable("gui.good-tea.kettle");
     }
 
     @Nullable
