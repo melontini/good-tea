@@ -1,0 +1,34 @@
+{
+    "variants": {
+        "facing=east,support=false": {
+            "model": "good-tea:block/kettle",
+            "y": 90
+        },
+        "facing=north,support=false": {
+            "model": "good-tea:block/kettle"
+        },
+        "facing=south,support=false": {
+            "model": "good-tea:block/kettle",
+            "y": 180
+        },
+        "facing=west,support=false": {
+            "model": "good-tea:block/kettle",
+            "y": 270
+        },
+        "facing=east,support=true": {
+            "model": "good-tea:block/kettle_support",
+            "y": 90
+        },
+        "facing=north,support=true": {
+            "model": "good-tea:block/kettle_support"
+        },
+        "facing=south,support=true": {
+            "model": "good-tea:block/kettle_support",
+            "y": 180
+        },
+        "facing=west,support=true": {
+            "model": "good-tea:block/kettle_support",
+            "y": 270
+        }
+    }
+}

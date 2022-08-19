@@ -1,0 +1,22 @@
+{
+  "tooltip.good-tea.filled_cup": "This tea is made from: %s",
+  "tooltip.good-tea.filled_cup.nothing": "This tea has no interesting properties",
+  "tooltip.good-tea.filled_cup.something": "This tea has some interesting properties",
+
+  "gui.good-tea.kettle": "Kettle",
+
+  "block.good-tea.kettle": "Kettle",
+
+  "text.good-tea.obsidian_toughness": "This was horrible, but your Armour Toughness is permanently increased by 2!",
+  "text.good-tea.rabbits_luck": "This was horrible, but your Luck is permanently increased by 1!",
+  "text.good-tea.hoglin_repellent": "Hmm... looks like you'll smell like warped fungus for the next 2 minutes",
+
+  "item.good-tea.filled_cup": "Cup of Tea",
+  "item.good-tea.cup": "Empty Cup",
+
+  "tea-tooltip.good-tea.tea-cup-tea": "What kind of Tea is that?!",
+  "tea-tooltip.good-tea.axolotl_tea": "You Monster!",
+  "tea-tooltip.good-tea.bed-tea": "Only drink in the Overworld!",
+  "tea-tooltip.good-tea.music-disc-tea": "Who needs a BoomBox anyway?",
+  "tea-tooltip.good-tea.wheat_tea": "Drink in moderation"
+}

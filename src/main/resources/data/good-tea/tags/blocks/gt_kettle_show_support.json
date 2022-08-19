@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "good-tea:kettle",
+    "minecraft:campfire",
+    "minecraft:soul_campfire",
+    "minecraft:lava",
+    "#minecraft:small_flowers",
+    "#minecraft:saplings"
+  ]
+}
