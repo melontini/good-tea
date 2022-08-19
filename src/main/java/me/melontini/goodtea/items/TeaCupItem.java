@@ -2,20 +2,18 @@ package me.melontini.goodtea.items;
 
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.TeaCupBehavior;
+import me.melontini.goodtea.util.TextUtil;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.*;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +63,7 @@ public class TeaCupItem extends Item {
             }
         }
 
-        world.emitGameEvent(user, GameEvent.DRINKING_FINISH, user.getCameraBlockPos());
+        user.emitGameEvent(GameEvent.DRINK, user);
         return stack;
     }
 
@@ -76,7 +74,7 @@ public class TeaCupItem extends Item {
         if (stack1 != null) {
             Item item = stack1.getItem();
             if (item != null) {
-                tooltip.add(new TranslatableText("tooltip.good-tea.filled_cup", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
+                tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup", item.getName()), item.getRarity(item.getDefaultStack()).formatting));
                 if (item.equals(Items.POTION) || item.equals(Items.SPLASH_POTION) || item.equals(Items.LINGERING_POTION)) {
                     PotionUtil.buildTooltip(stack1, tooltip, 1.6F);
                     return;
@@ -85,9 +83,9 @@ public class TeaCupItem extends Item {
                     tooltip.add(TeaCupBehavior.INSTANCE.getTooltip(item));
                 } else {
                     if (!TeaCupBehavior.INSTANCE.hasBehavior(item)) {
-                        tooltip.add(new TranslatableText("tooltip.good-tea.filled_cup.nothing").formatted(Formatting.ITALIC, Formatting.GRAY));
+                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.nothing"), Formatting.ITALIC, Formatting.GRAY));
                     } else
-                        tooltip.add(new TranslatableText("tooltip.good-tea.filled_cup.something").formatted(Formatting.ITALIC, Formatting.GRAY));
+                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.something"), Formatting.ITALIC, Formatting.GRAY));
                 }
             }
         }
