@@ -49,7 +49,7 @@ public class TextUtil {//At the end of the day, just changing 2 lines of Text wo
     }
 
     public static  <T> T applyFormatting(T text, Formatting... formattings) {
-        var method = findMethod("class_5250", "method_27695", "([Lnet/minecraft/class_124;)Lnet/minecraft/class_5250;", new Class[]{findClass("class_124")});
+        var method = findMethod("class_5250", "method_27695", "([Lnet/minecraft/class_124;)Lnet/minecraft/class_5250;", Formatting.class);
         for (Formatting formatting1 : formattings) {
             try {
                 text = (T) method.invoke(text, formatting1);
