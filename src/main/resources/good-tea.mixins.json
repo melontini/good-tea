@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.melontini.goodtea.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "warped_fungus_tea.HoglinSensorMixin",
+    "warped_fungus_tea.PlayerEntityMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

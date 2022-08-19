@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "good-tea",
+  "version": "${version}",
+  "name": "Good Tea",
+  "description": "Adds some good tea to minecraft",
+  "authors": [
+    "melontini"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/good-tea/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "me.melontini.goodtea.client.GoodTeaClient"
+    ],
+    "main": [
+      "me.melontini.goodtea.GoodTea"
+    ]
+  },
+  "mixins": [
+    "good-tea.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": "*",
+    "fabric": "*",
+    "minecraft": "1.18.2"
+  }
+}
