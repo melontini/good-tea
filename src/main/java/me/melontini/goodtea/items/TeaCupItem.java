@@ -3,7 +3,6 @@ package me.melontini.goodtea.items;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.TeaCupBehavior;
 import me.melontini.goodtea.util.TextUtil;
-import net.minecraft.MinecraftVersion;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -21,6 +20,7 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class TeaCupItem extends Item {
     public TeaCupItem(Settings settings) {
@@ -65,8 +65,9 @@ public class TeaCupItem extends Item {
             }
         }
 
-        if (GoodTea.MCVERSION >= 119) user.emitGameEvent(Registry.GAME_EVENT.get(new Identifier("drink")), user);
-        else world.emitGameEvent(user, Registry.GAME_EVENT.get(new Identifier("drinking_finish")), user.getCameraBlockPos());
+        Optional<GameEvent> optional = Registry.GAME_EVENT.getOrEmpty(new Identifier("drink"));
+        GameEvent event = optional.orElseGet(() -> Registry.GAME_EVENT.get(new Identifier("drinking_finish")));
+        user.emitGameEvent(event, user);
         return stack;
     }
 
