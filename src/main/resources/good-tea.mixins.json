@@ -4,6 +4,8 @@
   "package": "me.melontini.goodtea.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "screenhandler_tea.CraftingScreenHandlerMixin",
+    "screenhandler_tea.PlayerEntityMixin",
     "warped_fungus_tea.HoglinSensorMixin",
     "warped_fungus_tea.PlayerEntityMixin"
   ],

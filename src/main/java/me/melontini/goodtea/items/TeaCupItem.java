@@ -79,17 +79,19 @@ public class TeaCupItem extends Item {
             Item item = stack1.getItem();
             if (item != null) {
                 tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup", item.getName()), item.getRarity(item.getDefaultStack()).formatting));
-                if (item.equals(Items.POTION) || item.equals(Items.SPLASH_POTION) || item.equals(Items.LINGERING_POTION)) {
-                    PotionUtil.buildTooltip(stack1, tooltip, 1.6F);
-                    return;
-                }
                 if (TeaCupBehavior.INSTANCE.hasTooltip(item)) {
                     tooltip.add(TeaCupBehavior.INSTANCE.getTooltip(item));
                 } else {
                     if (!TeaCupBehavior.INSTANCE.hasBehavior(item)) {
-                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.nothing"), Formatting.ITALIC, Formatting.GRAY));
+                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.nothing"), Formatting.GRAY));
                     } else
-                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.something"), Formatting.ITALIC, Formatting.GRAY));
+                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.something"), Formatting.GRAY));
+                }
+                if (item.equals(Items.POTION) || item.equals(Items.SPLASH_POTION)) {
+                    PotionUtil.buildTooltip(stack1, tooltip, 1.2F);
+                }
+                if (item.equals(Items.LINGERING_POTION)) {
+                    PotionUtil.buildTooltip(stack1, tooltip, 0.3125F);
                 }
             }
         }

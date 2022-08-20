@@ -34,7 +34,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -101,10 +101,12 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
         if (this.time > 0) {
             BlockState state = world.getBlockState(this.pos.down());
-            Optional<List<Property<?>>> optional = KettleBlockBehaviour.INSTANCE.getProperties(state.getBlock());
+            Optional<Map<Property<?>, ?>> optional = KettleBlockBehaviour.INSTANCE.getProperties(state.getBlock());
             if (optional.isPresent()) {
-                if (state.getProperties().containsAll(optional.get())) {
-                    tickTime();
+                if (state.getProperties().containsAll(optional.get().keySet())) {
+                    if (state.getProperties().stream().filter(property -> optional.get().containsKey(property)).allMatch(property -> state.get(property).equals(optional.get().get(property)))) {
+                        tickTime();
+                    }
                 }
             } else if (state.isIn(GoodTea.HOT_BLOCKS)) {
                 tickTime();

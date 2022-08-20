@@ -1,5 +1,5 @@
 {
-  "tooltip.good-tea.filled_cup": "This tea is made from: %s",
+  "tooltip.good-tea.filled_cup": "Made from: %s",
   "tooltip.good-tea.filled_cup.nothing": "This tea has no interesting properties",
   "tooltip.good-tea.filled_cup.something": "This tea has some interesting properties",
 
