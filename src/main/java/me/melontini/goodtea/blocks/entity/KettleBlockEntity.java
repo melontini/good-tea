@@ -36,9 +36,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @SuppressWarnings("UnstableApiUsage")
 public class KettleBlockEntity extends BlockEntity implements SidedInventory, NamedScreenHandlerFactory {
+
+    private final Random jRandom = new Random();
 
     public final SingleVariantStorage<FluidVariant> waterStorage = new SingleVariantStorage<>() {
         @Override
@@ -130,31 +133,25 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                         this.time = 650;
                     }
                     update();
-                    //LogUtil.info("Started Processing");
                 }
             }
 
             if (this.time != -1) {
                 if (input.isEmpty() || input.isOf(GoodTea.TEA_CUP_FILLED)) {
-                    //LogUtil.info("Quit Processing, input is empty");
                     this.time = -1;
                     update();
                 } else if (cup.isEmpty()) {
-                    //LogUtil.info("Quit Processing, cup is empty");
                     this.time = -1;
                     update();
                 } else if (!canCombine(stack, output)) {
-                    //LogUtil.info("Quit Processing, input & output can't combine");
                     this.time = -1;
                     update();
                 } else if (this.waterStorage.amount < FluidConstants.BOTTLE) {
-                    //LogUtil.info("Quit Processing, water is 0");
                     this.time = -1;
                     update();
                 }
             }
             if (this.time == 0) {
-                //LogUtil.info("Finishing Processing");
                 if (output.isEmpty()) {
                     if (input.getItem().hasRecipeRemainder()) {
                         ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), new ItemStack(input.getItem().getRecipeRemainder()));
@@ -162,7 +159,6 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                     input.decrement(1);
                     cup.decrement(1);
                     this.inventory.set(2, stack);
-                    //LogUtil.info("Output is empty, safe to insert");
                 } else if (canCombine(stack, output)) {
                     int a = stack.getCount();
                     int b = output.getCount();
@@ -173,9 +169,6 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                     }
                     input.decrement(1);
                     cup.decrement(1);
-                    //LogUtil.info("stacks can combine, safe to insert");
-                } else {
-                    //LogUtil.info("stacks can't combine, error");
                 }
                 try (Transaction transaction = Transaction.openOuter()) {
                     long amount = this.waterStorage.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BOTTLE, transaction);
@@ -185,7 +178,6 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                 }
                 this.time = -1;
                 update();
-                //LogUtil.info("Finished Processing");
             }
         }
     }
@@ -195,7 +187,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         if (world.isClient()) {
             BlockState state2 = world.getBlockState(this.pos);
             Direction direction = state2.get(KettleBlock.FACING);
-            if (world.random.nextInt(16) == 0) {
+            if (jRandom.nextInt(16) == 0) {
                 world.addParticle(ParticleTypes.BUBBLE_POP, (pos.offset(direction).getX() + 0.5) - (direction.getOffsetX() * 0.45), pos.getY() + 0.35, (pos.offset(direction).getZ() + 0.5) - (direction.getOffsetZ() * 0.45), 0F, 0.03F, 0F);
             }
         }
