@@ -29,7 +29,6 @@ import java.util.UUID;
 
 @SuppressWarnings("UnstableApiUsage")
 public class GoodTea implements ModInitializer {
-    public static final int MCVERSION = Integer.parseInt(MinecraftVersion.CURRENT.getName().replace(".", ""));
     public static final String MODID = "good-tea";
     public static final EntityAttributeModifier OBSIDIAN_TOUGHNESS = new EntityAttributeModifier(UUID.fromString("36dae011-70d8-482a-b3b3-7bb12c871eae"), "Tea Modifier", 2, EntityAttributeModifier.Operation.ADDITION);
     public static final EntityAttributeModifier RABBITS_LUCK = new EntityAttributeModifier(UUID.fromString("57c5033e-c071-4b23-8f14-0551eb4c5b0a"), "Tea Modifier", 1, EntityAttributeModifier.Operation.ADDITION);

@@ -2,7 +2,6 @@ package me.melontini.goodtea.util;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;
-import net.minecraft.MinecraftVersion;
 import net.minecraft.util.Formatting;
 
 import java.lang.reflect.InvocationTargetException;
@@ -10,6 +9,7 @@ import java.lang.reflect.Method;
 
 @SuppressWarnings("unchecked")
 public class TextUtil {//At the end of the day, just changing 2 lines of Text would've been easier...
+    private static final boolean DEV_ENV = FabricLoader.getInstance().isDevelopmentEnvironment();
     public static <T> T createTranslatable(String namespace, Object... args) {
         try {
             return (T) findMethod("class_2561", "method_43469", "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/class_5250;", String.class, Object[].class).invoke(null, namespace, args);
@@ -37,7 +37,7 @@ public class TextUtil {//At the end of the day, just changing 2 lines of Text wo
     public static  <T> T applyFormatting(T text, Formatting... formattings) {
         Method method;
         try {
-            method = findMethod("class_5250", "method_27692", "([Lnet/minecraft/class_124;)Lnet/minecraft/class_5250;", findClass("class_124"));
+            method = findMethod("class_5250", DEV_ENV ? "method_27695" : "method_27692", "([Lnet/minecraft/class_124;)Lnet/minecraft/class_5250;", findClass("class_124"));
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
