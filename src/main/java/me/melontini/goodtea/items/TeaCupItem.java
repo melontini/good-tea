@@ -7,7 +7,10 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsage;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -61,7 +64,7 @@ public class TeaCupItem extends Item {
             }
 
             if (player != null) {
-                player.getInventory().insertStack(new ItemStack(GoodTea.TEA_CUP));
+                player.getInventory().offerOrDrop(new ItemStack(GoodTea.TEA_CUP));
             }
         }
 

@@ -10,13 +10,16 @@ import java.lang.reflect.Method;
 @SuppressWarnings("unchecked")
 public class TextUtil {//At the end of the day, just changing 2 lines of Text would've been easier...
     private static final boolean DEV_ENV = FabricLoader.getInstance().isDevelopmentEnvironment();
+
     public static <T> T createTranslatable(String namespace, Object... args) {
         try {
             return (T) findMethod("class_2561", "method_43469", "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/class_5250;", String.class, Object[].class).invoke(null, namespace, args);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 ClassNotFoundException e) {
             try {
                 return (T) findClass("class_2588").getConstructor(String.class, Object[].class).newInstance(namespace, args);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException ex) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException | ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -25,16 +28,18 @@ public class TextUtil {//At the end of the day, just changing 2 lines of Text wo
     public static <T> T createTranslatable(String namespace) {
         try {
             return (T) findMethod("class_2561", "method_43471", "(Ljava/lang/String;)Lnet/minecraft/class_5250;", String.class).invoke(null, namespace);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                 ClassNotFoundException e) {
             try {
                 return (T) findClass("class_2588").getConstructor(String.class).newInstance(namespace);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException ex) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException | ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
         }
     }
 
-    public static  <T> T applyFormatting(T text, Formatting... formattings) {
+    public static <T> T applyFormatting(T text, Formatting... formattings) {
         Method method;
         try {
             method = findMethod("class_5250", DEV_ENV ? "method_27695" : "method_27692", "([Lnet/minecraft/class_124;)Lnet/minecraft/class_5250;", findClass("class_124"));

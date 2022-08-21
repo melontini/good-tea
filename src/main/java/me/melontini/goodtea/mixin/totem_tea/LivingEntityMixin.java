@@ -1,7 +1,6 @@
 package me.melontini.goodtea.mixin.totem_tea;
 
 import me.melontini.goodtea.ducks.DivineAccess;
-import me.melontini.goodtea.util.LogUtil;
 import me.melontini.goodtea.util.TextUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,13 +21,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LivingEntityMixin extends Entity implements DivineAccess {
     @Unique
     private boolean good_tea$divine = false;
+
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
 
     @SuppressWarnings("InvalidInjectorMethodSignature")
     @ModifyVariable(method = "tryUseTotem", at = @At(value = "STORE", ordinal = 0), ordinal = 0)
-    private ItemStack mod(ItemStack value) {
+    private ItemStack good_tea$setFakeTotem(ItemStack value) {
         if (this.good_tea$isDivine()) {
             this.good_tea$setDivine(false);
             if ((LivingEntity) (Object) this instanceof PlayerEntity player) {

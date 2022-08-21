@@ -13,14 +13,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class CraftingScreenHandlerMixin {
 
     @Inject(at = @At("RETURN"), method = "canUse", cancellable = true)
-    private void canUse(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
+    private void good_tea$canUse(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
         if (((CraftingScreenAllowanceAccess) player).good_tea$isAllowed()) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(at = @At("TAIL"), method = "close")
-    private void close(PlayerEntity player, CallbackInfo ci) {
+    private void good_tea$close(PlayerEntity player, CallbackInfo ci) {
         ((CraftingScreenAllowanceAccess) player).good_tea$setAllowed(false);
     }
 }
