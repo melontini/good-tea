@@ -2,7 +2,11 @@ package me.melontini.goodtea.behaviors;
 
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
+import me.melontini.goodtea.ducks.DivineAccess;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
+import me.melontini.goodtea.mixin.BucketItemAccessor;
+import me.melontini.goodtea.mixin.PotionEntityAccessor;
+import me.melontini.goodtea.mixin.SpongeBlockAccessor;
 import me.melontini.goodtea.util.JavaRandomUtil;
 import me.melontini.goodtea.util.LogUtil;
 import me.melontini.goodtea.util.TextUtil;
@@ -35,6 +39,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.explosion.Explosion;
+import org.apache.commons.compress.utils.Lists;
 
 import java.util.*;
 
@@ -49,148 +54,148 @@ public class TeaCupBehavior {
     public void addDefaultBehaviours() {
         for (Item item : Registry.ITEM) {
             if (item instanceof EntityBucketItem entityBucketItem) {
-                if (item != Items.AXOLOTL_BUCKET) addBehavior(item, (player, stack) -> {
-                    var entity = entityBucketItem.entityType.spawnFromItemStack((ServerWorld) player.world, stack, player, new BlockPos(player.getX(), player.getEyePos().y, player.getZ()), SpawnReason.BUCKET, false, false);
-                    if (entity instanceof Bucketable bucketable) {
+                if (item != Items.AXOLOTL_BUCKET) addBehavior(item, (entity, stack) -> {
+                    var bucketEntity = ((BucketItemAccessor)entityBucketItem).getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, false, false);
+                    if (bucketEntity instanceof Bucketable bucketable) {
                         bucketable.copyDataFromNbt(stack.getOrCreateNbt());
-                        entity.setVelocity(player.getRotationVector());
-                        player.world.spawnEntity(entity);
+                        bucketEntity.setVelocity(entity.getRotationVector());
+                        entity.world.spawnEntity(bucketEntity);
                     }
                 });
             }
             if (item instanceof SwordItem swordItem) {
-                addBehavior(item, (player, stack) -> player.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 3.0F));
+                addBehavior(item, (entity, stack) -> entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 3.0F));
             }
             if (item instanceof MusicDiscItem musicDiscItem) {
-                addBehavior(item, (player, stack) -> player.world.playSoundFromEntity(null, player, musicDiscItem.getSound(), SoundCategory.RECORDS, 1F, 1F));
+                addBehavior(item, (entity, stack) -> entity.world.playSoundFromEntity(null, entity, musicDiscItem.getSound(), SoundCategory.RECORDS, 1F, 1F));
             }
             if (item instanceof BlockItem blockItem) {
                 if (blockItem.getBlock() instanceof FlowerBlock flowerBlock) {
-                    addBehavior(item, (player, stack) -> {
+                    addBehavior(item, (entity, stack) -> {
                         StatusEffectInstance effectInstance = new StatusEffectInstance(flowerBlock.getEffectInStew(), flowerBlock.getEffectInStew().isInstant() ? flowerBlock.getEffectInStewDuration() : (flowerBlock.getEffectInStewDuration() * 2));
-                        player.addStatusEffect(effectInstance);
+                        entity.addStatusEffect(effectInstance);
                     });
                 }
                 if (blockItem.getBlock() instanceof BedBlock) {
-                    addBehavior(item, (player, stack) -> {
-                        if (!BedBlock.isBedWorking(player.world))
-                            player.world.createExplosion(null, DamageSource.badRespawnPoint(), null, player.getX() + 0.5, player.getY() + 0.5, player.getZ() + 0.5, 5.0F, true, Explosion.DestructionType.DESTROY);
+                    addBehavior(item, (entity, stack) -> {
+                        if (!BedBlock.isBedWorking(entity.world))
+                            entity.world.createExplosion(null, DamageSource.badRespawnPoint(), null, entity.getX() + 0.5, entity.getY() + 0.5, entity.getZ() + 0.5, 5.0F, true, Explosion.DestructionType.DESTROY);
                     });
                 }
             }
         }
-        addBehavior(Items.ENCHANTED_GOLDEN_APPLE, (player, stack) -> {
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0));
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 8000, 0));
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 8000, 0));
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 3200, 2));
+        addBehavior(Items.ENCHANTED_GOLDEN_APPLE, (entity, stack) -> {
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0));
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 8000, 0));
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 8000, 0));
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 3200, 2));
         });
 
-        addBehavior(Items.TNT, (player, stack) -> player.world.createExplosion(null, player.getX(), player.getY(), player.getZ(), 4.0F, Explosion.DestructionType.DESTROY));
-        addBehavior(Items.GUNPOWDER, (player, stack) -> player.world.createExplosion(null, player.getX(), player.getY(), player.getZ(), 1.0F, Explosion.DestructionType.DESTROY));
-        addBehavior(Items.TNT_MINECART, (player, stack) -> player.world.createExplosion(null, player.getX(), player.getY(), player.getZ(), 4.0F, Explosion.DestructionType.DESTROY));
+        addBehavior(Items.TNT, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, Explosion.DestructionType.DESTROY));
+        addBehavior(Items.GUNPOWDER, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 1.0F, Explosion.DestructionType.DESTROY));
+        addBehavior(Items.TNT_MINECART, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, Explosion.DestructionType.DESTROY));
 
-        addBehavior(Items.END_ROD, (player, stack) -> {
+        addBehavior(Items.END_ROD, (entity, stack) -> {
             Random random = new Random();
-            ((ServerWorld) player.world).spawnParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1.6, player.getZ(), 35, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, 0.3);
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 600, 0));
+            ((ServerWorld) entity.world).spawnParticles(ParticleTypes.END_ROD, entity.getX(), entity.getY() + 1.6, entity.getZ(), 35, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, 0.3);
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 600, 0));
         });
 
-        addBehavior(Items.SPORE_BLOSSOM, (player, stack) -> {
+        addBehavior(Items.SPORE_BLOSSOM, (entity, stack) -> {
             Random random = new Random();
             BlockPos.Mutable mutable = new BlockPos.Mutable();
 
-            int i = player.getBlockPos().getX();
-            int j = player.getBlockPos().getY();
-            int k = player.getBlockPos().getZ();
+            int i = entity.getBlockPos().getX();
+            int j = entity.getBlockPos().getY();
+            int k = entity.getBlockPos().getZ();
             for (int l = 0; l < 3; ++l) {
                 mutable.set(i + JavaRandomUtil.nextInt(random, -4, 4), j + 4, k + JavaRandomUtil.nextInt(random, -4, 4));
-                BlockState blockState = player.world.getBlockState(mutable);
-                if (!blockState.isFullCube(player.world, mutable)) {
-                    ((ServerWorld) player.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + random.nextDouble(), mutable.getY() + random.nextDouble(), mutable.getZ() + random.nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
+                BlockState blockState = entity.world.getBlockState(mutable);
+                if (!blockState.isFullCube(entity.world, mutable)) {
+                    ((ServerWorld) entity.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + random.nextDouble(), mutable.getY() + random.nextDouble(), mutable.getZ() + random.nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
                 }
             }
 
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 300, 0));
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 300, 0));
         });
 
-        addBehavior(Items.AXOLOTL_BUCKET, (player, stack) -> {
-                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 0));
-                    var entity = ((EntityBucketItem) Items.AXOLOTL_BUCKET).entityType.spawnFromItemStack((ServerWorld) player.world, stack, player, new BlockPos(player.getX(), player.getEyePos().y, player.getZ()), SpawnReason.BUCKET, true, false);
-                    if (entity instanceof Bucketable bucketable) {
+        addBehavior(Items.AXOLOTL_BUCKET, (entity, stack) -> {
+                    entity.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 0));
+                    var bucketEntity = ((BucketItemAccessor) Items.AXOLOTL_BUCKET).getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
+                    if (bucketEntity instanceof Bucketable bucketable) {
                         bucketable.copyDataFromNbt(stack.getOrCreateNbt());
-                        entity.setVelocity(player.getRotationVector());
-                        player.world.spawnEntity(entity);
+                        bucketEntity.setVelocity(entity.getRotationVector());
+                        bucketEntity.world.spawnEntity(entity);
                     }
                 }
         );
-        addBehavior(Items.RED_MUSHROOM, (player, stack) -> player.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 0)));
-        addBehavior(Items.RED_MUSHROOM_BLOCK, (player, stack) -> player.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 250, 1)));
-        addBehavior(Items.WHEAT, (player, stack) -> {
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 600));
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 1000));
+        addBehavior(Items.RED_MUSHROOM, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 0)));
+        addBehavior(Items.RED_MUSHROOM_BLOCK, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 250, 1)));
+        addBehavior(Items.WHEAT, (entity, stack) -> {
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 600));
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 1000));
         });
-        addBehavior(Items.HAY_BLOCK, (player, stack) -> {
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 600 * 9));
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 1000 * 9));
+        addBehavior(Items.HAY_BLOCK, (entity, stack) -> {
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 600 * 9));
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 1000 * 9));
         });
 
-        addBehavior(Items.OBSIDIAN, (player, stack) -> {
-            var instance = Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
+        addBehavior(Items.OBSIDIAN, (entity, stack) -> {
+            var instance = Objects.requireNonNull(entity.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
             if (!instance.hasModifier(GoodTea.OBSIDIAN_TOUGHNESS)) {
                 instance.addPersistentModifier(GoodTea.OBSIDIAN_TOUGHNESS);
-                player.sendMessage(TextUtil.createTranslatable("text.good-tea.obsidian_toughness"), true);
+                if (entity instanceof PlayerEntity player) player.sendMessage(TextUtil.createTranslatable("text.good-tea.obsidian_toughness"), true);
             }
         });
 
-        addBehavior(Items.RABBIT_FOOT, (player, stack) -> {
-            var instance = Objects.requireNonNull(player.getAttributeInstance(EntityAttributes.GENERIC_LUCK));
+        addBehavior(Items.RABBIT_FOOT, (entity, stack) -> {
+            var instance = Objects.requireNonNull(entity.getAttributeInstance(EntityAttributes.GENERIC_LUCK));
             if (!instance.hasModifier(GoodTea.RABBITS_LUCK)) {
                 instance.addPersistentModifier(GoodTea.RABBITS_LUCK);
-                player.sendMessage(TextUtil.createTranslatable("text.good-tea.rabbits_luck"), true);
+                if (entity instanceof PlayerEntity player) player.sendMessage(TextUtil.createTranslatable("text.good-tea.rabbits_luck"), true);
             }
         });
 
-        addBehavior(Items.POTION, (player, stack) -> {
+        addBehavior(Items.POTION, (entity, stack) -> {
             for (StatusEffectInstance sei : PotionUtil.getPotionEffects(stack)) {
                 if (sei.getEffectType().isInstant()) {
-                    sei.getEffectType().applyInstantEffect(player, player, player, sei.getAmplifier(), 1.0);
+                    sei.getEffectType().applyInstantEffect(entity, entity, entity, sei.getAmplifier(), 1.0);
                 } else {
                     var effect = new StatusEffectInstance(sei.getEffectType(), (int) (sei.getDuration() * 1.2), sei.getAmplifier(), sei.isAmbient(), sei.shouldShowParticles(), sei.shouldShowIcon());
-                    player.addStatusEffect(new StatusEffectInstance(effect));
+                    entity.addStatusEffect(new StatusEffectInstance(effect));
                 }
             }
         });
 
-        addBehavior(Items.SPLASH_POTION, (player, stack) -> {
-            PotionEntity entity = new PotionEntity(player.world, player.getX(), player.getY(), player.getZ());
-            entity.setItem(stack);
+        addBehavior(Items.SPLASH_POTION, (entity, stack) -> {
+            PotionEntity potionEntity = new PotionEntity(entity.world, entity.getX(), entity.getY(), entity.getZ());
+            potionEntity.setItem(stack);
 
             Potion potion = PotionUtil.getPotion(stack);
             List<StatusEffectInstance> list = PotionUtil.getPotionEffects(stack);
-            List<StatusEffectInstance> list1 = new ArrayList<>();
+            List<StatusEffectInstance> list1 = Lists.newArrayList();
             for (StatusEffectInstance sei : list) {
                 var effect = new StatusEffectInstance(sei.getEffectType(), (int) (sei.getDuration() * 1.2), sei.getAmplifier(), sei.isAmbient(), sei.shouldShowParticles(), sei.shouldShowIcon());
                 list1.add(effect);
             }
             boolean bl = potion == Potions.WATER && list1.isEmpty();
 
-            if (bl) this.damageEntitiesHurtByWater(entity);
-            else if (!list1.isEmpty()) entity.applySplashPotion(list1, player);
+            if (bl) this.damageEntitiesHurtByWater(potionEntity);
+            else if (!list1.isEmpty()) ((PotionEntityAccessor)potionEntity).applySplashPotion(list1, entity);
 
             int i = potion.hasInstantEffect() ? WorldEvents.INSTANT_SPLASH_POTION_SPLASHED : WorldEvents.SPLASH_POTION_SPLASHED;
-            player.world.syncWorldEvent(i, player.getBlockPos(), PotionUtil.getColor(stack));
+            entity.world.syncWorldEvent(i, entity.getBlockPos(), PotionUtil.getColor(stack));
 
-            entity.discard();
+            potionEntity.discard();
         });
 
-        addBehavior(Items.LINGERING_POTION, (player, stack) -> {
-            PotionEntity entity = new PotionEntity(player.world, player.getX(), player.getY(), player.getZ());
-            entity.setItem(stack);
+        addBehavior(Items.LINGERING_POTION, (entity, stack) -> {
+            PotionEntity potionEntity = new PotionEntity(entity.world, entity.getX(), entity.getY(), entity.getZ());
+            potionEntity.setItem(stack);
 
             Potion potion = PotionUtil.getPotion(stack);
             List<StatusEffectInstance> list = PotionUtil.getPotionEffects(stack);
-            List<StatusEffectInstance> list1 = new ArrayList<>();
+            List<StatusEffectInstance> list1 = Lists.newArrayList();
             for (StatusEffectInstance sei : list) {
                 var effect = new StatusEffectInstance(sei.getEffectType(), (int) (sei.getDuration() * 1.2), sei.getAmplifier(), sei.isAmbient(), sei.shouldShowParticles(), sei.shouldShowIcon());
                 list1.add(effect);
@@ -198,28 +203,37 @@ public class TeaCupBehavior {
 
             boolean bl = potion == Potions.WATER && list1.isEmpty();
 
-            if (bl) this.damageEntitiesHurtByWater(entity);
-            else if (!list1.isEmpty()) entity.applyLingeringPotion(stack, potion);
+            if (bl) this.damageEntitiesHurtByWater(potionEntity);
+            else if (!list1.isEmpty()) ((PotionEntityAccessor)potionEntity).applyLingeringPotion(stack, potion);
 
             int i = potion.hasInstantEffect() ? WorldEvents.INSTANT_SPLASH_POTION_SPLASHED : WorldEvents.SPLASH_POTION_SPLASHED;
-            player.world.syncWorldEvent(i, player.getBlockPos(), PotionUtil.getColor(stack));
+            entity.world.syncWorldEvent(i, entity.getBlockPos(), PotionUtil.getColor(stack));
 
-            entity.discard();
+            potionEntity.discard();
         });
 
-        addBehavior(Items.SPONGE, (player, stack) -> {
-            ((SpongeBlock) Blocks.SPONGE).absorbWater(player.world, player.getBlockPos());
-            ItemScatterer.spawn(player.world, player.getX(), player.getY(), player.getZ(), new ItemStack(Items.WET_SPONGE));
+        addBehavior(Items.SPONGE, (entity, stack) -> {
+            ((SpongeBlockAccessor) Blocks.SPONGE).absorbWater(entity.world, entity.getBlockPos());
+            ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), new ItemStack(Items.WET_SPONGE));
         });
 
-        addBehavior(Items.WARPED_FUNGUS, (player, stack) -> {
-            ((HoglinRepellentAccess) player).makeHoglinRepellent(2400);
-            player.sendMessage(TextUtil.createTranslatable("text.good-tea.hoglin_repellent"), true);
+        addBehavior(Items.WARPED_FUNGUS, (entity, stack) -> {
+            ((HoglinRepellentAccess) entity).good_tea$makeHoglinRepellent(2400);
+            if (entity instanceof PlayerEntity player) player.sendMessage(TextUtil.createTranslatable("text.good-tea.hoglin_repellent"), true);
         });
 
-        addBehavior(Items.CRAFTING_TABLE, (player, stack) -> {
-            ((CraftingScreenAllowanceAccess) player).setAllowed(true);
-            player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, player1) -> new CraftingScreenHandler(syncId, inv, ScreenHandlerContext.create(player.world, player.getBlockPos())), TextUtil.createTranslatable("container.crafting")));
+        addBehavior(Items.CRAFTING_TABLE, (entity, stack) -> {
+            if (entity instanceof PlayerEntity player) {
+                ((CraftingScreenAllowanceAccess) entity).good_tea$setAllowed(true);
+                player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, entity1) -> new CraftingScreenHandler(syncId, inv, ScreenHandlerContext.create(entity.world, entity.getBlockPos())), TextUtil.createTranslatable("container.crafting")));
+            }
+        });
+
+        addBehavior(Items.LAVA_BUCKET, (entity, stack) -> entity.setOnFireFor(1200));
+
+        addBehavior(Items.TOTEM_OF_UNDYING, (entity, stack) -> {
+            ((DivineAccess)entity).good_tea$setDivine(true);
+            if (entity instanceof PlayerEntity player) player.sendMessage(TextUtil.createTranslatable("text.good-tea.divine"), true);
         });
     }
 
@@ -228,7 +242,7 @@ public class TeaCupBehavior {
     }
 
     public Behavior getBehavior(Item item) {
-        return TEA_CUP_BEHAVIOR.getOrDefault(item, (player, stack) -> {
+        return TEA_CUP_BEHAVIOR.getOrDefault(item, (entity, stack) -> {
         });
     }
 
@@ -307,7 +321,7 @@ public class TeaCupBehavior {
         addTooltip(Items.HAY_BLOCK, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"), Formatting.GRAY, Formatting.ITALIC));
     }
 
-    private void damageEntitiesHurtByWater(PotionEntity entity) {
+    public void damageEntitiesHurtByWater(PotionEntity entity) {
         Box box = entity.getBoundingBox().expand(4.0, 2.0, 4.0);
         List<LivingEntity> list = entity.world.getEntitiesByClass(LivingEntity.class, box, PotionEntity.WATER_HURTS);
         if (!list.isEmpty()) {
@@ -327,6 +341,6 @@ public class TeaCupBehavior {
 
     @FunctionalInterface
     public interface Behavior {
-        void run(PlayerEntity player, ItemStack stack);
+        void run(LivingEntity entity, ItemStack stack);
     }
 }

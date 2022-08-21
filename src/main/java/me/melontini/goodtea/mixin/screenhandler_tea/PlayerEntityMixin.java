@@ -10,13 +10,15 @@ public class PlayerEntityMixin implements CraftingScreenAllowanceAccess {
     @Unique
     private boolean canUseCraftingTable = false;
 
+    @Unique
     @Override
-    public boolean isAllowed() {
+    public boolean good_tea$isAllowed() {
         return canUseCraftingTable;
     }
 
+    @Unique
     @Override
-    public void setAllowed(boolean allowed) {
+    public void good_tea$setAllowed(boolean allowed) {
         this.canUseCraftingTable = allowed;
     }
 }

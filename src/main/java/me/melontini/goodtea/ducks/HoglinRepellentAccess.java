@@ -1,7 +1,7 @@
 package me.melontini.goodtea.ducks;
 
 public interface HoglinRepellentAccess {
-    boolean isHoglinRepellent();
+    boolean good_tea$isHoglinRepellent();
 
-    void makeHoglinRepellent(int timeInTicks);
+    void good_tea$makeHoglinRepellent(int timeInTicks);
 }

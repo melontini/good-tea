@@ -4,7 +4,6 @@ import me.melontini.goodtea.ducks.HoglinRepellentAccess;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
-public abstract class PlayerEntityMixin extends Entity implements HoglinRepellentAccess {
+public abstract class LivingEntityMixin extends Entity implements HoglinRepellentAccess {
     @Unique
     private int hoglinRepellent = 0;
 
-    public PlayerEntityMixin(EntityType<?> type, World world) {
+    public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
 
@@ -40,12 +39,14 @@ public abstract class PlayerEntityMixin extends Entity implements HoglinRepellen
     }
 
     @Unique
-    public boolean isHoglinRepellent() {
+    @Override
+    public boolean good_tea$isHoglinRepellent() {
         return this.hoglinRepellent > 0;
     }
 
     @Unique
-    public void makeHoglinRepellent(int timeInTicks) {
+    @Override
+    public void good_tea$makeHoglinRepellent(int timeInTicks) {
         this.hoglinRepellent = timeInTicks;
     }
 }

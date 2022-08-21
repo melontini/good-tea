@@ -9,7 +9,9 @@
 
   "text.good-tea.obsidian_toughness": "This was horrible, but your Armour Toughness is permanently increased by 2!",
   "text.good-tea.rabbits_luck": "This was horrible, but your Luck is permanently increased by 1!",
-  "text.good-tea.hoglin_repellent": "Hmm... looks like you'll smell like warped fungus for the next 2 minutes",
+  "text.good-tea.hoglin_repellent": "Hmm... looks like you'll smell like warped fungus for the next 2 minutes.",
+  "text.good-tea.divine": "You feel Totem's divine energy running through your body.",
+  "text.good-tea.used_divine": "Totem's divine energy has left your body",
 
   "item.good-tea.filled_cup": "Cup of Tea",
   "item.good-tea.cup": "Empty Cup",

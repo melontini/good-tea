@@ -14,13 +14,13 @@ public class CraftingScreenHandlerMixin {
 
     @Inject(at = @At("RETURN"), method = "canUse", cancellable = true)
     private void canUse(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        if (((CraftingScreenAllowanceAccess) player).isAllowed()) {
+        if (((CraftingScreenAllowanceAccess) player).good_tea$isAllowed()) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(at = @At("TAIL"), method = "close")
     private void close(PlayerEntity player, CallbackInfo ci) {
-        ((CraftingScreenAllowanceAccess) player).setAllowed(false);
+        ((CraftingScreenAllowanceAccess) player).good_tea$setAllowed(false);
     }
 }
