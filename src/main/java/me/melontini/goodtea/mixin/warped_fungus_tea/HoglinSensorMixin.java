@@ -2,10 +2,8 @@ package me.melontini.goodtea.mixin.warped_fungus_tea;
 
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.brain.sensor.HoglinSpecificSensor;
 import net.minecraft.entity.mob.HoglinEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;

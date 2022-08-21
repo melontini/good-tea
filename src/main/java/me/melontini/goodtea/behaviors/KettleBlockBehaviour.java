@@ -6,7 +6,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.state.property.Property;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class KettleBlockBehaviour {
     public static KettleBlockBehaviour INSTANCE = new KettleBlockBehaviour();

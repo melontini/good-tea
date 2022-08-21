@@ -40,12 +40,10 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.commons.compress.utils.Lists;
@@ -268,6 +266,10 @@ public class TeaCupBehavior {
             entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.AMBIENT, 1.0f, 1.0f);
         });
 
+        /*addBehavior(Items.DIRT, (entity, stack) -> {
+            entity.world.getServer().getCommandManager().execute(new ServerCommandSource(CommandOutput.DUMMY, entity.getPos(), new Vec2f(entity.getPitch(), entity.getYaw()), (ServerWorld) entity.world, 3, "idk", TextUtil.createTranslatable("dummy.text"), entity.world.getServer(), entity), "kill @s");
+        });*/
+
         MinecraftItems.OCHRE_FROGLIGHT.ifPresent(item -> addBehavior(item, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0))));
         MinecraftItems.PEARLESCENT_FROGLIGHT.ifPresent(item -> addBehavior(item, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0))));
         MinecraftItems.VERDANT_FROGLIGHT.ifPresent(item -> addBehavior(item, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0))));
@@ -278,7 +280,7 @@ public class TeaCupBehavior {
     }
 
     public Behavior getBehavior(Item item) {
-        return TEA_CUP_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(DamageSource.MAGIC, ((SwordItem)Items.WOODEN_SWORD).getAttackDamage()));
+        return TEA_CUP_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(DamageSource.MAGIC, ((SwordItem) Items.WOODEN_SWORD).getAttackDamage()));
     }
 
     public void removeBehavior(ItemStack stack) {

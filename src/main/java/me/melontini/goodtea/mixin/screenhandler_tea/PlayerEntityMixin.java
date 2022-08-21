@@ -8,17 +8,17 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(PlayerEntity.class)
 public class PlayerEntityMixin implements CraftingScreenAllowanceAccess {
     @Unique
-    private boolean canUseCraftingTable = false;
+    private boolean good_tea$canUseCraftingTable = false;
 
     @Unique
     @Override
     public boolean good_tea$isAllowed() {
-        return canUseCraftingTable;
+        return good_tea$canUseCraftingTable;
     }
 
     @Unique
     @Override
     public void good_tea$setAllowed(boolean allowed) {
-        this.canUseCraftingTable = allowed;
+        this.good_tea$canUseCraftingTable = allowed;
     }
 }
