@@ -1,5 +1,6 @@
 package me.melontini.goodtea;
 
+import com.unascribed.kahur.api.KahurImpactBehavior;
 import me.melontini.goodtea.behaviors.KettleBlockBehaviour;
 import me.melontini.goodtea.behaviors.TeaCupBehavior;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -11,18 +12,25 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.MinecraftVersion;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.registry.Registry;
 
 import java.util.UUID;
@@ -53,6 +61,21 @@ public class GoodTea implements ModInitializer {
         KettleBlockBehaviour.INSTANCE.addDefaultBlocks();
 
         FluidStorage.SIDED.registerForBlockEntity((kettle, direction) -> kettle.waterStorage, KETTLE_BLOCK_ENTITY);
+
+        if (FabricLoader.getInstance().isModLoaded("kahur")) {
+            KahurImpactBehavior.register((kahurShotEntity, itemStack, hitResult) -> {
+                if (hitResult.getType() == HitResult.Type.ENTITY) {
+                    if (((EntityHitResult) hitResult).getEntity() instanceof LivingEntity livingEntity) {
+                        NbtCompound nbt = itemStack.getNbt();
+                        ItemStack stack1 = TeaCupItem.getStackFromNbt(nbt);
+                        if (stack1 != null) {
+                            TeaCupBehavior.INSTANCE.getBehavior(stack1).run(livingEntity, stack1);
+                        }
+                    }
+                }
+                return KahurImpactBehavior.ImpactResult.destroy(true);
+            }, TEA_CUP_FILLED);
+        }
     }
 
     public static final BlockEntityType<KettleBlockEntity> KETTLE_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(KettleBlockEntity::new, KETTLE_BLOCK).build();

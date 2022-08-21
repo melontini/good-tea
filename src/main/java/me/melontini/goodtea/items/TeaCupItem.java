@@ -27,7 +27,7 @@ public class TeaCupItem extends Item {
         super(settings);
     }
 
-    private static ItemStack getStackFromNbt(NbtCompound nbt) {
+    public static ItemStack getStackFromNbt(NbtCompound nbt) {
         if (nbt != null) if (nbt.contains("GT-TeaItem")) {
             return ItemStack.fromNbt(nbt.getCompound("GT-TeaItem"));
         }
@@ -35,33 +35,33 @@ public class TeaCupItem extends Item {
     }
 
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
-        PlayerEntity playerEntity = user instanceof PlayerEntity ? (PlayerEntity) user : null;
-        if (playerEntity instanceof ServerPlayerEntity) {
-            Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity) playerEntity, stack);
+        PlayerEntity player = user instanceof PlayerEntity ? (PlayerEntity) user : null;
+        if (player instanceof ServerPlayerEntity) {
+            Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity) player, stack);
         }
 
         if (!world.isClient()) {
             NbtCompound nbt = stack.getNbt();
             ItemStack stack1 = getStackFromNbt(nbt);
             if (stack1 != null) {
-                TeaCupBehavior.INSTANCE.getBehavior(stack1).run(playerEntity, stack1);
+                TeaCupBehavior.INSTANCE.getBehavior(stack1).run(player, stack1);
             }
         }
 
-        if (playerEntity != null) {
-            playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
-            if (!playerEntity.getAbilities().creativeMode) {
+        if (player != null) {
+            player.incrementStat(Stats.USED.getOrCreateStat(this));
+            if (!player.getAbilities().creativeMode) {
                 stack.decrement(1);
             }
         }
 
-        if (playerEntity == null || !playerEntity.getAbilities().creativeMode) {
+        if (player == null || !player.getAbilities().creativeMode) {
             if (stack.isEmpty()) {
                 return new ItemStack(GoodTea.TEA_CUP);
             }
 
-            if (playerEntity != null) {
-                playerEntity.getInventory().insertStack(new ItemStack(GoodTea.TEA_CUP));
+            if (player != null) {
+                player.getInventory().insertStack(new ItemStack(GoodTea.TEA_CUP));
             }
         }
 
