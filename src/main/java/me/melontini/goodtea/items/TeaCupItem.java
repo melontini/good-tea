@@ -83,18 +83,12 @@ public class TeaCupItem extends Item {
             if (item != null) {
                 tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup", item.getName()), item.getRarity(item.getDefaultStack()).formatting));
                 if (TeaCupBehavior.INSTANCE.hasTooltip(item)) {
-                    tooltip.add(TeaCupBehavior.INSTANCE.getTooltip(item));
+                    TeaCupBehavior.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
                 } else {
                     if (!TeaCupBehavior.INSTANCE.hasBehavior(item)) {
                         tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.nothing"), Formatting.GRAY));
                     } else
                         tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.something"), Formatting.GRAY));
-                }
-                if (item.equals(Items.POTION) || item.equals(Items.SPLASH_POTION)) {
-                    PotionUtil.buildTooltip(stack1, tooltip, 1.2F);
-                }
-                if (item.equals(Items.LINGERING_POTION)) {
-                    PotionUtil.buildTooltip(stack1, tooltip, 0.3125F);
                 }
             }
         }

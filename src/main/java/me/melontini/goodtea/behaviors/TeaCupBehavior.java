@@ -15,6 +15,7 @@ import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowerBlock;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -38,22 +39,24 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.commons.compress.utils.Lists;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class TeaCupBehavior {
     public static TeaCupBehavior INSTANCE = new TeaCupBehavior();
     Map<Item, Behavior> TEA_CUP_BEHAVIOR = new HashMap<>();
-    Map<Item, MutableText> TEA_CUP_TOOLTIP = new HashMap<>();
+    Map<Item, Tooltip> TEA_CUP_TOOLTIP = new HashMap<>();
 
     private TeaCupBehavior() {
     }
@@ -308,11 +311,11 @@ public class TeaCupBehavior {
     }
 
 
-    public MutableText getTooltip(ItemStack stack) {
+    public Tooltip getTooltip(ItemStack stack) {
         return getTooltip(stack.getItem());
     }
 
-    public MutableText getTooltip(Item item) {
+    public Tooltip getTooltip(Item item) {
         return TEA_CUP_TOOLTIP.get(item);
     }
 
@@ -332,9 +335,19 @@ public class TeaCupBehavior {
         return TEA_CUP_TOOLTIP.containsKey(item);
     }
 
-    public void addTooltip(Item item, MutableText text) {
+    public void addTooltip(Tooltip tooltip, Item... items) {
+        for (Item item : items) {
+            if (!TEA_CUP_TOOLTIP.containsKey(item)) {
+                TEA_CUP_TOOLTIP.putIfAbsent(item, tooltip);
+            } else {
+                LogUtil.error("Tried to add a tooltip for the same item twice! {}", item);
+            }
+        }
+    }
+
+    public void addTooltip(Item item, Tooltip tooltip) {
         if (!TEA_CUP_TOOLTIP.containsKey(item)) {
-            TEA_CUP_TOOLTIP.putIfAbsent(item, text);
+            TEA_CUP_TOOLTIP.putIfAbsent(item, tooltip);
         } else {
             LogUtil.error("Tried to add a tooltip for the same item twice! {}", item);
         }
@@ -343,19 +356,21 @@ public class TeaCupBehavior {
     public void addDefaultTooltips() {
         for (Item item : Registry.ITEM) {
             if (item instanceof MusicDiscItem discItem) {
-                addTooltip(item, TextUtil.applyFormatting((discItem.getDescription()), Formatting.GRAY));
+                addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting((discItem.getDescription()), Formatting.GRAY)));
             }
             if (item instanceof BlockItem blockItem) {
                 if (blockItem.getBlock() instanceof BedBlock) {
-                    addTooltip(item, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.bed-tea"), Formatting.GRAY, Formatting.ITALIC));
+                    addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.bed-tea"), Formatting.GRAY, Formatting.ITALIC)));
                 }
             }
         }
-        addTooltip(GoodTea.TEA_CUP, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.tea-cup-tea"), Formatting.GRAY, Formatting.ITALIC));
-        addTooltip(GoodTea.KETTLE_BLOCK_ITEM, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.tea-cup-tea"), Formatting.GRAY, Formatting.ITALIC));
-        addTooltip(Items.AXOLOTL_BUCKET, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.axolotl_tea"), Formatting.GRAY, Formatting.ITALIC));
-        addTooltip(Items.WHEAT, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"), Formatting.GRAY, Formatting.ITALIC));
-        addTooltip(Items.HAY_BLOCK, TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"), Formatting.GRAY, Formatting.ITALIC));
+        addTooltip(GoodTea.TEA_CUP, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.tea-cup-tea"), Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(GoodTea.KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.tea-cup-tea"), Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.axolotl_tea"), Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(Items.WHEAT, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"), Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(Items.HAY_BLOCK, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"), Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
+        addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
     }
 
     public void damageEntitiesHurtByWater(PotionEntity entity) {
@@ -379,5 +394,10 @@ public class TeaCupBehavior {
     @FunctionalInterface
     public interface Behavior {
         void run(LivingEntity entity, ItemStack stack);
+    }
+
+    @FunctionalInterface
+    public interface Tooltip {
+        void append(ItemStack stack, ItemStack teaStack, @Nullable World world, List<Text> tooltip, TooltipContext context);
     }
 }

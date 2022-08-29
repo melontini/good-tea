@@ -2,12 +2,10 @@ package me.melontini.goodtea.client.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.melontini.goodtea.screens.KettleScreenHandler;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -40,11 +38,5 @@ public class KettleScreen extends HandledScreen<KettleScreenHandler> {
 
         int a = this.handler.getTeaProgress();
         this.drawTexture(matrices, i + 79, j + 34, 176, 0, a + 1, 16);
-    }
-
-    @Override
-    protected void drawForeground(MatrixStack matrixStack, final int mouseX, final int mouseY) {
-        super.drawForeground(matrixStack, mouseX, mouseY);
-        itemRenderer.renderInGui(new ItemStack(Blocks.WATER), mouseX, mouseY);
     }
 }
