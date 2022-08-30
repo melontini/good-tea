@@ -125,16 +125,12 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
             stack.setNbt(nbt);
             if (this.time == -1) {
                 if ((!input.isEmpty() && !input.isOf(GoodTea.TEA_CUP_FILLED)) && !cup.isEmpty() && canCombine(stack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
-                    if (input.getItem().getRarity(input) == Rarity.COMMON) {
-                        this.time = 600;
-                    } else if (input.getItem().getRarity(input) == Rarity.UNCOMMON) {
-                        this.time = 750;
-                    } else if (input.getItem().getRarity(input) == Rarity.RARE) {
-                        this.time = 800;
-                    } else if (input.getItem().getRarity(input) == Rarity.EPIC) {
-                        this.time = 850;
-                    } else {
-                        this.time = 650;
+                    switch (input.getItem().getRarity(input)) {
+                        case COMMON -> this.time = 600;
+                        case UNCOMMON -> this.time = 750;
+                        case RARE -> this.time = 800;
+                        case EPIC -> this.time = 850;
+                        default -> this.time = 700;
                     }
                     update();
                 }
@@ -203,7 +199,6 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         assert world != null;
         var state = world.getBlockState(pos);
         world.updateListeners(pos, state, state, Block.NOTIFY_LISTENERS);
-        //LogUtil.info("Kettle Update");
     }
 
     private boolean canCombine(ItemStack input, ItemStack output) {
@@ -253,7 +248,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
             return false;
         } else if (slot == 1 && stack.isOf(GoodTea.TEA_CUP)) {
             return true;
-        } else return slot == 0;
+        } else return slot == 0 && !stack.isOf(GoodTea.TEA_CUP);
     }
 
     @Override

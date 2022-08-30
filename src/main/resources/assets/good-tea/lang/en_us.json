@@ -4,6 +4,8 @@
   "tooltip.good-tea.filled_cup.something": "This tea has some interesting properties",
 
   "gui.good-tea.kettle": "Kettle",
+  "gui.good-tea.water-level.title": "Water Level:",
+  "gui.good-tea.water-level": "%s / 81000",
 
   "block.good-tea.kettle": "Kettle",
 

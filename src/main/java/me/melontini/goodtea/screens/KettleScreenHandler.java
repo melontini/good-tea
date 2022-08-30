@@ -96,16 +96,15 @@ public class KettleScreenHandler extends ScreenHandler {
 
     public int getTeaProgress() {
         int i = this.propertyDelegate.get(0);
-        int j = 650;
+        int j;
         ItemStack input = this.inventory.getStack(0);
-        if (input.getItem().getRarity(input) == Rarity.COMMON) {
-            j = 600;
-        } else if (input.getItem().getRarity(input) == Rarity.UNCOMMON) {
-            j = 750;
-        } else if (input.getItem().getRarity(input) == Rarity.RARE) {
-            j = 800;
-        } else if (input.getItem().getRarity(input) == Rarity.EPIC) {
-            j = 850;
+        if (input == null) return 0;
+        switch (input.getItem().getRarity(input)) {
+            case COMMON -> j = 600;
+            case UNCOMMON -> j = 750;
+            case RARE -> j = 800;
+            case EPIC -> j = 850;
+            default -> j = 700;
         }
         return i > 0 ? 24 - (i * 24 / j) : 0;
     }
@@ -114,5 +113,9 @@ public class KettleScreenHandler extends ScreenHandler {
         int i = this.propertyDelegate.get(1);
         int j = 81000;
         return i > 0 ? i * 54 / j : 0;
+    }
+
+    public int getWaterLevelUnscaled() {
+        return this.propertyDelegate.get(1);
     }
 }

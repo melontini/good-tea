@@ -88,6 +88,7 @@ public class TeaCupBehavior {
                 addBehavior(item, (entity, stack) -> {
                     entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 3.0F);
                     entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
+                    ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
                 });
             }
             if (item instanceof MusicDiscItem musicDiscItem) {
@@ -108,6 +109,11 @@ public class TeaCupBehavior {
                 }
             }
         }
+        /*addBehavior(item, (entity, stack) -> {
+            float f = blockItem.getBlock().getHardness();
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, (int) (100 * f), 0));
+            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, (int) (100 * (f * 1.2)), 0));
+        });*/
         addBehavior(Items.ENCHANTED_GOLDEN_APPLE, (entity, stack) -> {
             entity.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0));
             entity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 8000, 0));
