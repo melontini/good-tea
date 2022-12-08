@@ -1,5 +1,7 @@
 package me.melontini.goodtea.blocks.entity;
 
+import me.melontini.crackerutil.data.NBTUtil;
+import me.melontini.crackerutil.data.NbtBuilder;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.KettleBlockBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -42,6 +44,7 @@ import java.util.Random;
 
 @SuppressWarnings("UnstableApiUsage")
 public class KettleBlockEntity extends BlockEntity implements SidedInventory, NamedScreenHandlerFactory {
+    private static final Text KETTLE_GUI_KEY = Text.translatable("gui.good-tea.kettle");
 
     public final SingleVariantStorage<FluidVariant> waterStorage = new SingleVariantStorage<>() {
         @Override
@@ -118,11 +121,9 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
             ItemStack stack = new ItemStack(GoodTea.TEA_CUP_FILLED);
             ItemStack teaStack = input.copy();
             teaStack.setCount(1);
-            NbtCompound nbt = new NbtCompound();
-            NbtCompound nbt2 = new NbtCompound();
-            teaStack.writeNbt(nbt2);
-            nbt.put("GT-TeaItem", nbt2);
-            stack.setNbt(nbt);
+            stack.setNbt(NbtBuilder.create()
+                    .put("GT-TeaItem", teaStack.writeNbt(new NbtCompound()))
+                    .build());
             if (this.time == -1) {
                 if ((!input.isEmpty() && !input.isOf(GoodTea.TEA_CUP_FILLED)) && !cup.isEmpty() && canCombine(stack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
                     switch (input.getItem().getRarity(input)) {
@@ -213,7 +214,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         this.time = nbt.getInt("Time");
         waterStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
         waterStorage.amount = nbt.getLong("amount");
-        Inventories.readNbt(nbt, this.inventory);
+        NBTUtil.readInventoryFromNbt(nbt, this);
     }
 
     @Override
@@ -222,7 +223,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         nbt.putInt("Time", this.time);
         nbt.put("fluidVariant", waterStorage.variant.toNbt());
         nbt.putLong("amount", waterStorage.amount);
-        Inventories.writeNbt(nbt, this.inventory);
+        NBTUtil.writeInventoryToNbt(nbt, this);
     }
 
     @Nullable
@@ -306,7 +307,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
     @Override
     public Text getDisplayName() {
-        return TextUtil.createTranslatable("gui.good-tea.kettle");
+        return KETTLE_GUI_KEY;
     }
 
     @Nullable

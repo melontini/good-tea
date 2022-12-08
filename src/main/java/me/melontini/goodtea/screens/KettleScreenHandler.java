@@ -11,10 +11,12 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Rarity;
+import net.minecraft.world.World;
 
 public class KettleScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final PropertyDelegate propertyDelegate;
+    private final World world;
 
     public KettleScreenHandler(int syncId, PlayerInventory playerInventory) {
         this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(2));
@@ -22,6 +24,7 @@ public class KettleScreenHandler extends ScreenHandler {
 
     public KettleScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
         super(GoodTea.KETTLE_SCREEN_HANDLER, syncId);
+        this.world = playerInventory.player.world;
         this.inventory = inventory;
         this.propertyDelegate = propertyDelegate;
         this.addProperties(propertyDelegate);
@@ -94,7 +97,7 @@ public class KettleScreenHandler extends ScreenHandler {
         return this.inventory.canPlayerUse(player);
     }
 
-    public int getTeaProgress() {
+    public float getTeaProgress() {
         int i = this.propertyDelegate.get(0);
         int j;
         ItemStack input = this.inventory.getStack(0);
@@ -106,13 +109,13 @@ public class KettleScreenHandler extends ScreenHandler {
             case EPIC -> j = 850;
             default -> j = 700;
         }
-        return i > 0 ? 24 - (i * 24 / j) : 0;
+        return i > 0 ? 24 - (i * 24f / j) : 0;
     }
 
-    public int getWaterLevel() {
+    public float getWaterLevel() {
         int i = this.propertyDelegate.get(1);
         int j = 81000;
-        return i > 0 ? i * 54 / j : 0;
+        return i > 0 ? i * 54f / j : 0;
     }
 
     public int getWaterLevelUnscaled() {

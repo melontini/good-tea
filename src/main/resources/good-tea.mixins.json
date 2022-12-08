@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BucketItemAccessor",
+    "GoatHornItemAccessor",
     "PotionEntityAccessor",
     "SpongeBlockAccessor",
     "screenhandler_tea.CraftingScreenHandlerMixin",

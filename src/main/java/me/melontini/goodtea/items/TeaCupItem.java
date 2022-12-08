@@ -1,5 +1,6 @@
 package me.melontini.goodtea.items;
 
+import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.TeaCupBehavior;
 import me.melontini.goodtea.util.TextUtil;
@@ -38,6 +39,7 @@ public class TeaCupItem extends Item {
     }
 
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        MakeSure.notNulls(stack, world);
         PlayerEntity player = user instanceof PlayerEntity ? (PlayerEntity) user : null;
         if (player instanceof ServerPlayerEntity) {
             Criteria.CONSUME_ITEM.trigger((ServerPlayerEntity) player, stack);
@@ -47,7 +49,7 @@ public class TeaCupItem extends Item {
             NbtCompound nbt = stack.getNbt();
             ItemStack stack1 = getStackFromNbt(nbt);
             if (stack1 != null) {
-                TeaCupBehavior.INSTANCE.getBehavior(stack1).run(player, stack1);
+                TeaCupBehavior.INSTANCE.getBehavior(stack1).run(user, stack1);
             }
         }
 
@@ -76,6 +78,7 @@ public class TeaCupItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        MakeSure.notNulls(stack, world);
         NbtCompound nbt = stack.getNbt();
         ItemStack stack1 = getStackFromNbt(nbt);
         if (stack1 != null) {
