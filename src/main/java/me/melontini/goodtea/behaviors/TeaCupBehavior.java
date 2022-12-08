@@ -1,15 +1,16 @@
 package me.melontini.goodtea.behaviors;
 
+import me.melontini.crackerutil.CrackerLog;
+import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
 import me.melontini.goodtea.ducks.DivineAccess;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
 import me.melontini.goodtea.mixin.BucketItemAccessor;
+import me.melontini.goodtea.mixin.GoatHornItemAccessor;
 import me.melontini.goodtea.mixin.PotionEntityAccessor;
 import me.melontini.goodtea.mixin.SpongeBlockAccessor;
 import me.melontini.goodtea.util.JavaRandomUtil;
-import me.melontini.goodtea.util.LogUtil;
-import me.melontini.goodtea.util.MinecraftItems;
 import me.melontini.goodtea.util.TextUtil;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
@@ -36,8 +37,10 @@ import net.minecraft.potion.Potions;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -45,8 +48,10 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
+import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
@@ -88,6 +93,7 @@ public class TeaCupBehavior {
                 addBehavior(item, (entity, stack) -> {
                     entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 3.0F);
                     entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
+                    stack.damage(4, entity.world.random, entity instanceof ServerPlayerEntity player ? player :null);
                     ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
                 });
             }
@@ -275,13 +281,19 @@ public class TeaCupBehavior {
             entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.AMBIENT, 1.0f, 1.0f);
         });
 
-        /*addBehavior(Items.DIRT, (entity, stack) -> {
-            entity.world.getServer().getCommandManager().execute(new ServerCommandSource(CommandOutput.DUMMY, entity.getPos(), new Vec2f(entity.getPitch(), entity.getYaw()), (ServerWorld) entity.world, 3, "idk", TextUtil.createTranslatable("dummy.text"), entity.world.getServer(), entity), "kill @s");
-        });*/
+        addBehavior(Items.OCHRE_FROGLIGHT, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)));
+        addBehavior(Items.PEARLESCENT_FROGLIGHT, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)));
+        addBehavior(Items.VERDANT_FROGLIGHT, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)));
 
-        MinecraftItems.OCHRE_FROGLIGHT.ifPresent(item -> addBehavior(item, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0))));
-        MinecraftItems.PEARLESCENT_FROGLIGHT.ifPresent(item -> addBehavior(item, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0))));
-        MinecraftItems.VERDANT_FROGLIGHT.ifPresent(item -> addBehavior(item, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0))));
+        addBehavior(Items.GOAT_HORN, (entity, stack) -> {
+            ((GoatHornItemAccessor) Items.GOAT_HORN).getInstrument(stack).ifPresent(registryEntry -> {
+                Instrument instrument = (Instrument) ((RegistryEntry<?>) registryEntry).value();
+                SoundEvent soundEvent = instrument.soundEvent();
+                float f = instrument.range() / 16.0F;
+                entity.world.playSoundFromEntity(null, entity, soundEvent, SoundCategory.RECORDS, f, 1.0F);
+                entity.world.emitGameEvent(GameEvent.INSTRUMENT_PLAY, entity.getPos(), GameEvent.Emitter.of(entity));
+            });
+        });
     }
 
     public Behavior getBehavior(ItemStack stack) {
@@ -309,10 +321,11 @@ public class TeaCupBehavior {
     }
 
     public void addBehavior(Item item, Behavior behavior) {
+        MakeSure.notNulls(item, behavior);
         if (!TEA_CUP_BEHAVIOR.containsKey(item)) {
             TEA_CUP_BEHAVIOR.putIfAbsent(item, behavior);
         } else {
-            LogUtil.error("Tried to add behaviour for the same item twice! {}", item);
+            CrackerLog.error("Tried to add behaviour for the same item twice! {}", item);
         }
     }
 
@@ -342,20 +355,22 @@ public class TeaCupBehavior {
     }
 
     public void addTooltip(Tooltip tooltip, Item... items) {
+        MakeSure.notNull(tooltip);
         for (Item item : items) {
             if (!TEA_CUP_TOOLTIP.containsKey(item)) {
                 TEA_CUP_TOOLTIP.putIfAbsent(item, tooltip);
             } else {
-                LogUtil.error("Tried to add a tooltip for the same item twice! {}", item);
+                CrackerLog.error("Tried to add a tooltip for the same item twice! {}", item);
             }
         }
     }
 
     public void addTooltip(Item item, Tooltip tooltip) {
+        MakeSure.notNull(tooltip);
         if (!TEA_CUP_TOOLTIP.containsKey(item)) {
             TEA_CUP_TOOLTIP.putIfAbsent(item, tooltip);
         } else {
-            LogUtil.error("Tried to add a tooltip for the same item twice! {}", item);
+            CrackerLog.error("Tried to add a tooltip for the same item twice! {}", item);
         }
     }
 
