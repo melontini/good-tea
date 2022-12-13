@@ -10,8 +10,9 @@ import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Rarity;
 import net.minecraft.world.World;
+
+import static me.melontini.goodtea.util.GoodTeaStuff.TEA_CUP;
 
 public class KettleScreenHandler extends ScreenHandler {
     private final Inventory inventory;
@@ -57,11 +58,11 @@ public class KettleScreenHandler extends ScreenHandler {
 
                 slot.onQuickTransfer(itemStack2, itemStack);
             } else if (index != 1 && index != 0) {
-                if (!itemStack2.isOf(GoodTea.TEA_CUP)) {
+                if (!itemStack2.isOf(TEA_CUP)) {
                     if (!this.insertItem(itemStack2, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (itemStack2.isOf(GoodTea.TEA_CUP)) {
+                } else if (itemStack2.isOf(TEA_CUP)) {
                     if (!this.insertItem(itemStack2, 1, 2, false)) {
                         return ItemStack.EMPTY;
                     }

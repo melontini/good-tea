@@ -23,6 +23,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
+import static me.melontini.goodtea.util.GoodTeaStuff.TEA_CUP;
+
 public class TeaCupItem extends Item {
     private static final Text NOTHING_TEXT = Text.translatable("tooltip.good-tea.filled_cup.nothing").formatted(Formatting.GRAY);
 
@@ -62,11 +64,11 @@ public class TeaCupItem extends Item {
 
         if (player == null || !player.getAbilities().creativeMode) {
             if (stack.isEmpty()) {
-                return new ItemStack(GoodTea.TEA_CUP);
+                return new ItemStack(TEA_CUP);
             }
 
             if (player != null) {
-                player.getInventory().offerOrDrop(new ItemStack(GoodTea.TEA_CUP));
+                player.getInventory().offerOrDrop(new ItemStack(TEA_CUP));
             }
         }
 

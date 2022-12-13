@@ -2,7 +2,6 @@ package me.melontini.goodtea.behaviors;
 
 import me.melontini.crackerutil.CrackerLog;
 import me.melontini.crackerutil.util.MakeSure;
-import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
 import me.melontini.goodtea.ducks.DivineAccess;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
@@ -56,6 +55,8 @@ import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
 public class TeaCupBehavior {
     public static TeaCupBehavior INSTANCE = new TeaCupBehavior();
@@ -178,8 +179,8 @@ public class TeaCupBehavior {
 
         addBehavior(Items.OBSIDIAN, (entity, stack) -> {
             var instance = Objects.requireNonNull(entity.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
-            if (!instance.hasModifier(GoodTea.OBSIDIAN_TOUGHNESS)) {
-                instance.addPersistentModifier(GoodTea.OBSIDIAN_TOUGHNESS);
+            if (!instance.hasModifier(OBSIDIAN_TOUGHNESS)) {
+                instance.addPersistentModifier(OBSIDIAN_TOUGHNESS);
                 if (entity instanceof PlayerEntity player)
                     player.sendMessage(Text.translatable("text.good-tea.obsidian_toughness"), true);
             }
@@ -187,8 +188,8 @@ public class TeaCupBehavior {
 
         addBehavior(Items.RABBIT_FOOT, (entity, stack) -> {
             var instance = Objects.requireNonNull(entity.getAttributeInstance(EntityAttributes.GENERIC_LUCK));
-            if (!instance.hasModifier(GoodTea.RABBITS_LUCK)) {
-                instance.addPersistentModifier(GoodTea.RABBITS_LUCK);
+            if (!instance.hasModifier(RABBITS_LUCK)) {
+                instance.addPersistentModifier(RABBITS_LUCK);
                 if (entity instanceof PlayerEntity player)
                     player.sendMessage(Text.translatable("text.good-tea.rabbits_luck"), true);
             }
@@ -384,8 +385,8 @@ public class TeaCupBehavior {
                 }
             }
         }
-        addTooltip(GoodTea.TEA_CUP, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(GoodTea.KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(TEA_CUP, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip(Items.WHEAT, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip(Items.HAY_BLOCK, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
