@@ -1,7 +1,6 @@
 package me.melontini.goodtea.mixin.totem_tea;
 
 import me.melontini.goodtea.ducks.DivineAccess;
-import me.melontini.goodtea.util.TextUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -9,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,7 +32,7 @@ public abstract class LivingEntityMixin extends Entity implements DivineAccess {
         if (this.good_tea$isDivine()) {
             this.good_tea$setDivine(false);
             if ((LivingEntity) (Object) this instanceof PlayerEntity player) {
-                player.sendMessage(TextUtil.createTranslatable("text.good-tea.used_divine"), true);
+                player.sendMessage(Text.translatable("text.good-tea.used_divine"), true);
             }
             return new ItemStack(Items.TOTEM_OF_UNDYING);
         }

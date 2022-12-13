@@ -3,7 +3,6 @@ package me.melontini.goodtea.items;
 import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.TeaCupBehavior;
-import me.melontini.goodtea.util.TextUtil;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -11,9 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
@@ -27,6 +24,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class TeaCupItem extends Item {
+    private static final Text NOTHING_TEXT = Text.translatable("tooltip.good-tea.filled_cup.nothing").formatted(Formatting.GRAY);
+
+    private static final Text SOMETHING_TEXT = Text.translatable("tooltip.good-tea.filled_cup.something").formatted(Formatting.GRAY);
     public TeaCupItem(Settings settings) {
         super(settings);
     }
@@ -84,14 +84,14 @@ public class TeaCupItem extends Item {
         if (stack1 != null) {
             Item item = stack1.getItem();
             if (item != null) {
-                tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup", item.getName()), item.getRarity(item.getDefaultStack()).formatting));
+                tooltip.add(Text.translatable("tooltip.good-tea.filled_cup", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
                 if (TeaCupBehavior.INSTANCE.hasTooltip(item)) {
                     TeaCupBehavior.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
                 } else {
                     if (!TeaCupBehavior.INSTANCE.hasBehavior(item)) {
-                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.nothing"), Formatting.GRAY));
+                        tooltip.add(NOTHING_TEXT);
                     } else
-                        tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tooltip.good-tea.filled_cup.something"), Formatting.GRAY));
+                        tooltip.add(SOMETHING_TEXT);
                 }
             }
         }

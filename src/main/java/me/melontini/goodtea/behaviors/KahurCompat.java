@@ -30,13 +30,14 @@ public class KahurCompat {
                     }
                 }
             } else if (hitResult.getType() == HitResult.Type.BLOCK){
+                Vec3d pos = hitResult.getPos();
                 List<LivingEntity> livingEntities = kahurShotEntity.world.getEntitiesByClass(LivingEntity.class, new Box(((BlockHitResult)hitResult).getBlockPos()).expand(0.5), LivingEntity::isAlive);
-                NbtCompound nbt = itemStack.getNbt();
-                ItemStack stack1 = TeaCupItem.getStackFromNbt(nbt);
-
-                if (stack1 != null) {
-                    for (LivingEntity livingEntity : livingEntities) {
-                        TeaCupBehavior.INSTANCE.getBehavior(stack1).run(livingEntity, stack1);
+                Optional<LivingEntity> winner = livingEntities.stream().min(Comparator.comparingDouble(livingEntity -> livingEntity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())));
+                if (winner.isPresent()) {
+                    NbtCompound nbt = itemStack.getNbt();
+                    ItemStack stack1 = TeaCupItem.getStackFromNbt(nbt);
+                    if (stack1 != null) {
+                        TeaCupBehavior.INSTANCE.getBehavior(stack1).run(winner.get(), stack1);
                     }
                 }
             }
