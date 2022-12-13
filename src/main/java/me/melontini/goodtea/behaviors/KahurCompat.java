@@ -1,7 +1,6 @@
 package me.melontini.goodtea.behaviors;
 
 import com.unascribed.kahur.api.KahurImpactBehavior;
-import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.goodtea.items.TeaCupItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -16,7 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static me.melontini.goodtea.GoodTea.TEA_CUP_FILLED;
+import static me.melontini.goodtea.util.GoodTeaStuff.TEA_CUP_FILLED;
 
 public class KahurCompat {
     public static void register() {

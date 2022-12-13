@@ -9,11 +9,13 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 
+import static me.melontini.goodtea.util.GoodTeaStuff.KETTLE_BLOCK;
+
 @Environment(EnvType.CLIENT)
 public class GoodTeaClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), GoodTea.KETTLE_BLOCK);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), KETTLE_BLOCK);
         HandledScreens.register(GoodTea.KETTLE_SCREEN_HANDLER, KettleScreen::new);
     }
 }

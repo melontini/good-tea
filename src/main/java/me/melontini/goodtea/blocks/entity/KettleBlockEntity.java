@@ -2,7 +2,6 @@ package me.melontini.goodtea.blocks.entity;
 
 import me.melontini.crackerutil.data.NBTUtil;
 import me.melontini.crackerutil.data.NbtBuilder;
-import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.KettleBlockBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.screens.KettleScreenHandler;
@@ -39,6 +38,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+
+import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class KettleBlockEntity extends BlockEntity implements SidedInventory, NamedScreenHandlerFactory {
@@ -88,7 +89,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     protected DefaultedList<ItemStack> inventory = DefaultedList.ofSize(3, ItemStack.EMPTY);
 
     public KettleBlockEntity(BlockPos pos, BlockState state) {
-        super(GoodTea.KETTLE_BLOCK_ENTITY, pos, state);
+        super(KETTLE_BLOCK_ENTITY, pos, state);
     }
 
     @SuppressWarnings("unused")
@@ -111,19 +112,19 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                         tickTime();
                     }
                 }
-            } else if (state.isIn(GoodTea.HOT_BLOCKS)) {
+            } else if (state.isIn(HOT_BLOCKS)) {
                 tickTime();
             }
         }
         if (!world.isClient) {
-            ItemStack stack = new ItemStack(GoodTea.TEA_CUP_FILLED);
+            ItemStack stack = new ItemStack(TEA_CUP_FILLED);
             ItemStack teaStack = input.copy();
             teaStack.setCount(1);
             stack.setNbt(NbtBuilder.create()
                     .put("GT-TeaItem", teaStack.writeNbt(new NbtCompound()))
                     .build());
             if (this.time == -1) {
-                if ((!input.isEmpty() && !input.isOf(GoodTea.TEA_CUP_FILLED)) && !cup.isEmpty() && canCombine(stack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
+                if ((!input.isEmpty() && !input.isOf(TEA_CUP_FILLED)) && !cup.isEmpty() && canCombine(stack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
                     switch (input.getItem().getRarity(input)) {
                         case COMMON -> this.time = 600;
                         case UNCOMMON -> this.time = 750;
@@ -136,7 +137,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
             }
 
             if (this.time != -1) {
-                if (input.isEmpty() || input.isOf(GoodTea.TEA_CUP_FILLED)) {
+                if (input.isEmpty() || input.isOf(TEA_CUP_FILLED)) {
                     this.time = -1;
                     update();
                 } else if (cup.isEmpty()) {
@@ -245,9 +246,9 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         if (slot == 2) {
             return false;
-        } else if (slot == 1 && stack.isOf(GoodTea.TEA_CUP)) {
+        } else if (slot == 1 && stack.isOf(TEA_CUP)) {
             return true;
-        } else return slot == 0 && !stack.isOf(GoodTea.TEA_CUP);
+        } else return slot == 0 && !stack.isOf(TEA_CUP);
     }
 
     @Override

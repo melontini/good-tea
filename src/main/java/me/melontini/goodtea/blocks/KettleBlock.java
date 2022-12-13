@@ -30,6 +30,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
+import static me.melontini.goodtea.util.GoodTeaStuff.KETTLE_BLOCK_ENTITY;
+import static me.melontini.goodtea.util.GoodTeaStuff.SHOW_SUPPORT;
+
 @SuppressWarnings({"UnstableApiUsage", "deprecation"})
 public class KettleBlock extends BlockWithEntity {
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
@@ -52,7 +55,7 @@ public class KettleBlock extends BlockWithEntity {
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, GoodTea.KETTLE_BLOCK_ENTITY, KettleBlockEntity::tick);
+        return checkType(type, KETTLE_BLOCK_ENTITY, KettleBlockEntity::tick);
     }
 
     @Override
@@ -96,7 +99,7 @@ public class KettleBlock extends BlockWithEntity {
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         BlockState state = ctx.getWorld().getBlockState(ctx.getBlockPos().down());
-        if (state.isIn(GoodTea.SHOW_SUPPORT)) {
+        if (state.isIn(SHOW_SUPPORT)) {
             return this.getDefaultState().with(FACING, ctx.getPlayerFacing()).with(SUPPORT, true);
         }
         return this.getDefaultState().with(FACING, ctx.getPlayerFacing()).with(SUPPORT, false);
@@ -105,7 +108,7 @@ public class KettleBlock extends BlockWithEntity {
     @Override //I guess?
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         if (direction == Direction.DOWN) {
-            return state.with(SUPPORT, neighborState.isIn(GoodTea.SHOW_SUPPORT));
+            return state.with(SUPPORT, neighborState.isIn(SHOW_SUPPORT));
         }
         return state;
     }
