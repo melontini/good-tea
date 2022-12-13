@@ -3,7 +3,6 @@ package me.melontini.goodtea.client.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.melontini.crackerutil.client.util.DrawUtil;
 import me.melontini.goodtea.screens.KettleScreenHandler;
-import me.melontini.goodtea.util.TextUtil;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -17,6 +16,8 @@ import java.util.List;
 import static me.melontini.goodtea.GoodTea.MODID;
 
 public class KettleScreen extends HandledScreen<KettleScreenHandler> {
+
+    private static final Text WATER_LEVEL = Text.translatable("gui.good-tea.water-level.title");
     private final Identifier BACKGROUND_TEXTURE = new Identifier(MODID, "textures/gui/kettle_screen.png");
 
     public KettleScreen(KettleScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -45,7 +46,7 @@ public class KettleScreen extends HandledScreen<KettleScreenHandler> {
         DrawUtil.drawTexture(matrices, i + 79, j + 34, getZOffset(), 176, 0, a + 1, 16);
 
         if ((mouseX <= i + 7 + 18 && mouseX >= i + 7) && (mouseY <= j + 16 + 54 && mouseY >= j + 16)) {
-            List<Text> text = List.of(TextUtil.createTranslatable("gui.good-tea.water-level.title"), TextUtil.applyFormatting(TextUtil.createTranslatable("gui.good-tea.water-level", this.handler.getWaterLevelUnscaled()), Formatting.GRAY));
+            List<Text> text = List.of(WATER_LEVEL, Text.translatable("gui.good-tea.water-level", this.handler.getWaterLevelUnscaled()).formatted(Formatting.GRAY));
             renderTooltip(matrices, text, mouseX, mouseY);
         }
     }

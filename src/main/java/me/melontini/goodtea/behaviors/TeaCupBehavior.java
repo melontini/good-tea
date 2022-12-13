@@ -11,7 +11,6 @@ import me.melontini.goodtea.mixin.GoatHornItemAccessor;
 import me.melontini.goodtea.mixin.PotionEntityAccessor;
 import me.melontini.goodtea.mixin.SpongeBlockAccessor;
 import me.melontini.goodtea.util.JavaRandomUtil;
-import me.melontini.goodtea.util.TextUtil;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -60,8 +59,8 @@ import java.util.*;
 
 public class TeaCupBehavior {
     public static TeaCupBehavior INSTANCE = new TeaCupBehavior();
-    Map<Item, Behavior> TEA_CUP_BEHAVIOR = new HashMap<>();
-    Map<Item, Tooltip> TEA_CUP_TOOLTIP = new HashMap<>();
+    public Map<Item, Behavior> TEA_CUP_BEHAVIOR = new HashMap<>();
+    public Map<Item, Tooltip> TEA_CUP_TOOLTIP = new HashMap<>();
 
     private TeaCupBehavior() {
     }
@@ -93,7 +92,7 @@ public class TeaCupBehavior {
                 addBehavior(item, (entity, stack) -> {
                     entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 3.0F);
                     entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
-                    stack.damage(4, entity.world.random, entity instanceof ServerPlayerEntity player ? player :null);
+                    stack.damage(4, entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
                     ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
                 });
             }
@@ -182,7 +181,7 @@ public class TeaCupBehavior {
             if (!instance.hasModifier(GoodTea.OBSIDIAN_TOUGHNESS)) {
                 instance.addPersistentModifier(GoodTea.OBSIDIAN_TOUGHNESS);
                 if (entity instanceof PlayerEntity player)
-                    player.sendMessage(TextUtil.createTranslatable("text.good-tea.obsidian_toughness"), true);
+                    player.sendMessage(Text.translatable("text.good-tea.obsidian_toughness"), true);
             }
         });
 
@@ -191,7 +190,7 @@ public class TeaCupBehavior {
             if (!instance.hasModifier(GoodTea.RABBITS_LUCK)) {
                 instance.addPersistentModifier(GoodTea.RABBITS_LUCK);
                 if (entity instanceof PlayerEntity player)
-                    player.sendMessage(TextUtil.createTranslatable("text.good-tea.rabbits_luck"), true);
+                    player.sendMessage(Text.translatable("text.good-tea.rabbits_luck"), true);
             }
         });
 
@@ -262,13 +261,13 @@ public class TeaCupBehavior {
         addBehavior(Items.WARPED_FUNGUS, (entity, stack) -> {
             ((HoglinRepellentAccess) entity).good_tea$makeHoglinRepellent(2400);
             if (entity instanceof PlayerEntity player)
-                player.sendMessage(TextUtil.createTranslatable("text.good-tea.hoglin_repellent"), true);
+                player.sendMessage(Text.translatable("text.good-tea.hoglin_repellent"), true);
         });
 
         addBehavior(Items.CRAFTING_TABLE, (entity, stack) -> {
             if (entity instanceof PlayerEntity player) {
                 ((CraftingScreenAllowanceAccess) entity).good_tea$setAllowed(true);
-                player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, entity1) -> new CraftingScreenHandler(syncId, inv, ScreenHandlerContext.create(entity.world, entity.getBlockPos())), TextUtil.createTranslatable("container.crafting")));
+                player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, entity1) -> new CraftingScreenHandler(syncId, inv, ScreenHandlerContext.create(entity.world, entity.getBlockPos())), Text.translatable("container.crafting")));
             }
         });
 
@@ -277,7 +276,7 @@ public class TeaCupBehavior {
         addBehavior(Items.TOTEM_OF_UNDYING, (entity, stack) -> {
             ((DivineAccess) entity).good_tea$setDivine(true);
             if (entity instanceof PlayerEntity player)
-                player.sendMessage(TextUtil.createTranslatable("text.good-tea.divine"), true);
+                player.sendMessage(Text.translatable("text.good-tea.divine"), true);
             entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.AMBIENT, 1.0f, 1.0f);
         });
 
@@ -377,19 +376,19 @@ public class TeaCupBehavior {
     public void addDefaultTooltips() {
         for (Item item : Registry.ITEM) {
             if (item instanceof MusicDiscItem discItem) {
-                addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting((discItem.getDescription()), Formatting.GRAY)));
+                addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(discItem.getDescription().formatted(Formatting.GRAY)));
             }
             if (item instanceof BlockItem blockItem) {
                 if (blockItem.getBlock() instanceof BedBlock) {
-                    addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.bed-tea"), Formatting.GRAY, Formatting.ITALIC)));
+                    addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.bed-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
                 }
             }
         }
-        addTooltip(GoodTea.TEA_CUP, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.tea-cup-tea"), Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(GoodTea.KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.tea-cup-tea"), Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.axolotl_tea"), Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(Items.WHEAT, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"), Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(Items.HAY_BLOCK, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.applyFormatting(TextUtil.createTranslatable("tea-tooltip.good-tea.wheat_tea"), Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(GoodTea.TEA_CUP, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(GoodTea.KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(Items.WHEAT, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(Items.HAY_BLOCK, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
         addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
     }
