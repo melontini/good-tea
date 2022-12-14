@@ -14,7 +14,7 @@ import java.util.Optional;
 public class KettleBlockBehaviour {
     public static KettleBlockBehaviour INSTANCE = new KettleBlockBehaviour();
 
-    Map<Block, Map<Property<?>, ?>> HOT_BLOCKS_WITH_STATE = new HashMap<>();
+    public final Map<Block, Map<Property<?>, ?>> HOT_BLOCKS_WITH_STATE = new HashMap<>();
 
     public void addDefaultBlocks() {
         addBlockWithProperties(Blocks.CAMPFIRE, Map.of(CampfireBlock.LIT, true));

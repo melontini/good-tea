@@ -1,4 +1,6 @@
 {
+  "itemGroup.good_tea_item_group": "Good Tea",
+
   "tooltip.good-tea.filled_cup": "Made from: %s",
   "tooltip.good-tea.filled_cup.nothing": "This tea has no interesting properties",
   "tooltip.good-tea.filled_cup.something": "This tea has some interesting properties",
