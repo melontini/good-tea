@@ -2,6 +2,7 @@ package me.melontini.goodtea.behaviors;
 
 import me.melontini.crackerutil.CrackerLog;
 import me.melontini.crackerutil.util.MakeSure;
+import me.melontini.crackerutil.util.MathStuff;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
 import me.melontini.goodtea.ducks.DivineAccess;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
@@ -91,9 +92,9 @@ public class TeaCupBehavior {
             }
             if (item instanceof SwordItem swordItem) {
                 addBehavior(item, (entity, stack) -> {
-                    entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 3.0F);
+                    entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage());
                     entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
-                    stack.damage(4, entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
+                    stack.damage(MathStuff.fastCeil(swordItem.getAttackDamage() * 3.0F), entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
                     ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
                 });
             }

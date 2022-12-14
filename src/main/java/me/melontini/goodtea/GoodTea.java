@@ -3,6 +3,7 @@ package me.melontini.goodtea;
 import me.melontini.crackerutil.client.util.DrawUtil;
 import me.melontini.crackerutil.data.NbtBuilder;
 import me.melontini.crackerutil.interfaces.AnimatedItemGroup;
+import me.melontini.crackerutil.util.MathStuff;
 import me.melontini.goodtea.behaviors.KahurCompat;
 import me.melontini.goodtea.behaviors.KettleBlockBehaviour;
 import me.melontini.goodtea.behaviors.TeaCupBehavior;
@@ -18,6 +19,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
@@ -25,6 +27,10 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
@@ -51,6 +57,7 @@ public class GoodTea implements ModInitializer {
 
         public final ItemStack KETTLE = KETTLE_BLOCK_ITEM.getDefaultStack();
         public final ItemStack CUP = TEA_CUP.getDefaultStack();
+        private final DefaultedList<ItemStack> EMPTY_LIST = DefaultedList.ofSize(9, ItemStack.EMPTY);
         float angle = 45f, lerpPoint = 0;
 
         public GoodTeaGroup(int index, String id) {
@@ -99,13 +106,45 @@ public class GoodTea implements ModInitializer {
 
         @Override
         public void appendStacks(DefaultedList<ItemStack> stacks) {
-            for (Item item : TeaCupBehavior.INSTANCE.TEA_CUP_BEHAVIOR.keySet()) {
-                var cup = new ItemStack(TEA_CUP_FILLED);
-                var stack = new ItemStack(item);
-                cup.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
-                stacks.add(cup);
+            List<ItemStack> teaStartedPack = new ArrayList<>();
+            teaStartedPack.add(KETTLE);
+            teaStartedPack.add(CUP);
+
+            teaStartedPack.add(ItemStack.EMPTY);
+
+            teaStartedPack.add(Items.CAMPFIRE.getDefaultStack());
+            teaStartedPack.add(Items.SOUL_CAMPFIRE.getDefaultStack());
+            teaStartedPack.add(Items.LAVA_BUCKET.getDefaultStack());
+            appendStacks(stacks, teaStartedPack);
+
+            var help = DefaultedList.<ItemStack>of();
+            var list = TeaCupBehavior.INSTANCE.TEA_CUP_BEHAVIOR.keySet().stream().sorted(Comparator.comparing(Registry.ITEM::getId)).toList();
+            for (Item item : list) {
+                item.appendStacks(SEARCH, help);
+
+                for (ItemStack stack : help) {
+                    var cup = new ItemStack(TEA_CUP_FILLED);
+                    cup.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
+                    stacks.add(cup);
+                    stacks.add(stack);
+                    stacks.add(ItemStack.EMPTY);
+                }
+                help.clear();
             }
-            super.appendStacks(stacks);
+        }
+
+        private void appendStacks(DefaultedList<ItemStack> stacks, List<ItemStack> list) {
+            if (list.isEmpty()) return; //we shouldn't add line breaks if there are no items.
+
+            int rows = MathStuff.fastCeil(list.size() / 9d);
+            stacks.addAll(list);
+            int left = (rows * 9) - list.size();
+            for (int i = 0; i < left; i++) {
+                stacks.add(ItemStack.EMPTY); //fill the gaps
+            }
+            stacks.addAll(EMPTY_LIST); //line break
         }
     }
+
+
 }
