@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "U": {
+      "item": "minecraft:cauldron"
+    },
+    "B": {
+      "item": "minecraft:bucket"
+    }
+  },
+  "pattern": [
+    " C ",
+    "CUC",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "item": "good-tea:kettle"
+  }
+}
