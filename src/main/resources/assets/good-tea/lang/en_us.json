@@ -1,9 +1,9 @@
 {
   "itemGroup.good_tea_item_group": "Good Tea",
 
-  "tooltip.good-tea.filled_cup": "Made from: %s",
-  "tooltip.good-tea.filled_cup.nothing": "This tea has no interesting properties",
-  "tooltip.good-tea.filled_cup.something": "This tea has some interesting properties",
+  "tooltip.good-tea.filled_mug": "Made from: %s",
+  "tooltip.good-tea.filled_mug.nothing": "This tea has no interesting properties",
+  "tooltip.good-tea.filled_mug.something": "This tea has some interesting properties",
 
   "gui.good-tea.kettle": "Kettle",
   "gui.good-tea.water-level.title": "Water Level:",
@@ -17,10 +17,10 @@
   "text.good-tea.divine": "You feel Totem's divine energy running through your body.",
   "text.good-tea.used_divine": "Totem's divine energy has left your body",
 
-  "item.good-tea.filled_cup": "Cup of Tea",
-  "item.good-tea.cup": "Empty Cup",
+  "item.good-tea.filled_mug": "Mug of Tea",
+  "item.good-tea.mug": "Empty Mug",
 
-  "tea-tooltip.good-tea.tea-cup-tea": "What kind of Tea is that?!",
+  "tea-tooltip.good-tea.tea-mug-tea": "What kind of Tea is that?!",
   "tea-tooltip.good-tea.axolotl_tea": "You Monster!",
   "tea-tooltip.good-tea.bed-tea": "Only drink in the Overworld!",
   "tea-tooltip.good-tea.music-disc-tea": "Who needs a BoomBox anyway?",

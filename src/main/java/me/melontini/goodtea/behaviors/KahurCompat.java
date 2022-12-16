@@ -1,7 +1,7 @@
 package me.melontini.goodtea.behaviors;
 
 import com.unascribed.kahur.api.KahurImpactBehavior;
-import me.melontini.goodtea.items.TeaCupItem;
+import me.melontini.goodtea.items.TeaMugItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -15,7 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static me.melontini.goodtea.util.GoodTeaStuff.TEA_CUP_FILLED;
+import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG_FILLED;
 
 public class KahurCompat {
     public static void register() {
@@ -23,9 +23,9 @@ public class KahurCompat {
             if (hitResult.getType() == HitResult.Type.ENTITY) {
                 if (((EntityHitResult) hitResult).getEntity() instanceof LivingEntity livingEntity) {
                     NbtCompound nbt = itemStack.getNbt();
-                    ItemStack stack1 = TeaCupItem.getStackFromNbt(nbt);
+                    ItemStack stack1 = TeaMugItem.getStackFromNbt(nbt);
                     if (stack1 != null) {
-                        TeaCupBehavior.INSTANCE.getBehavior(stack1).run(livingEntity, stack1);
+                        TeaBehavior.INSTANCE.getBehavior(stack1).run(livingEntity, stack1);
                     }
                 }
             } else if (hitResult.getType() == HitResult.Type.BLOCK){
@@ -34,13 +34,13 @@ public class KahurCompat {
                 Optional<LivingEntity> winner = livingEntities.stream().min(Comparator.comparingDouble(livingEntity -> livingEntity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())));
                 if (winner.isPresent()) {
                     NbtCompound nbt = itemStack.getNbt();
-                    ItemStack stack1 = TeaCupItem.getStackFromNbt(nbt);
+                    ItemStack stack1 = TeaMugItem.getStackFromNbt(nbt);
                     if (stack1 != null) {
-                        TeaCupBehavior.INSTANCE.getBehavior(stack1).run(winner.get(), stack1);
+                        TeaBehavior.INSTANCE.getBehavior(stack1).run(winner.get(), stack1);
                     }
                 }
             }
             return KahurImpactBehavior.ImpactResult.destroy(true);
-        }, TEA_CUP_FILLED);
+        }, TEA_MUG_FILLED);
     }
 }

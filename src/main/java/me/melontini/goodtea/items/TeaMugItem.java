@@ -1,8 +1,7 @@
 package me.melontini.goodtea.items;
 
 import me.melontini.crackerutil.util.MakeSure;
-import me.melontini.goodtea.GoodTea;
-import me.melontini.goodtea.behaviors.TeaCupBehavior;
+import me.melontini.goodtea.behaviors.TeaBehavior;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -23,13 +22,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-import static me.melontini.goodtea.util.GoodTeaStuff.TEA_CUP;
+import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
 
-public class TeaCupItem extends Item {
-    private static final Text NOTHING_TEXT = Text.translatable("tooltip.good-tea.filled_cup.nothing").formatted(Formatting.GRAY);
+public class TeaMugItem extends Item {
+    private static final Text NOTHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.nothing").formatted(Formatting.GRAY);
 
-    private static final Text SOMETHING_TEXT = Text.translatable("tooltip.good-tea.filled_cup.something").formatted(Formatting.GRAY);
-    public TeaCupItem(Settings settings) {
+    private static final Text SOMETHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.something").formatted(Formatting.GRAY);
+    public TeaMugItem(Settings settings) {
         super(settings);
     }
 
@@ -51,7 +50,7 @@ public class TeaCupItem extends Item {
             NbtCompound nbt = stack.getNbt();
             ItemStack stack1 = getStackFromNbt(nbt);
             if (stack1 != null) {
-                TeaCupBehavior.INSTANCE.getBehavior(stack1).run(user, stack1);
+                TeaBehavior.INSTANCE.getBehavior(stack1).run(user, stack1);
             }
         }
 
@@ -64,11 +63,11 @@ public class TeaCupItem extends Item {
 
         if (player == null || !player.getAbilities().creativeMode) {
             if (stack.isEmpty()) {
-                return new ItemStack(TEA_CUP);
+                return new ItemStack(TEA_MUG);
             }
 
             if (player != null) {
-                player.getInventory().offerOrDrop(new ItemStack(TEA_CUP));
+                player.getInventory().offerOrDrop(new ItemStack(TEA_MUG));
             }
         }
 
@@ -86,11 +85,11 @@ public class TeaCupItem extends Item {
         if (stack1 != null) {
             Item item = stack1.getItem();
             if (item != null) {
-                tooltip.add(Text.translatable("tooltip.good-tea.filled_cup", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
-                if (TeaCupBehavior.INSTANCE.hasTooltip(item)) {
-                    TeaCupBehavior.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
+                tooltip.add(Text.translatable("tooltip.good-tea.filled_mug", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
+                if (TeaBehavior.INSTANCE.hasTooltip(item)) {
+                    TeaBehavior.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
                 } else {
-                    if (!TeaCupBehavior.INSTANCE.hasBehavior(item)) {
+                    if (!TeaBehavior.INSTANCE.hasBehavior(item)) {
                         tooltip.add(NOTHING_TEXT);
                     } else
                         tooltip.add(SOMETHING_TEXT);

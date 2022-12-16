@@ -12,7 +12,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.world.World;
 
-import static me.melontini.goodtea.util.GoodTeaStuff.TEA_CUP;
+import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
 
 public class KettleScreenHandler extends ScreenHandler {
     private final Inventory inventory;
@@ -30,7 +30,7 @@ public class KettleScreenHandler extends ScreenHandler {
         this.propertyDelegate = propertyDelegate;
         this.addProperties(propertyDelegate);
         this.addSlot(new Slot(inventory, 0, 38, 35));
-        this.addSlot(new KettleCupSlot(inventory, 1, 56, 35));
+        this.addSlot(new KettleMugSlot(inventory, 1, 56, 35));
         this.addSlot(new KettleOutputSlot(playerInventory.player, inventory, 2, 116, 35));
 
         for (int i = 0; i < 3; ++i) {
@@ -58,11 +58,11 @@ public class KettleScreenHandler extends ScreenHandler {
 
                 slot.onQuickTransfer(itemStack2, itemStack);
             } else if (index != 1 && index != 0) {
-                if (!itemStack2.isOf(TEA_CUP)) {
+                if (!itemStack2.isOf(TEA_MUG)) {
                     if (!this.insertItem(itemStack2, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (itemStack2.isOf(TEA_CUP)) {
+                } else if (itemStack2.isOf(TEA_MUG)) {
                     if (!this.insertItem(itemStack2, 1, 2, false)) {
                         return ItemStack.EMPTY;
                     }

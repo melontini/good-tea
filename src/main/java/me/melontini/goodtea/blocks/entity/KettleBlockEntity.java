@@ -100,7 +100,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     private void tick() {
         assert world != null;
         ItemStack input = this.inventory.get(0);
-        ItemStack cup = this.inventory.get(1);
+        ItemStack mug = this.inventory.get(1);
         ItemStack output = this.inventory.get(2);
 
         if (this.time > 0) {
@@ -117,14 +117,14 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
             }
         }
         if (!world.isClient) {
-            ItemStack stack = new ItemStack(TEA_CUP_FILLED);
+            ItemStack stack = new ItemStack(TEA_MUG_FILLED);
             ItemStack teaStack = input.copy();
             teaStack.setCount(1);
             stack.setNbt(NbtBuilder.create()
                     .put("GT-TeaItem", teaStack.writeNbt(new NbtCompound()))
                     .build());
             if (this.time == -1) {
-                if ((!input.isEmpty() && !input.isOf(TEA_CUP_FILLED)) && !cup.isEmpty() && canCombine(stack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
+                if ((!input.isEmpty() && !input.isOf(TEA_MUG_FILLED)) && !mug.isEmpty() && canCombine(stack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
                     switch (input.getItem().getRarity(input)) {
                         case COMMON -> this.time = 600;
                         case UNCOMMON -> this.time = 750;
@@ -137,10 +137,10 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
             }
 
             if (this.time != -1) {
-                if (input.isEmpty() || input.isOf(TEA_CUP_FILLED)) {
+                if (input.isEmpty() || input.isOf(TEA_MUG_FILLED)) {
                     this.time = -1;
                     update();
-                } else if (cup.isEmpty()) {
+                } else if (mug.isEmpty()) {
                     this.time = -1;
                     update();
                 } else if (!canCombine(stack, output)) {
@@ -157,7 +157,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                         ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), new ItemStack(input.getItem().getRecipeRemainder()));
                     }
                     input.decrement(1);
-                    cup.decrement(1);
+                    mug.decrement(1);
                     this.inventory.set(2, stack);
                 } else if (canCombine(stack, output)) {
                     int a = stack.getCount();
@@ -168,7 +168,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                         ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), new ItemStack(input.getItem().getRecipeRemainder()));
                     }
                     input.decrement(1);
-                    cup.decrement(1);
+                    mug.decrement(1);
                 }
                 try (Transaction transaction = Transaction.openOuter()) {
                     long amount = this.waterStorage.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BOTTLE, transaction);
@@ -183,7 +183,10 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     }
 
     private void tickTime() {
-        if (!world.isClient()) --this.time;
+        if (!world.isClient()) {
+            --this.time;
+            markDirty();
+        }
         if (world.isClient()) {
             BlockState state2 = world.getBlockState(this.pos);
             Direction direction = state2.get(KettleBlock.FACING);
@@ -246,9 +249,9 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         if (slot == 2) {
             return false;
-        } else if (slot == 1 && stack.isOf(TEA_CUP)) {
+        } else if (slot == 1 && stack.isOf(TEA_MUG)) {
             return true;
-        } else return slot == 0 && !stack.isOf(TEA_CUP);
+        } else return slot == 0 && !stack.isOf(TEA_MUG);
     }
 
     @Override

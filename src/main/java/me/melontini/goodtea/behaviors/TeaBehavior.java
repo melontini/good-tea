@@ -59,12 +59,12 @@ import java.util.*;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
-public class TeaCupBehavior {
-    public static TeaCupBehavior INSTANCE = new TeaCupBehavior();
-    public Map<Item, Behavior> TEA_CUP_BEHAVIOR = new HashMap<>();
-    public Map<Item, Tooltip> TEA_CUP_TOOLTIP = new HashMap<>();
+public class TeaBehavior {
+    public static TeaBehavior INSTANCE = new TeaBehavior();
+    public Map<Item, Behavior> TEA_BEHAVIOR = new HashMap<>();
+    public Map<Item, Tooltip> TEA_TOOLTIP = new HashMap<>();
 
-    private TeaCupBehavior() {
+    private TeaBehavior() {
     }
 
     public void addDefaultBehaviours() {
@@ -92,7 +92,7 @@ public class TeaCupBehavior {
             }
             if (item instanceof SwordItem swordItem) {
                 addBehavior(item, (entity, stack) -> {
-                    entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage());
+                    entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 2);
                     entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
                     stack.damage(MathStuff.fastCeil(swordItem.getAttackDamage() * 3.0F), entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
                     ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
@@ -302,7 +302,7 @@ public class TeaCupBehavior {
     }
 
     public Behavior getBehavior(Item item) {
-        return TEA_CUP_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(DamageSource.MAGIC, ((SwordItem) Items.WOODEN_SWORD).getAttackDamage()));
+        return TEA_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(DamageSource.MAGIC, ((SwordItem) Items.WOODEN_SWORD).getAttackDamage()));
     }
 
     public void removeBehavior(ItemStack stack) {
@@ -310,21 +310,21 @@ public class TeaCupBehavior {
     }
 
     public void removeBehavior(Item item) {
-        TEA_CUP_BEHAVIOR.remove(item);
+        TEA_BEHAVIOR.remove(item);
     }
 
     public boolean hasBehavior(ItemStack stack) {
-        return TEA_CUP_BEHAVIOR.containsKey(stack.getItem());
+        return TEA_BEHAVIOR.containsKey(stack.getItem());
     }
 
     public boolean hasBehavior(Item item) {
-        return TEA_CUP_BEHAVIOR.containsKey(item);
+        return TEA_BEHAVIOR.containsKey(item);
     }
 
     public void addBehavior(Item item, Behavior behavior) {
         MakeSure.notNulls(item, behavior);
-        if (!TEA_CUP_BEHAVIOR.containsKey(item)) {
-            TEA_CUP_BEHAVIOR.putIfAbsent(item, behavior);
+        if (!TEA_BEHAVIOR.containsKey(item)) {
+            TEA_BEHAVIOR.putIfAbsent(item, behavior);
         } else {
             CrackerLog.error("Tried to add behaviour for the same item twice! {}", item);
         }
@@ -336,7 +336,7 @@ public class TeaCupBehavior {
     }
 
     public Tooltip getTooltip(Item item) {
-        return TEA_CUP_TOOLTIP.get(item);
+        return TEA_TOOLTIP.get(item);
     }
 
     public void removeTooltip(ItemStack stack) {
@@ -344,22 +344,22 @@ public class TeaCupBehavior {
     }
 
     public void removeTooltip(Item item) {
-        TEA_CUP_TOOLTIP.remove(item);
+        TEA_TOOLTIP.remove(item);
     }
 
     public boolean hasTooltip(ItemStack stack) {
-        return TEA_CUP_TOOLTIP.containsKey(stack.getItem());
+        return TEA_TOOLTIP.containsKey(stack.getItem());
     }
 
     public boolean hasTooltip(Item item) {
-        return TEA_CUP_TOOLTIP.containsKey(item);
+        return TEA_TOOLTIP.containsKey(item);
     }
 
     public void addTooltip(Tooltip tooltip, Item... items) {
         MakeSure.notNull(tooltip);
         for (Item item : items) {
-            if (!TEA_CUP_TOOLTIP.containsKey(item)) {
-                TEA_CUP_TOOLTIP.putIfAbsent(item, tooltip);
+            if (!TEA_TOOLTIP.containsKey(item)) {
+                TEA_TOOLTIP.putIfAbsent(item, tooltip);
             } else {
                 CrackerLog.error("Tried to add a tooltip for the same item twice! {}", item);
             }
@@ -368,8 +368,8 @@ public class TeaCupBehavior {
 
     public void addTooltip(Item item, Tooltip tooltip) {
         MakeSure.notNull(tooltip);
-        if (!TEA_CUP_TOOLTIP.containsKey(item)) {
-            TEA_CUP_TOOLTIP.putIfAbsent(item, tooltip);
+        if (!TEA_TOOLTIP.containsKey(item)) {
+            TEA_TOOLTIP.putIfAbsent(item, tooltip);
         } else {
             CrackerLog.error("Tried to add a tooltip for the same item twice! {}", item);
         }
@@ -386,8 +386,8 @@ public class TeaCupBehavior {
                 }
             }
         }
-        addTooltip(TEA_CUP, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-cup-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(TEA_MUG, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip(KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip(Items.WHEAT, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip(Items.HAY_BLOCK, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
