@@ -4,17 +4,16 @@ import me.melontini.crackerutil.client.util.DrawUtil;
 import me.melontini.crackerutil.content.RegistryUtil;
 import me.melontini.crackerutil.data.NbtBuilder;
 import me.melontini.crackerutil.interfaces.AnimatedItemGroup;
-import me.melontini.crackerutil.util.MathStuff;
-import me.melontini.goodtea.GoodTea;
+import me.melontini.crackerutil.util.MathStuff;;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.blocks.KettleBlock;
+import me.melontini.goodtea.blocks.TeaMugBlock;
 import me.melontini.goodtea.blocks.entity.KettleBlockEntity;
 import me.melontini.goodtea.items.TeaMugItem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.impl.item.group.ItemGroupExtensions;
-import net.minecraft.block.Block;
-import net.minecraft.block.Material;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.BakedModel;
@@ -22,6 +21,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
@@ -45,9 +45,11 @@ public class GoodTeaStuff {
 
     public static TagKey<Block> SHOW_SUPPORT;
     public static TagKey<Block> HOT_BLOCKS;
-    public static Item TEA_MUG;
+    public static BlockItem TEA_MUG;
 
     public static TeaMugItem TEA_MUG_FILLED;
+
+    public static TeaMugBlock TEA_MUG_BLOCK;
     public static KettleBlock KETTLE_BLOCK;
 
     public static BlockItem KETTLE_BLOCK_ITEM;
@@ -55,7 +57,11 @@ public class GoodTeaStuff {
     public static ItemGroup GROUP;
 
     public static void init() {
-        TEA_MUG = RegistryUtil.createItem(Item.class, new Identifier(MODID, "mug"), new FabricItemSettings().group(ItemGroup.MISC).maxCount(16));
+        TEA_MUG_BLOCK = (TeaMugBlock) RegistryUtil.createBlock(TeaMugBlock.class, new Identifier(MODID, "mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW)
+            .nonOpaque()
+            .strength(0.1F)
+            .sounds(BlockSoundGroup.CANDLE));
+        TEA_MUG = (BlockItem) RegistryUtil.createItem(BlockItem.class, new Identifier(MODID, "mug"), TEA_MUG_BLOCK, new FabricItemSettings().group(ItemGroup.MISC).maxCount(16));
         KETTLE_BLOCK = (KettleBlock) RegistryUtil.createBlock(KettleBlock.class, new Identifier(MODID, "kettle"), FabricBlockSettings.of(Material.METAL));
         KETTLE_BLOCK_ENTITY = RegistryUtil.createBlockEntity(new Identifier(MODID, "kettle_block_entity"), BlockEntityType.Builder.create(KettleBlockEntity::new, KETTLE_BLOCK));
         KETTLE_BLOCK_ITEM = (BlockItem) RegistryUtil.createItem(BlockItem.class, new Identifier(MODID, "kettle"), KETTLE_BLOCK, new FabricItemSettings().group(ItemGroup.DECORATIONS));

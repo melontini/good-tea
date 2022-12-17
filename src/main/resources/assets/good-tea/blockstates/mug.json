@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "count=1": {
+      "model": "good-tea:block/tea_mugs_0"
+    },
+    "count=2": {
+      "model": "good-tea:block/tea_mugs_1"
+    },
+    "count=3": {
+      "model": "good-tea:block/tea_mugs_2"
+    }
+  }
+}
