@@ -67,7 +67,7 @@ public class TeaBehavior {
     private TeaBehavior() {
     }
 
-    public void addDefaultBehaviours() {
+    public void init() {
         for (Item item : Registry.ITEM) {
             if (item instanceof SpawnEggItem spawnEggItem) {
                 addBehavior(item, (entity, stack) -> {
@@ -128,9 +128,8 @@ public class TeaBehavior {
             entity.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 3200, 2));
         });
 
-        addBehavior(Items.TNT, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, Explosion.DestructionType.DESTROY));
+        addBehavior((entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, Explosion.DestructionType.DESTROY), Items.TNT, Items.TNT_MINECART);
         addBehavior(Items.GUNPOWDER, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 1.0F, Explosion.DestructionType.DESTROY));
-        addBehavior(Items.TNT_MINECART, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, Explosion.DestructionType.DESTROY));
 
         addBehavior(Items.END_ROD, (entity, stack) -> {
             Random random = new Random();
@@ -282,9 +281,7 @@ public class TeaBehavior {
             entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.AMBIENT, 1.0f, 1.0f);
         });
 
-        addBehavior(Items.OCHRE_FROGLIGHT, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)));
-        addBehavior(Items.PEARLESCENT_FROGLIGHT, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)));
-        addBehavior(Items.VERDANT_FROGLIGHT, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)));
+        addBehavior((entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)), Items.OCHRE_FROGLIGHT, Items.PEARLESCENT_FROGLIGHT, Items.VERDANT_FROGLIGHT);
 
         addBehavior(Items.GOAT_HORN, (entity, stack) -> {
             ((GoatHornItemAccessor) Items.GOAT_HORN).getInstrument(stack).ifPresent(registryEntry -> {
@@ -327,6 +324,12 @@ public class TeaBehavior {
             TEA_BEHAVIOR.putIfAbsent(item, behavior);
         } else {
             CrackerLog.error("Tried to add behaviour for the same item twice! {}", item);
+        }
+    }
+
+    public void addBehavior(Behavior behavior, Item... items) {
+        for (Item item : items) {
+            addBehavior(item, behavior);
         }
     }
 
@@ -375,7 +378,7 @@ public class TeaBehavior {
         }
     }
 
-    public void addDefaultTooltips() {
+    public void initTooltips() {
         for (Item item : Registry.ITEM) {
             if (item instanceof MusicDiscItem discItem) {
                 addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(discItem.getDescription().formatted(Formatting.GRAY)));

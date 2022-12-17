@@ -2,7 +2,7 @@ package me.melontini.goodtea.blocks.entity;
 
 import me.melontini.crackerutil.data.NBTUtil;
 import me.melontini.crackerutil.data.NbtBuilder;
-import me.melontini.goodtea.behaviors.KettleBlockBehaviour;
+import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.screens.KettleScreenHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -105,7 +105,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
         if (this.time > 0) {
             BlockState state = world.getBlockState(this.pos.down());
-            Optional<Map<Property<?>, ?>> optional = KettleBlockBehaviour.INSTANCE.getProperties(state.getBlock());
+            Optional<Map<Property<?>, ?>> optional = KettleBehaviour.INSTANCE.getProperties(state.getBlock());
             if (optional.isPresent()) {
                 if (state.getProperties().containsAll(optional.get().keySet())) {
                     if (state.getProperties().stream().filter(property -> optional.get().containsKey(property)).allMatch(property -> state.get(property).equals(optional.get().get(property)))) {

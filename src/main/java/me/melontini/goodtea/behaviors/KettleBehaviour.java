@@ -11,12 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class KettleBlockBehaviour {
-    public static KettleBlockBehaviour INSTANCE = new KettleBlockBehaviour();
+public class KettleBehaviour {
+    public static KettleBehaviour INSTANCE = new KettleBehaviour();
 
     public final Map<Block, Map<Property<?>, ?>> HOT_BLOCKS_WITH_STATE = new HashMap<>();
 
-    public void addDefaultBlocks() {
+    public void init() {
         addBlockWithProperties(Blocks.CAMPFIRE, Map.of(CampfireBlock.LIT, true));
         addBlockWithProperties(Blocks.SOUL_CAMPFIRE, Map.of(CampfireBlock.LIT, true));
     }

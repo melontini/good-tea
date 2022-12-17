@@ -26,7 +26,6 @@ import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
 
 public class TeaMugItem extends Item {
     private static final Text NOTHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.nothing").formatted(Formatting.GRAY);
-
     private static final Text SOMETHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.something").formatted(Formatting.GRAY);
     public TeaMugItem(Settings settings) {
         super(settings);
