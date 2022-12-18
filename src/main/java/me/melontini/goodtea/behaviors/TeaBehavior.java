@@ -26,6 +26,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
@@ -41,11 +42,11 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
@@ -292,6 +293,22 @@ public class TeaBehavior {
                 entity.world.emitGameEvent(GameEvent.INSTRUMENT_PLAY, entity.getPos(), GameEvent.Emitter.of(entity));
             });
         });
+
+        addBehavior(Items.FIREWORK_ROCKET, (entity, stack) -> {
+            FireworkRocketEntity fireworkRocketEntity = new FireworkRocketEntity(entity.world, stack, entity, entity.getX(), entity.getEyeY() - 0.15F, entity.getZ(), true);
+
+            Vec3d vec3d = entity.getOppositeRotationVector(1.0F);
+            Quaternion quaternion = new Quaternion(new Vec3f(vec3d), 0, true);
+            Vec3d vec3d2 = entity.getRotationVec(1.0F);
+            Vec3f vec3f = new Vec3f(vec3d2);
+            vec3f.rotate(quaternion);
+            fireworkRocketEntity.setVelocity(vec3f.getX(), vec3f.getY(), vec3f.getZ(), 1.6f, 1);
+
+            entity.world.spawnEntity(fireworkRocketEntity);
+            if (entity instanceof PlayerEntity player) {
+                player.incrementStat(Stats.USED.getOrCreateStat(Items.FIREWORK_ROCKET));
+            }
+        });
     }
 
     public Behavior getBehavior(ItemStack stack) {
@@ -300,14 +317,6 @@ public class TeaBehavior {
 
     public Behavior getBehavior(Item item) {
         return TEA_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(DamageSource.MAGIC, ((SwordItem) Items.WOODEN_SWORD).getAttackDamage()));
-    }
-
-    public void removeBehavior(ItemStack stack) {
-        removeBehavior(stack.getItem());
-    }
-
-    public void removeBehavior(Item item) {
-        TEA_BEHAVIOR.remove(item);
     }
 
     public boolean hasBehavior(ItemStack stack) {
@@ -342,14 +351,6 @@ public class TeaBehavior {
         return TEA_TOOLTIP.get(item);
     }
 
-    public void removeTooltip(ItemStack stack) {
-        removeTooltip(stack.getItem());
-    }
-
-    public void removeTooltip(Item item) {
-        TEA_TOOLTIP.remove(item);
-    }
-
     public boolean hasTooltip(ItemStack stack) {
         return TEA_TOOLTIP.containsKey(stack.getItem());
     }
@@ -359,13 +360,8 @@ public class TeaBehavior {
     }
 
     public void addTooltip(Tooltip tooltip, Item... items) {
-        MakeSure.notNull(tooltip);
         for (Item item : items) {
-            if (!TEA_TOOLTIP.containsKey(item)) {
-                TEA_TOOLTIP.putIfAbsent(item, tooltip);
-            } else {
-                CrackerLog.error("Tried to add a tooltip for the same item twice! {}", item);
-            }
+            addTooltip(item, tooltip);
         }
     }
 
@@ -389,11 +385,9 @@ public class TeaBehavior {
                 }
             }
         }
-        addTooltip(TEA_MUG, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(KETTLE_BLOCK_ITEM, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)), TEA_MUG, KETTLE_BLOCK_ITEM);
         addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(Items.WHEAT, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip(Items.HAY_BLOCK, (stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(Text.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)), Items.HAY_BLOCK, Items.WHEAT);
         addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
         addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
     }
