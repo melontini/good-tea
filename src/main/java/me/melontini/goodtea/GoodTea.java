@@ -1,11 +1,13 @@
 package me.melontini.goodtea;
 
+import me.melontini.crackerutil.CrackerLog;
 import me.melontini.goodtea.behaviors.KahurCompat;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.screens.KettleScreenHandler;
 import me.melontini.goodtea.util.GoodTeaStuff;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.screen.ScreenHandlerType;
@@ -31,5 +33,7 @@ public class GoodTea implements ModInitializer {
         if (FabricLoader.getInstance().isModLoaded("kahur")) {
             KahurCompat.register();
         }
+
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> CrackerLog.info("Registered {} item behaviors", TeaBehavior.INSTANCE.TEA_BEHAVIOR.size()));
     }
 }
