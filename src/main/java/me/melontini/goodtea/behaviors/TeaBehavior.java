@@ -396,19 +396,15 @@ public class TeaBehavior {
         Box box = entity.getBoundingBox().expand(4.0, 2.0, 4.0);
         List<LivingEntity> list = entity.world.getEntitiesByClass(LivingEntity.class, box, PotionEntity.WATER_HURTS);
         if (!list.isEmpty()) {
-            for (LivingEntity livingEntity : list) {
-                double d = entity.squaredDistanceTo(livingEntity);
-                if (d < 16.0 && livingEntity.hurtByWater()) {
-                    livingEntity.damage(DamageSource.magic(entity, entity.getOwner()), 1.0F);
-                }
-            }
+            list.stream()
+                    .filter(livingEntity -> entity.squaredDistanceTo(livingEntity) < 16.0 && livingEntity.hurtByWater())
+                    .forEach(livingEntity -> livingEntity.damage(DamageSource.magic(entity, entity.getOwner()), 1.0F));
         }
 
-        for (AxolotlEntity axolotlEntity : entity.world.getNonSpectatingEntities(AxolotlEntity.class, box)) {
-            axolotlEntity.hydrateFromPotion();
-        }
-
+        entity.world.getNonSpectatingEntities(AxolotlEntity.class, box)
+                .forEach(AxolotlEntity::hydrateFromPotion);
     }
+
 
     @FunctionalInterface
     public interface Behavior {
