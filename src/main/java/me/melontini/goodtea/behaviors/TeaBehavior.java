@@ -3,6 +3,7 @@ package me.melontini.goodtea.behaviors;
 import me.melontini.crackerutil.CrackerLog;
 import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.crackerutil.util.MathStuff;
+import me.melontini.goodtea.ducks.ChorusAccess;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
 import me.melontini.goodtea.ducks.DivineAccess;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
@@ -308,6 +309,17 @@ public class TeaBehavior {
             if (entity instanceof PlayerEntity player) {
                 player.incrementStat(Stats.USED.getOrCreateStat(Items.FIREWORK_ROCKET));
             }
+        });
+
+        addBehavior(Items.CHORUS_FRUIT, (entity, stack) -> {
+            if (entity instanceof PlayerEntity player) {
+                if (((ChorusAccess)entity).good_tea$isTeleporting()) {
+                    player.sendMessage(Text.translatable("text.good-tea.chorus-tea-renew"));
+                } else {
+                    player.sendMessage(Text.translatable("text.good-tea.chorus-tea"));
+                }
+            }
+            ((ChorusAccess)entity).good_tea$addTeleportingTime(3600);
         });
     }
 

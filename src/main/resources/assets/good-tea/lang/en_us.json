@@ -16,9 +16,11 @@
   "text.good-tea.hoglin_repellent": "Hmm... looks like you'll smell like warped fungus for the next 2 minutes.",
   "text.good-tea.divine": "You feel Totem's divine energy running through your body.",
   "text.good-tea.used_divine": "Totem's divine energy has left your body",
+  "text.good-tea.chorus-tea": "You're starting to feel bad...",
+  "text.good-tea.chorus-tea-renew": "You feel worse...",
 
-  "item.good-tea.filled_mug": "Mug of Tea",
-  "item.good-tea.mug": "Empty Mug",
+  "block.good-tea.filled_mug": "Mug of Tea",
+  "block.good-tea.mug": "Empty Mug",
 
   "tea-tooltip.good-tea.tea-mug-tea": "What kind of Tea is that?!",
   "tea-tooltip.good-tea.axolotl_tea": "You Monster!",
