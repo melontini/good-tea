@@ -6,8 +6,10 @@ import me.melontini.crackerutil.data.NbtBuilder;
 import me.melontini.crackerutil.interfaces.AnimatedItemGroup;
 import me.melontini.crackerutil.util.MathStuff;;
 import me.melontini.goodtea.behaviors.TeaBehavior;
+import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.blocks.TeaMugBlock;
+import me.melontini.goodtea.blocks.entity.FilledTeaMugBlockEntity;
 import me.melontini.goodtea.blocks.entity.KettleBlockEntity;
 import me.melontini.goodtea.items.TeaMugItem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -50,10 +52,11 @@ public class GoodTeaStuff {
     public static TeaMugItem TEA_MUG_FILLED;
 
     public static TeaMugBlock TEA_MUG_BLOCK;
+    public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK;
     public static KettleBlock KETTLE_BLOCK;
-
     public static BlockItem KETTLE_BLOCK_ITEM;
     public static BlockEntityType<KettleBlockEntity> KETTLE_BLOCK_ENTITY;
+    public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY;
     public static ItemGroup GROUP;
 
     public static void init() {
@@ -62,10 +65,18 @@ public class GoodTeaStuff {
             .strength(0.1F)
             .sounds(BlockSoundGroup.CANDLE));
         TEA_MUG = (BlockItem) RegistryUtil.createItem(BlockItem.class, new Identifier(MODID, "mug"), TEA_MUG_BLOCK, new FabricItemSettings().group(ItemGroup.MISC).maxCount(16));
+
         KETTLE_BLOCK = (KettleBlock) RegistryUtil.createBlock(KettleBlock.class, new Identifier(MODID, "kettle"), FabricBlockSettings.of(Material.METAL));
         KETTLE_BLOCK_ENTITY = RegistryUtil.createBlockEntity(new Identifier(MODID, "kettle_block_entity"), BlockEntityType.Builder.create(KettleBlockEntity::new, KETTLE_BLOCK));
         KETTLE_BLOCK_ITEM = (BlockItem) RegistryUtil.createItem(BlockItem.class, new Identifier(MODID, "kettle"), KETTLE_BLOCK, new FabricItemSettings().group(ItemGroup.DECORATIONS));
-        TEA_MUG_FILLED = (TeaMugItem) RegistryUtil.createItem(TeaMugItem.class, new Identifier(MODID, "filled_mug"), new FabricItemSettings().maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG));
+
+        FILLED_TEA_MUG_BLOCK = (FilledTeaMugBlock) RegistryUtil.createBlock(FilledTeaMugBlock.class, new Identifier(MODID, "filled_mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW)
+                .nonOpaque()
+                .strength(0.1F)
+                .sounds(BlockSoundGroup.CANDLE));
+        FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.createBlockEntity(new Identifier(MODID, "filled_mug"), BlockEntityType.Builder.create(FilledTeaMugBlockEntity::new, FILLED_TEA_MUG_BLOCK));
+        TEA_MUG_FILLED = (TeaMugItem) RegistryUtil.createItem(TeaMugItem.class, new Identifier(MODID, "filled_mug"), FILLED_TEA_MUG_BLOCK, new FabricItemSettings().maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG));
+
         HOT_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_hot_blocks"));
         SHOW_SUPPORT = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_kettle_show_support"));
         OBSIDIAN_TOUGHNESS = new EntityAttributeModifier(UUID.fromString("36dae011-70d8-482a-b3b3-7bb12c871eae"), "Tea Modifier", 2, EntityAttributeModifier.Operation.ADDITION);

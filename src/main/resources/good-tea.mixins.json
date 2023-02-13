@@ -8,6 +8,7 @@
     "GoatHornItemAccessor",
     "PotionEntityAccessor",
     "SpongeBlockAccessor",
+    "chorus_tea.LivingEntityMixin",
     "screenhandler_tea.CraftingScreenHandlerMixin",
     "screenhandler_tea.PlayerEntityMixin",
     "totem_tea.LivingEntityMixin",

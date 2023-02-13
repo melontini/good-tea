@@ -3,9 +3,11 @@ package me.melontini.goodtea.items;
 import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.block.Block;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
@@ -24,11 +26,12 @@ import java.util.Optional;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
 
-public class TeaMugItem extends Item {
+public class TeaMugItem extends BlockItem {
     private static final Text NOTHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.nothing").formatted(Formatting.GRAY);
     private static final Text SOMETHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.something").formatted(Formatting.GRAY);
-    public TeaMugItem(Settings settings) {
-        super(settings);
+
+    public TeaMugItem(Block block, Settings settings) {
+        super(block, settings);
     }
 
     public static ItemStack getStackFromNbt(NbtCompound nbt) {
