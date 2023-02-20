@@ -314,9 +314,9 @@ public class TeaBehavior {
         addBehavior(Items.CHORUS_FRUIT, (entity, stack) -> {
             if (entity instanceof PlayerEntity player) {
                 if (((ChorusAccess)entity).good_tea$isTeleporting()) {
-                    player.sendMessage(Text.translatable("text.good-tea.chorus-tea-renew"));
+                    player.sendMessage(Text.translatable("text.good-tea.chorus-tea-renew"), true);
                 } else {
-                    player.sendMessage(Text.translatable("text.good-tea.chorus-tea"));
+                    player.sendMessage(Text.translatable("text.good-tea.chorus-tea"), true);
                 }
             }
             ((ChorusAccess)entity).good_tea$addTeleportingTime(3600);
