@@ -1,6 +1,5 @@
 package me.melontini.goodtea.blocks;
 
-import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.blocks.entity.KettleBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -62,28 +61,30 @@ public class KettleBlock extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         ItemStack stack = player.getStackInHand(hand);
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (!player.shouldCancelInteraction()) {
-            if (hand == Hand.MAIN_HAND && stack.isOf(Items.WATER_BUCKET)) {
-                if (blockEntity instanceof KettleBlockEntity kettleBlockEntity) {
-                    try (Transaction transaction = Transaction.openOuter()) {
-                        long i = kettleBlockEntity.waterStorage.insert(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction);
-                        if (i != FluidConstants.BUCKET) {
-                            transaction.abort();
-                            return ActionResult.PASS;
+        if (!world.isClient()) {
+            if (!player.shouldCancelInteraction()) {
+                if (hand == Hand.MAIN_HAND && stack.isOf(Items.WATER_BUCKET)) {
+                    if (blockEntity instanceof KettleBlockEntity kettleBlockEntity) {
+                        try (Transaction transaction = Transaction.openOuter()) {
+                            long i = kettleBlockEntity.waterStorage.insert(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET, transaction);
+                            if (i != FluidConstants.BUCKET) {
+                                transaction.abort();
+                                return ActionResult.PASS;
+                            }
+                            if (!player.isCreative()) {
+                                stack.decrement(1);
+                                player.getInventory().insertStack(Items.BUCKET.getDefaultStack());
+                            }
+                            transaction.commit();
+                            kettleBlockEntity.update();
                         }
-                        if (!player.isCreative()) {
-                            stack.decrement(1);
-                            player.getInventory().insertStack(Items.BUCKET.getDefaultStack());
-                        }
-                        transaction.commit();
-                        kettleBlockEntity.update();
                     }
-                }
+                    return ActionResult.SUCCESS;
+                } else this.openScreen(world, pos, player);
                 return ActionResult.SUCCESS;
-            } else this.openScreen(world, pos, player);
-            return ActionResult.SUCCESS;
+            }
         }
-        return ActionResult.PASS;
+        return ActionResult.success(world.isClient);
     }
 
     protected void openScreen(World world, BlockPos pos, PlayerEntity player) {
