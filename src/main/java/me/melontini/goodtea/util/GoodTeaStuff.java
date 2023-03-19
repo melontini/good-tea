@@ -69,7 +69,7 @@ public class GoodTeaStuff {
     public static ItemGroup GROUP = Util.make(() -> {
         ((ItemGroupExtensions) ItemGroup.BUILDING_BLOCKS).fabric_expandArray();
         return new GoodTeaGroup(ItemGroup.GROUPS.length - 1, "good_tea_item_group");
-    });;
+    });
 
     public static void init() {
     }
