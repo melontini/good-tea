@@ -9,5 +9,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(SpongeBlock.class)
 public interface SpongeBlockAccessor {
     @Invoker("absorbWater")
-    boolean absorbWater(World world, BlockPos pos);
+    boolean gt$absorbWater(World world, BlockPos pos);
 }

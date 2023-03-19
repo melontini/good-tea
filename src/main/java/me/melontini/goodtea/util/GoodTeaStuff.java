@@ -1,10 +1,11 @@
 package me.melontini.goodtea.util;
 
 import me.melontini.crackerutil.client.util.DrawUtil;
+import me.melontini.crackerutil.content.ContentBuilder;
 import me.melontini.crackerutil.content.RegistryUtil;
 import me.melontini.crackerutil.data.NbtBuilder;
 import me.melontini.crackerutil.interfaces.AnimatedItemGroup;
-import me.melontini.crackerutil.util.MathStuff;;
+import me.melontini.crackerutil.util.Utilities;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -13,9 +14,11 @@ import me.melontini.goodtea.blocks.entity.FilledTeaMugBlockEntity;
 import me.melontini.goodtea.blocks.entity.KettleBlockEntity;
 import me.melontini.goodtea.items.TeaMugItem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.impl.item.group.ItemGroupExtensions;
-import net.minecraft.block.*;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.MapColor;
+import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.BakedModel;
@@ -41,65 +44,49 @@ import java.util.UUID;
 import static me.melontini.goodtea.GoodTea.MODID;
 
 public class GoodTeaStuff {
-    public static EntityAttributeModifier OBSIDIAN_TOUGHNESS;
+    public static EntityAttributeModifier OBSIDIAN_TOUGHNESS = new EntityAttributeModifier(UUID.fromString("36dae011-70d8-482a-b3b3-7bb12c871eae"), "Tea Modifier", 2, EntityAttributeModifier.Operation.ADDITION);
 
-    public static EntityAttributeModifier RABBITS_LUCK;
+    public static EntityAttributeModifier RABBITS_LUCK = new EntityAttributeModifier(UUID.fromString("57c5033e-c071-4b23-8f14-0551eb4c5b0a"), "Tea Modifier", 1, EntityAttributeModifier.Operation.ADDITION);
 
-    public static TagKey<Block> SHOW_SUPPORT;
-    public static TagKey<Block> HOT_BLOCKS;
-    public static BlockItem TEA_MUG;
-
-    public static TeaMugItem TEA_MUG_FILLED;
-
-    public static TeaMugBlock TEA_MUG_BLOCK;
-    public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK;
-    public static KettleBlock KETTLE_BLOCK;
-    public static BlockItem KETTLE_BLOCK_ITEM;
-    public static BlockEntityType<KettleBlockEntity> KETTLE_BLOCK_ENTITY;
-    public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY;
-    public static ItemGroup GROUP;
+    public static TagKey<Block> SHOW_SUPPORT = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_kettle_show_support"));
+    public static TagKey<Block> HOT_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_hot_blocks"));
+    public static TeaMugBlock TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(TeaMugBlock.class, new Identifier(MODID, "mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW))
+            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroup.MISC).maxCount(16))
+            .nonOpaque().strength(0.1F).sounds(BlockSoundGroup.CANDLE).build();
+    public static BlockItem TEA_MUG = RegistryUtil.asItem(TEA_MUG_BLOCK);
+    public static KettleBlock KETTLE_BLOCK = ContentBuilder.BlockBuilder.create(KettleBlock.class, new Identifier(MODID, "kettle"), AbstractBlock.Settings.of(Material.METAL, MapColor.STONE_GRAY))
+            .blockEntity((block, id) -> ContentBuilder.BlockEntityBuilder.create(id, KettleBlockEntity::new, block))
+            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroup.DECORATIONS))
+            .requiresTool().strength(2.0f).nonOpaque().build();
+    public static BlockItem KETTLE_BLOCK_ITEM = RegistryUtil.asItem(KETTLE_BLOCK);
+    public static BlockEntityType<KettleBlockEntity> KETTLE_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(KETTLE_BLOCK);
+    public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(FilledTeaMugBlock.class, new Identifier(MODID, "filled_mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW))
+            .blockEntity((block, id) -> ContentBuilder.BlockEntityBuilder.create(id, FilledTeaMugBlockEntity::new, block))
+            .item((block, id) -> ContentBuilder.ItemBuilder.create(TeaMugItem.class, id, block, new Item.Settings()).maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG))
+            .sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque().build();
+    public static TeaMugItem TEA_MUG_FILLED = RegistryUtil.asItem(FILLED_TEA_MUG_BLOCK);
+    public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(FILLED_TEA_MUG_BLOCK);
+    public static ItemGroup GROUP = Util.make(() -> {
+        ((ItemGroupExtensions) ItemGroup.BUILDING_BLOCKS).fabric_expandArray();
+        return new GoodTeaGroup(ItemGroup.GROUPS.length - 1, "good_tea_item_group");
+    });;
 
     public static void init() {
-        TEA_MUG_BLOCK = (TeaMugBlock) RegistryUtil.createBlock(TeaMugBlock.class, new Identifier(MODID, "mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW)
-            .nonOpaque()
-            .strength(0.1F)
-            .sounds(BlockSoundGroup.CANDLE));
-        TEA_MUG = (BlockItem) RegistryUtil.createItem(BlockItem.class, new Identifier(MODID, "mug"), TEA_MUG_BLOCK, new FabricItemSettings().group(ItemGroup.MISC).maxCount(16));
-
-        KETTLE_BLOCK = (KettleBlock) RegistryUtil.createBlock(KettleBlock.class, new Identifier(MODID, "kettle"), AbstractBlock.Settings.of(Material.METAL, MapColor.STONE_GRAY).requiresTool().strength(2.0f).nonOpaque());
-        KETTLE_BLOCK_ENTITY = RegistryUtil.createBlockEntity(new Identifier(MODID, "kettle_block_entity"), BlockEntityType.Builder.create(KettleBlockEntity::new, KETTLE_BLOCK));
-        KETTLE_BLOCK_ITEM = (BlockItem) RegistryUtil.createItem(BlockItem.class, new Identifier(MODID, "kettle"), KETTLE_BLOCK, new FabricItemSettings().group(ItemGroup.DECORATIONS));
-
-        FILLED_TEA_MUG_BLOCK = (FilledTeaMugBlock) RegistryUtil.createBlock(FilledTeaMugBlock.class, new Identifier(MODID, "filled_mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW)
-                .nonOpaque()
-                .strength(0.1F)
-                .sounds(BlockSoundGroup.CANDLE));
-        FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.createBlockEntity(new Identifier(MODID, "filled_mug"), BlockEntityType.Builder.create(FilledTeaMugBlockEntity::new, FILLED_TEA_MUG_BLOCK));
-        TEA_MUG_FILLED = (TeaMugItem) RegistryUtil.createItem(TeaMugItem.class, new Identifier(MODID, "filled_mug"), FILLED_TEA_MUG_BLOCK, new FabricItemSettings().maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG));
-
-        HOT_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_hot_blocks"));
-        SHOW_SUPPORT = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_kettle_show_support"));
-        OBSIDIAN_TOUGHNESS = new EntityAttributeModifier(UUID.fromString("36dae011-70d8-482a-b3b3-7bb12c871eae"), "Tea Modifier", 2, EntityAttributeModifier.Operation.ADDITION);
-        RABBITS_LUCK = new EntityAttributeModifier(UUID.fromString("57c5033e-c071-4b23-8f14-0551eb4c5b0a"), "Tea Modifier", 1, EntityAttributeModifier.Operation.ADDITION);
-        GROUP = Util.make(() -> {
-            ((ItemGroupExtensions) ItemGroup.BUILDING_BLOCKS).fabric_expandArray();
-            return new GoodTeaGroup(ItemGroup.GROUPS.length - 1, "good_tea_item_group");
-        });
     }
 
     public static class GoodTeaGroup extends ItemGroup implements AnimatedItemGroup {
 
         public final ItemStack KETTLE = KETTLE_BLOCK_ITEM.getDefaultStack();
         public final ItemStack MUG = TEA_MUG.getDefaultStack();
-        private final DefaultedList<ItemStack> EMPTY_LIST = DefaultedList.ofSize(9, ItemStack.EMPTY);
         float angle = 45f, lerpPoint = 0;
 
         public GoodTeaGroup(int index, String id) {
             super(index, id);
+            this.setIconAnimation(this);
         }
 
         @Override
-        public void animateIcon(MatrixStack matrixStack, int itemX, int itemY) {
+        public void animateIcon(MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
             MinecraftClient client = MinecraftClient.getInstance();
 
             BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
@@ -149,7 +136,7 @@ public class GoodTeaStuff {
             teaStarterPack.add(Items.CAMPFIRE.getDefaultStack());
             teaStarterPack.add(Items.SOUL_CAMPFIRE.getDefaultStack());
             teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
-            appendStacks(stacks, teaStarterPack);
+            Utilities.appendStacks(stacks, teaStarterPack);
 
             var help = DefaultedList.<ItemStack>of();
             var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet().stream().sorted(Comparator.comparing(Registry.ITEM::getId)).toList();
@@ -157,7 +144,7 @@ public class GoodTeaStuff {
                 item.appendStacks(SEARCH, help);
 
                 for (ItemStack stack : help) {
-                    var mug = new ItemStack(TEA_MUG_FILLED);
+                    var mug = TEA_MUG_FILLED.getDefaultStack();
                     mug.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
                     stacks.add(mug);
                     stacks.add(stack);
@@ -165,18 +152,6 @@ public class GoodTeaStuff {
                 }
                 help.clear();
             }
-        }
-
-        private void appendStacks(DefaultedList<ItemStack> stacks, List<ItemStack> list) {
-            if (list.isEmpty()) return; //we shouldn't add line breaks if there are no items.
-
-            int rows = MathStuff.fastCeil(list.size() / 9d);
-            stacks.addAll(list);
-            int left = (rows * 9) - list.size();
-            for (int i = 0; i < left; i++) {
-                stacks.add(ItemStack.EMPTY); //fill the gaps
-            }
-            stacks.addAll(EMPTY_LIST); //line break
         }
     }
 }

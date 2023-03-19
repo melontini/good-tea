@@ -23,19 +23,17 @@ public abstract class LivingEntityMixin extends Entity implements HoglinRepellen
 
     @Inject(at = @At("HEAD"), method = "tick")
     private void good_tea$tick(CallbackInfo ci) {
-        if (!world.isClient()) {
-            if (this.good_tea$hoglinRepellent > 0) this.good_tea$hoglinRepellent--;
-        }
+        if (!world.isClient()) if (this.good_tea$hoglinRepellent > 0) this.good_tea$hoglinRepellent--;
     }
 
     @Inject(at = @At("TAIL"), method = "readCustomDataFromNbt")
     private void good_tea$readNbt(NbtCompound nbt, CallbackInfo ci) {
-        this.good_tea$hoglinRepellent = nbt.getInt("GT-HoglinRepellent");
+        if (nbt.contains("GT-HoglinRepellent")) this.good_tea$hoglinRepellent = nbt.getInt("GT-HoglinRepellent");
     }
 
     @Inject(at = @At("TAIL"), method = "writeCustomDataToNbt")
     private void good_tea$writeNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.putInt("GT-HoglinRepellent", this.good_tea$hoglinRepellent);
+        if (this.good_tea$hoglinRepellent > 0) nbt.putInt("GT-HoglinRepellent", this.good_tea$hoglinRepellent);
     }
 
     @Unique

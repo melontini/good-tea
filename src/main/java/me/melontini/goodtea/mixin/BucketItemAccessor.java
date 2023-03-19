@@ -8,5 +8,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(EntityBucketItem.class)
 public interface BucketItemAccessor {
     @Accessor("entityType")
-    EntityType<?> getEntityType();
+    EntityType<?> gt$getEntityType();
 }

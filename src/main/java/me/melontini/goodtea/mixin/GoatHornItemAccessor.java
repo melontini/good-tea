@@ -12,5 +12,5 @@ import java.util.Optional;
 @Mixin(GoatHornItem.class)
 public interface GoatHornItemAccessor {
     @Invoker("getInstrument")
-    Optional<RegistryEntry<Instrument>> getInstrument(ItemStack stack);
+    Optional<RegistryEntry<Instrument>> gt$getInstrument(ItemStack stack);
 }

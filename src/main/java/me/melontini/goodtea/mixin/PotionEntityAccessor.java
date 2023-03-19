@@ -14,8 +14,8 @@ import java.util.List;
 @Mixin(PotionEntity.class)
 public interface PotionEntityAccessor {
     @Invoker("applyLingeringPotion")
-    void applyLingeringPotion(ItemStack stack, Potion potion);
+    void gt$applyLingeringPotion(ItemStack stack, Potion potion);
 
     @Invoker("applySplashPotion")
-    void applySplashPotion(List<StatusEffectInstance> statusEffects, @Nullable Entity entity);
+    void gt$applySplashPotion(List<StatusEffectInstance> statusEffects, @Nullable Entity entity);
 }
