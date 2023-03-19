@@ -14,9 +14,7 @@ public class CraftingScreenHandlerMixin {
 
     @Inject(at = @At("RETURN"), method = "canUse", cancellable = true)
     private void good_tea$canUse(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        if (((CraftingScreenAllowanceAccess) player).good_tea$isAllowed()) {
-            cir.setReturnValue(true);
-        }
+        if (((CraftingScreenAllowanceAccess) player).good_tea$isAllowed()) cir.setReturnValue(true);
     }
 
     @Inject(at = @At("TAIL"), method = "close")

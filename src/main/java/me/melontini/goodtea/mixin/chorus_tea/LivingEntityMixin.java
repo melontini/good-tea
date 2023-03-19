@@ -75,14 +75,14 @@ public abstract class LivingEntityMixin extends Entity implements ChorusAccess {
 
     @Inject(at = @At("TAIL"), method = "readCustomDataFromNbt")
     private void good_tea$readNbt(NbtCompound nbt, CallbackInfo ci) {
-        this.good_tea$chorusTeleport = nbt.getInt("GT-ChorusTeleport");
-        this.good_tea$ticksSinceLastTeleport = nbt.getInt("GT-ChorusTeleportTicks");
+        if (nbt.contains("GT-ChorusTeleport")) this.good_tea$chorusTeleport = nbt.getInt("GT-ChorusTeleport");
+        if (nbt.contains("GT-ChorusTeleportTicks")) this.good_tea$ticksSinceLastTeleport = nbt.getInt("GT-ChorusTeleportTicks");
     }
 
     @Inject(at = @At("TAIL"), method = "writeCustomDataToNbt")
     private void good_tea$writeNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.putInt("GT-ChorusTeleport", this.good_tea$chorusTeleport);
-        nbt.putInt("GT-ChorusTeleportTicks", this.good_tea$ticksSinceLastTeleport);
+        if (this.good_tea$chorusTeleport > 0) nbt.putInt("GT-ChorusTeleport", this.good_tea$chorusTeleport);
+        if (this.good_tea$ticksSinceLastTeleport > 0) nbt.putInt("GT-ChorusTeleportTicks", this.good_tea$ticksSinceLastTeleport);
     }
 
     @Override

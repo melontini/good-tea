@@ -2,6 +2,7 @@ package me.melontini.goodtea.blocks.entity;
 
 import me.melontini.crackerutil.data.NBTUtil;
 import me.melontini.crackerutil.data.NbtBuilder;
+import me.melontini.crackerutil.util.TextUtil;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.screens.KettleScreenHandler;
@@ -27,7 +28,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Property;
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -43,7 +44,7 @@ import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class KettleBlockEntity extends BlockEntity implements SidedInventory, NamedScreenHandlerFactory {
-    private static final Text KETTLE_GUI_KEY = Text.translatable("gui.good-tea.kettle");
+    private static final MutableText KETTLE_GUI_KEY = TextUtil.translatable("gui.good-tea.kettle");
 
     public final SingleVariantStorage<FluidVariant> waterStorage = new SingleVariantStorage<>() {
         @Override
@@ -172,9 +173,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                 }
                 try (Transaction transaction = Transaction.openOuter()) {
                     long amount = this.waterStorage.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BOTTLE, transaction);
-                    if (amount == FluidConstants.BOTTLE) {
-                        transaction.commit();
-                    }
+                    if (amount == FluidConstants.BOTTLE) transaction.commit();
                 }
                 this.time = -1;
                 update();
@@ -247,11 +246,9 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        if (slot == 2) {
-            return false;
-        } else if (slot == 1 && stack.isOf(TEA_MUG)) {
-            return true;
-        } else return slot == 0 && !stack.isOf(TEA_MUG);
+        if (slot == 2) return false;
+        else if (slot == 1 && stack.isOf(TEA_MUG)) return true;
+        return slot == 0 && !stack.isOf(TEA_MUG);
     }
 
     @Override
@@ -277,9 +274,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     @Override
     public ItemStack removeStack(int slot, int amount) {
         ItemStack itemStack = Inventories.splitStack(this.inventory, slot, amount);
-        if (!itemStack.isEmpty()) {
-            this.markDirty();
-        }
+        if (!itemStack.isEmpty()) this.markDirty();
 
         return itemStack;
     }
@@ -292,9 +287,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     @Override
     public void setStack(int slot, ItemStack stack) {
         this.inventory.set(slot, stack);
-        if (stack.getCount() > this.getMaxCountPerStack()) {
-            stack.setCount(this.getMaxCountPerStack());
-        }
+        if (stack.getCount() > this.getMaxCountPerStack()) stack.setCount(this.getMaxCountPerStack());
     }
 
     @Override
@@ -308,7 +301,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     }
 
     @Override
-    public Text getDisplayName() {
+    public MutableText getDisplayName() {
         return KETTLE_GUI_KEY;
     }
 

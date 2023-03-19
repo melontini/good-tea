@@ -1,6 +1,7 @@
 package me.melontini.goodtea.items;
 
 import me.melontini.crackerutil.util.MakeSure;
+import me.melontini.crackerutil.util.TextUtil;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
@@ -14,6 +15,7 @@ import net.minecraft.item.ItemUsage;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.registry.Registry;
@@ -27,17 +29,15 @@ import java.util.Optional;
 import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
 
 public class TeaMugItem extends BlockItem {
-    private static final Text NOTHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.nothing").formatted(Formatting.GRAY);
-    private static final Text SOMETHING_TEXT = Text.translatable("tooltip.good-tea.filled_mug.something").formatted(Formatting.GRAY);
+    private static final MutableText NOTHING_TEXT = TextUtil.translatable("tooltip.good-tea.filled_mug.nothing").formatted(Formatting.GRAY);
+    private static final MutableText SOMETHING_TEXT = TextUtil.translatable("tooltip.good-tea.filled_mug.something").formatted(Formatting.GRAY);
 
     public TeaMugItem(Block block, Settings settings) {
         super(block, settings);
     }
 
     public static ItemStack getStackFromNbt(NbtCompound nbt) {
-        if (nbt != null) if (nbt.contains("GT-TeaItem")) {
-            return ItemStack.fromNbt(nbt.getCompound("GT-TeaItem"));
-        }
+        if (nbt != null) if (nbt.contains("GT-TeaItem")) return ItemStack.fromNbt(nbt.getCompound("GT-TeaItem"));
         return null;
     }
 
@@ -64,13 +64,8 @@ public class TeaMugItem extends BlockItem {
         }
 
         if (player == null || !player.getAbilities().creativeMode) {
-            if (stack.isEmpty()) {
-                return new ItemStack(TEA_MUG);
-            }
-
-            if (player != null) {
-                player.getInventory().offerOrDrop(new ItemStack(TEA_MUG));
-            }
+            if (stack.isEmpty()) return new ItemStack(TEA_MUG);
+            if (player != null) player.getInventory().offerOrDrop(new ItemStack(TEA_MUG));
         }
 
         Optional<GameEvent> optional = Registry.GAME_EVENT.getOrEmpty(new Identifier("drink"));
@@ -87,14 +82,12 @@ public class TeaMugItem extends BlockItem {
         if (stack1 != null) {
             Item item = stack1.getItem();
             if (item != null) {
-                tooltip.add(Text.translatable("tooltip.good-tea.filled_mug", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
+                tooltip.add(TextUtil.translatable("tooltip.good-tea.filled_mug", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
                 if (TeaBehavior.INSTANCE.hasTooltip(item)) {
                     TeaBehavior.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
                 } else {
-                    if (!TeaBehavior.INSTANCE.hasBehavior(item)) {
-                        tooltip.add(NOTHING_TEXT);
-                    } else
-                        tooltip.add(SOMETHING_TEXT);
+                    if (!TeaBehavior.INSTANCE.hasBehavior(item)) tooltip.add(NOTHING_TEXT);
+                    else tooltip.add(SOMETHING_TEXT);
                 }
             }
         }

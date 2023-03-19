@@ -17,6 +17,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
+@SuppressWarnings("deprecation")
 public class TeaMugBlock extends Block implements Waterloggable {
     public static final IntProperty COUNT = IntProperty.of("count", 1, 3);
 
@@ -31,12 +32,14 @@ public class TeaMugBlock extends Block implements Waterloggable {
         this.setDefaultState(this.stateManager.getDefaultState().with(COUNT, 1).with(WATERLOGGED, false));
     }
 
+    @Override
     public boolean canReplace(BlockState state, ItemPlacementContext context) {
         return !context.shouldCancelInteraction() && context.getStack().getItem() == this.asItem() && state.get(COUNT) < 3
                 ? true
                 : super.canReplace(state, context);
     }
 
+    @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         BlockState blockState = ctx.getWorld().getBlockState(ctx.getBlockPos());
         if (blockState.isOf(this)) {
@@ -48,6 +51,7 @@ public class TeaMugBlock extends Block implements Waterloggable {
         }
     }
 
+    @Override
     public BlockState getStateForNeighborUpdate(
             BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos
     ) {
@@ -58,10 +62,12 @@ public class TeaMugBlock extends Block implements Waterloggable {
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
+    @Override
     public FluidState getFluidState(BlockState state) {
         return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
+    @Override
     public boolean tryFillWithFluid(WorldAccess world, BlockPos pos, BlockState state, FluidState fluidState) {
         if (!state.get(WATERLOGGED) && fluidState.getFluid() == Fluids.WATER) {
             BlockState blockState = state.with(WATERLOGGED, true);
@@ -107,6 +113,7 @@ public class TeaMugBlock extends Block implements Waterloggable {
         };
     }
 
+    @Override
     public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         return Block.sideCoversSmallSquare(world, pos.down(), Direction.UP);
     }
