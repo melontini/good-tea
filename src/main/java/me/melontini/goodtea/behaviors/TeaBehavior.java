@@ -64,66 +64,19 @@ import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
 public class TeaBehavior {
     public static TeaBehavior INSTANCE = new TeaBehavior();
-    public Map<Item, Behavior> TEA_BEHAVIOR = new HashMap<>();
-    public Map<Item, Tooltip> TEA_TOOLTIP = new HashMap<>();
+    public Map<Item, Behavior> TEA_BEHAVIOR = new LinkedHashMap<>();
+    public Map<Item, Tooltip> TEA_TOOLTIP = new LinkedHashMap<>();
+
+    private boolean initDone = false;
+    private boolean tooltipInitDone = false;
+    private boolean dynamicInitDone = false;
+    private boolean dynamicTooltipInitDone = false;
 
     private TeaBehavior() {
     }
 
     public void init() {
-        for (Item item : Registry.ITEM) {
-            if (item instanceof SpawnEggItem spawnEggItem) {
-                addBehavior(item, (entity, stack) -> {
-                    Entity spawnEggEntity = spawnEggItem.getEntityType(new NbtCompound()).create(entity.world);
-                    if (spawnEggEntity != null) {
-                        spawnEggEntity.setPos(entity.getX(), entity.getY(), entity.getZ());
-                        spawnEggEntity.setVelocity(entity.getRotationVector());
-                        entity.world.spawnEntity(spawnEggEntity);
-                    }
-                });
-            }
-            if (item instanceof EntityBucketItem entityBucketItem) {
-                if (item != Items.AXOLOTL_BUCKET) addBehavior(item, (entity, stack) -> {
-                    var bucketEntity = ((BucketItemAccessor) entityBucketItem).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, false, false);
-                    if (bucketEntity instanceof Bucketable bucketable) {
-                        bucketable.copyDataFromNbt(stack.getOrCreateNbt());
-                        bucketEntity.setVelocity(entity.getRotationVector());
-                        entity.world.spawnEntity(bucketEntity);
-                        entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY_FISH, SoundCategory.AMBIENT, 1.0f, 1.0f);
-                    }
-                });
-            }
-            if (item instanceof SwordItem swordItem) {
-                addBehavior(item, (entity, stack) -> {
-                    entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 2);
-                    entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
-                    stack.damage(MathStuff.fastCeil(swordItem.getAttackDamage() * 3.0F), entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
-                    ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
-                });
-            }
-            if (item instanceof MusicDiscItem musicDiscItem) {
-                addBehavior(item, (entity, stack) -> entity.world.playSoundFromEntity(null, entity, musicDiscItem.getSound(), SoundCategory.RECORDS, 1F, 1F));
-            }
-            if (item instanceof BlockItem blockItem) {
-                if (blockItem.getBlock() instanceof FlowerBlock flowerBlock) {
-                    addBehavior(item, (entity, stack) -> {
-                        StatusEffectInstance effectInstance = new StatusEffectInstance(flowerBlock.getEffectInStew(), flowerBlock.getEffectInStew().isInstant() ? flowerBlock.getEffectInStewDuration() : (flowerBlock.getEffectInStewDuration() * 2));
-                        entity.addStatusEffect(effectInstance);
-                    });
-                }
-                if (blockItem.getBlock() instanceof BedBlock) {
-                    addBehavior(item, (entity, stack) -> {
-                        if (!BedBlock.isBedWorking(entity.world))
-                            entity.world.createExplosion(null, DamageSource.badRespawnPoint(), null, entity.getX() + 0.5, entity.getY() + 0.5, entity.getZ() + 0.5, 5.0F, true, Explosion.DestructionType.DESTROY);
-                    });
-                }
-            }
-        }
-        /*addBehavior(item, (entity, stack) -> {
-            float f = blockItem.getBlock().getHardness();
-            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, (int) (100 * f), 0));
-            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, (int) (100 * (f * 1.2)), 0));
-        });*/
+        if (initDone) return;
         addBehavior(Items.ENCHANTED_GOLDEN_APPLE, (entity, stack) -> {
             entity.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0));
             entity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 8000, 0));
@@ -163,10 +116,11 @@ public class TeaBehavior {
                     var bucketEntity = ((BucketItemAccessor) Items.AXOLOTL_BUCKET).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
                     if (bucketEntity instanceof Bucketable bucketable) {
                         bucketable.copyDataFromNbt(stack.getOrCreateNbt());
-                        bucketEntity.setVelocity(entity.getRotationVector());
-                        bucketEntity.world.spawnEntity(entity);
-                        entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY_AXOLOTL, SoundCategory.AMBIENT, 1.0f, 1.0f);
+                        bucketable.setFromBucket(true);
                     }
+                    if (bucketEntity == null) return;
+                    bucketEntity.setVelocity(entity.getRotationVector());
+                    entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY_AXOLOTL, SoundCategory.AMBIENT, 1.0f, 1.0f);
                 }
         );
         addBehavior(Items.RED_MUSHROOM, (entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 100, 0)));
@@ -314,12 +268,68 @@ public class TeaBehavior {
 
         addBehavior(Items.CHORUS_FRUIT, (entity, stack) -> {
             if (entity instanceof PlayerEntity player) {
-                if (((ChorusAccess)entity).good_tea$isTeleporting()) {
+                if (((ChorusAccess) entity).good_tea$isTeleporting()) {
                     player.sendMessage(TextUtil.translatable("text.good-tea.chorus-tea-renew"), true);
                 } else player.sendMessage(TextUtil.translatable("text.good-tea.chorus-tea"), true);
             }
-            ((ChorusAccess)entity).good_tea$addTeleportingTime(3600);
+            ((ChorusAccess) entity).good_tea$addTeleportingTime(3600);
         });
+
+        this.initDone = true;
+    }
+
+    public void initAuto() {
+        if (dynamicInitDone) return;
+        for (Item item : Registry.ITEM) {
+            if (item instanceof SpawnEggItem spawnEggItem) {
+                addBehavior(item, (entity, stack) -> {
+                    Entity spawnEggEntity = spawnEggItem.getEntityType(new NbtCompound()).create(entity.world);
+                    if (spawnEggEntity != null) {
+                        spawnEggEntity.setPos(entity.getX(), entity.getY(), entity.getZ());
+                        spawnEggEntity.setVelocity(entity.getRotationVector());
+                        entity.world.spawnEntity(spawnEggEntity);
+                    }
+                });
+            }
+            if (item instanceof EntityBucketItem entityBucketItem) {
+                if (item != Items.AXOLOTL_BUCKET) addBehavior(item, (entity, stack) -> {
+                    var bucketEntity = ((BucketItemAccessor) entityBucketItem).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
+                    if (bucketEntity instanceof Bucketable bucketable) {
+                        bucketable.copyDataFromNbt(stack.getOrCreateNbt());
+                        bucketable.setFromBucket(true);
+                    }
+                    if (bucketEntity == null) return;
+                    bucketEntity.setVelocity(entity.getRotationVector());
+                    entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY_FISH, SoundCategory.AMBIENT, 1.0f, 1.0f);
+                });
+            }
+            if (item instanceof SwordItem swordItem) {
+                addBehavior(item, (entity, stack) -> {
+                    entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 2);
+                    entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
+                    stack.damage(MathStuff.fastCeil(swordItem.getAttackDamage() * 3.0F), entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
+                    ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
+                });
+            }
+            if (item instanceof MusicDiscItem musicDiscItem) {
+                addBehavior(item, (entity, stack) -> entity.world.playSoundFromEntity(null, entity, musicDiscItem.getSound(), SoundCategory.RECORDS, 1F, 1F));
+            }
+            if (item instanceof BlockItem blockItem) {
+                if (blockItem.getBlock() instanceof FlowerBlock flowerBlock) {
+                    addBehavior(item, (entity, stack) -> {
+                        StatusEffectInstance effectInstance = new StatusEffectInstance(flowerBlock.getEffectInStew(), flowerBlock.getEffectInStew().isInstant() ? flowerBlock.getEffectInStewDuration() : (flowerBlock.getEffectInStewDuration() * 2));
+                        entity.addStatusEffect(effectInstance);
+                    });
+                }
+                if (blockItem.getBlock() instanceof BedBlock) {
+                    addBehavior(item, (entity, stack) -> {
+                        if (!BedBlock.isBedWorking(entity.world))
+                            entity.world.createExplosion(null, DamageSource.badRespawnPoint(), null, entity.getX() + 0.5, entity.getY() + 0.5, entity.getZ() + 0.5, 5.0F, true, Explosion.DestructionType.DESTROY);
+                    });
+                }
+            }
+        }
+        this.dynamicInitDone = true;
     }
 
     public Behavior getBehavior(ItemStack stack) {
@@ -376,6 +386,17 @@ public class TeaBehavior {
     }
 
     public void initTooltips() {
+        if (tooltipInitDone) return;
+        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)), TEA_MUG, KETTLE_BLOCK_ITEM);
+        addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
+        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)), Items.HAY_BLOCK, Items.WHEAT);
+        addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
+        addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
+        this.tooltipInitDone = true;
+    }
+
+    public void initAutoTooltips() {
+        if (dynamicTooltipInitDone) return;
         for (Item item : Registry.ITEM) {
             if (item instanceof MusicDiscItem discItem) {
                 addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(discItem.getDescription().formatted(Formatting.GRAY)));
@@ -386,11 +407,7 @@ public class TeaBehavior {
                 }
             }
         }
-        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)), TEA_MUG, KETTLE_BLOCK_ITEM);
-        addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)), Items.HAY_BLOCK, Items.WHEAT);
-        addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
-        addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
+        this.dynamicTooltipInitDone = true;
     }
 
     public void damageEntitiesHurtByWater(PotionEntity entity) {

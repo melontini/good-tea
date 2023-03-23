@@ -34,6 +34,10 @@ public class GoodTea implements ModInitializer {
             KahurCompat.register();
         }
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> CrackerLog.info("Found {} item behaviors", TeaBehavior.INSTANCE.TEA_BEHAVIOR.size()));
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            TeaBehavior.INSTANCE.initAuto();
+            TeaBehavior.INSTANCE.initAutoTooltips();
+            CrackerLog.info("Found {} item behaviors", TeaBehavior.INSTANCE.TEA_BEHAVIOR.size());
+        });
     }
 }

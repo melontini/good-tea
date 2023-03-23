@@ -66,7 +66,7 @@ public class GoodTeaStuff {
             .sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque().build();
     public static TeaMugItem TEA_MUG_FILLED = RegistryUtil.asItem(FILLED_TEA_MUG_BLOCK);
     public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(FILLED_TEA_MUG_BLOCK);
-    public static ItemGroup GROUP = Util.make(() -> {
+    public static ItemGroup GROUP = Utilities.supply(() -> {
         ((ItemGroupExtensions) ItemGroup.BUILDING_BLOCKS).fabric_expandArray();
         return new GoodTeaGroup(ItemGroup.GROUPS.length - 1, "good_tea_item_group");
     });
@@ -139,7 +139,7 @@ public class GoodTeaStuff {
             Utilities.appendStacks(stacks, teaStarterPack);
 
             var help = DefaultedList.<ItemStack>of();
-            var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet().stream().sorted(Comparator.comparing(Registry.ITEM::getId)).toList();
+            var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
             for (Item item : list) {
                 item.appendStacks(SEARCH, help);
 
