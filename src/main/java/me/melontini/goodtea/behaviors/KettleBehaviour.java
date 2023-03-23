@@ -8,13 +8,14 @@ import net.minecraft.block.CampfireBlock;
 import net.minecraft.state.property.Property;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class KettleBehaviour {
     public static KettleBehaviour INSTANCE = new KettleBehaviour();
 
-    public final Map<Block, Map<Property<?>, ?>> HOT_BLOCKS_WITH_STATE = new HashMap<>();
+    public final Map<Block, Map<Property<?>, ?>> HOT_BLOCKS_WITH_STATE = new LinkedHashMap<>();
 
     public void init() {
         addBlockWithProperties(Blocks.CAMPFIRE, Map.of(CampfireBlock.LIT, true));
