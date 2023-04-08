@@ -10,8 +10,6 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v3.4.0
-      - name: Get Minecraft version
-        run: echo "MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2)" >> $GITHUB_ENV
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: setup jdk 17
@@ -19,13 +17,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          key: ${{ runner.os }}-${{ env.MC_VERSION }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: build
