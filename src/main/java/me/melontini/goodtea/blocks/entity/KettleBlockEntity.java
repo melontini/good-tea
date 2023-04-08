@@ -98,6 +98,9 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         kettleBlockEntity.tick();
     }
 
+    private ItemStack teaMugStack = ItemStack.EMPTY;
+    private ItemStack lastInputStack = ItemStack.EMPTY;
+
     private void tick() {
         assert world != null;
         ItemStack input = this.inventory.get(0);
@@ -106,32 +109,38 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
         if (this.time > 0) {
             BlockState state = world.getBlockState(this.pos.down());
-            Optional<Map<Property<?>, ?>> optional = KettleBehaviour.INSTANCE.getProperties(state.getBlock());
-            if (optional.isPresent()) {
-                if (state.getProperties().containsAll(optional.get().keySet())) {
-                    if (state.getProperties().stream().filter(property -> optional.get().containsKey(property)).allMatch(property -> state.get(property).equals(optional.get().get(property)))) {
-                        tickTime();
+            if (state.isIn(HOT_BLOCKS)) {
+                this.tickTime();
+            } else {
+                KettleBehaviour.INSTANCE.getProperties(state.getBlock()).ifPresent(propertyMap -> {
+                    if (state.getProperties().containsAll(propertyMap.keySet())) {
+                        if (state.getProperties().stream().filter(propertyMap::containsKey).allMatch(property -> state.get(property).equals(propertyMap.get(property)))) {
+                            tickTime();
+                        }
                     }
-                }
-            } else if (state.isIn(HOT_BLOCKS)) {
-                tickTime();
+                });
             }
         }
         if (!world.isClient) {
-            ItemStack stack = new ItemStack(TEA_MUG_FILLED);
-            ItemStack teaStack = input.copy();
-            teaStack.setCount(1);
-            stack.setNbt(NbtBuilder.create()
-                    .put("GT-TeaItem", teaStack.writeNbt(new NbtCompound()))
-                    .build());
+            if (!ItemStack.areEqual(input, lastInputStack)) {
+                lastInputStack = input.copy();
+
+                teaMugStack = new ItemStack(TEA_MUG_FILLED);
+                ItemStack teaStack = input.copy();
+                teaStack.setCount(1);
+                teaMugStack.setNbt(NbtBuilder.create()
+                        .put("GT-TeaItem", teaStack.writeNbt(new NbtCompound()))
+                        .build());
+            }
+
             if (this.time == -1) {
-                if ((!input.isEmpty() && !input.isOf(TEA_MUG_FILLED)) && !mug.isEmpty() && canCombine(stack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
+                if ((!input.isEmpty() && !input.isOf(TEA_MUG_FILLED)) && !mug.isEmpty() && canCombine(teaMugStack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
                     switch (input.getItem().getRarity(input)) {
-                        case COMMON -> this.time = 600;
-                        case UNCOMMON -> this.time = 750;
-                        case RARE -> this.time = 800;
-                        case EPIC -> this.time = 850;
-                        default -> this.time = 700;
+                        case COMMON -> this.time = 400;
+                        case UNCOMMON -> this.time = 550;
+                        case RARE -> this.time = 600;
+                        case EPIC -> this.time = 650;
+                        default -> this.time = 500;
                     }
                     update();
                 }
@@ -144,7 +153,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                 } else if (mug.isEmpty()) {
                     this.time = -1;
                     update();
-                } else if (!canCombine(stack, output)) {
+                } else if (!canCombine(teaMugStack, output)) {
                     this.time = -1;
                     update();
                 } else if (this.waterStorage.amount < FluidConstants.BOTTLE) {
@@ -159,12 +168,11 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                     }
                     input.decrement(1);
                     mug.decrement(1);
-                    this.inventory.set(2, stack);
-                } else if (canCombine(stack, output)) {
-                    int a = stack.getCount();
+                    this.inventory.set(2, teaMugStack.copy());
+                } else if (canCombine(teaMugStack, output)) {
+                    int a = teaMugStack.getCount();
                     int b = output.getCount();
                     output.setCount(a + b);
-                    stack.setCount(0);
                     if (input.getItem().hasRecipeRemainder()) {
                         ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), new ItemStack(input.getItem().getRecipeRemainder()));
                     }
