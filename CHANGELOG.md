@@ -1,4 +1,4 @@
 ## What's new:
 
 - A bunch of internal changes
-- Updated CrackerUtil
+- Updated CrackerUtil in preps for 1.19.3

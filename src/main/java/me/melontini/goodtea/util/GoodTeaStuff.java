@@ -13,8 +13,6 @@ import me.melontini.goodtea.blocks.TeaMugBlock;
 import me.melontini.goodtea.blocks.entity.FilledTeaMugBlockEntity;
 import me.melontini.goodtea.blocks.entity.KettleBlockEntity;
 import me.melontini.goodtea.items.TeaMugItem;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.impl.item.group.ItemGroupExtensions;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
@@ -30,14 +28,12 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
-import net.minecraft.util.Util;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,92 +62,73 @@ public class GoodTeaStuff {
             .sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque().build();
     public static TeaMugItem TEA_MUG_FILLED = RegistryUtil.asItem(FILLED_TEA_MUG_BLOCK);
     public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(FILLED_TEA_MUG_BLOCK);
-    public static ItemGroup GROUP = Utilities.supply(() -> {
-        ((ItemGroupExtensions) ItemGroup.BUILDING_BLOCKS).fabric_expandArray();
-        return new GoodTeaGroup(ItemGroup.GROUPS.length - 1, "good_tea_item_group");
-    });
+    public static final ItemStack KETTLE = KETTLE_BLOCK_ITEM.getDefaultStack();
+    public static final ItemStack MUG = TEA_MUG.getDefaultStack();
+    public static ItemGroup GROUP = ContentBuilder.ItemGroupBuilder.create(new Identifier(MODID, "item_group"))
+            .animatedIcon(() -> new AnimatedItemGroup() {
+                float angle = 45f, lerpPoint = 0;
+                @Override
+                public void animateIcon(MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
+                    MinecraftClient client = MinecraftClient.getInstance();
+
+                    BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
+                    matrixStack.push();
+                    matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F + client.getItemRenderer().zOffset);
+                    matrixStack.translate(8.0, 8.0, 0.0);
+                    matrixStack.scale(1.0F, -1.0F, 1.0F);
+                    matrixStack.scale(15.0F, 15.0F, 15.0F);
+                    DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, MUG, model1);
+                    matrixStack.pop();
+
+
+                    BakedModel model = client.getItemRenderer().getModel(KETTLE, null, null, 0);
+                    //itemX + 5, itemY - 5
+                    matrixStack.push();
+                    matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F + client.getItemRenderer().zOffset);
+                    matrixStack.translate(8.0, 8.0, 0.0);
+                    matrixStack.scale(1.0F, -1.0F, 1.0F);
+                    matrixStack.scale(16.0F, 16.0F, 16.0F);
+
+
+                    angle = MathHelper.lerp(0.1f * client.getLastFrameDuration(), angle, lerpPoint);
+                    if (angle < 0.1f && lerpPoint == 0f) {
+                        lerpPoint = 45f;
+                    }
+                    if (angle > 44.9f && lerpPoint == 45f) {
+                        lerpPoint = 0f;
+                    }
+                    matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(angle));
+                    DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, KETTLE, model);
+                    matrixStack.pop();
+                }
+            }).entries(stacks -> {
+                List<ItemStack> teaStarterPack = new ArrayList<>();
+                teaStarterPack.add(KETTLE);
+                teaStarterPack.add(MUG);
+
+                teaStarterPack.add(ItemStack.EMPTY);
+
+                teaStarterPack.add(Items.CAMPFIRE.getDefaultStack());
+                teaStarterPack.add(Items.SOUL_CAMPFIRE.getDefaultStack());
+                teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
+                Utilities.appendStacks(stacks, teaStarterPack);
+
+                var help = DefaultedList.<ItemStack>of();
+                var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
+                for (Item item : list) {
+                    item.appendStacks(ItemGroup.SEARCH, help);
+
+                    for (ItemStack stack : help) {
+                        var mug = TEA_MUG_FILLED.getDefaultStack();
+                        mug.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
+                        stacks.add(mug);
+                        stacks.add(stack);
+                        stacks.add(ItemStack.EMPTY);
+                    }
+                    help.clear();
+                }
+            }).icon(KETTLE).build();
 
     public static void init() {
-    }
-
-    public static class GoodTeaGroup extends ItemGroup implements AnimatedItemGroup {
-
-        public final ItemStack KETTLE = KETTLE_BLOCK_ITEM.getDefaultStack();
-        public final ItemStack MUG = TEA_MUG.getDefaultStack();
-        float angle = 45f, lerpPoint = 0;
-
-        public GoodTeaGroup(int index, String id) {
-            super(index, id);
-            this.setIconAnimation(this);
-        }
-
-        @Override
-        public void animateIcon(MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
-            MinecraftClient client = MinecraftClient.getInstance();
-
-            BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
-            matrixStack.push();
-            matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F + client.getItemRenderer().zOffset);
-            matrixStack.translate(8.0, 8.0, 0.0);
-            matrixStack.scale(1.0F, -1.0F, 1.0F);
-            matrixStack.scale(15.0F, 15.0F, 15.0F);
-            DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, MUG, model1);
-            matrixStack.pop();
-
-
-            BakedModel model = client.getItemRenderer().getModel(KETTLE, null, null, 0);
-            //itemX + 5, itemY - 5
-            matrixStack.push();
-            matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F + client.getItemRenderer().zOffset);
-            matrixStack.translate(8.0, 8.0, 0.0);
-            matrixStack.scale(1.0F, -1.0F, 1.0F);
-            matrixStack.scale(16.0F, 16.0F, 16.0F);
-
-
-            angle = MathHelper.lerp(0.1f * client.getLastFrameDuration(), angle, lerpPoint);
-            if (angle < 0.1f && lerpPoint == 0f) {
-                lerpPoint = 45f;
-            }
-            if (angle > 44.9f && lerpPoint == 45f) {
-                lerpPoint = 0f;
-            }
-            matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(angle));
-            DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, KETTLE, model);
-            matrixStack.pop();
-        }
-
-        @Override
-        public ItemStack createIcon() {
-            return KETTLE_BLOCK_ITEM.getDefaultStack();
-        }
-
-        @Override
-        public void appendStacks(DefaultedList<ItemStack> stacks) {
-            List<ItemStack> teaStarterPack = new ArrayList<>();
-            teaStarterPack.add(KETTLE);
-            teaStarterPack.add(MUG);
-
-            teaStarterPack.add(ItemStack.EMPTY);
-
-            teaStarterPack.add(Items.CAMPFIRE.getDefaultStack());
-            teaStarterPack.add(Items.SOUL_CAMPFIRE.getDefaultStack());
-            teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
-            Utilities.appendStacks(stacks, teaStarterPack);
-
-            var help = DefaultedList.<ItemStack>of();
-            var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
-            for (Item item : list) {
-                item.appendStacks(SEARCH, help);
-
-                for (ItemStack stack : help) {
-                    var mug = TEA_MUG_FILLED.getDefaultStack();
-                    mug.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
-                    stacks.add(mug);
-                    stacks.add(stack);
-                    stacks.add(ItemStack.EMPTY);
-                }
-                help.clear();
-            }
-        }
     }
 }
