@@ -104,11 +104,11 @@ public class KettleScreenHandler extends ScreenHandler {
         ItemStack input = this.inventory.getStack(0);
         if (input == null) return 0;
         switch (input.getItem().getRarity(input)) {
-            case COMMON -> j = 600;
-            case UNCOMMON -> j = 750;
-            case RARE -> j = 800;
-            case EPIC -> j = 850;
-            default -> j = 700;
+            case COMMON -> j = 400;
+            case UNCOMMON -> j = 550;
+            case RARE -> j = 600;
+            case EPIC -> j = 650;
+            default -> j = 500;
         }
         return i > 0 ? 24 - (i * 24f / j) : 0;
     }
