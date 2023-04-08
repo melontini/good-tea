@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v3.4.0
+      - name: Get branch name
+        uses: tj-actions/branch-names@v6.5
+        id: extract_branch
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: setup jdk ${{ matrix.java }}
@@ -25,6 +28,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-${{ steps.extract_branch.outputs.current_branch }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
       - name: make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
