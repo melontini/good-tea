@@ -10,9 +10,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v3.4.0
-      - name: Get branch name
-        uses: tj-actions/branch-names@v6.5
-        id: extract_branch
+      - name: Get Minecraft version
+        run: echo "MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2)" >> $GITHUB_ENV
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: setup jdk 17
@@ -23,7 +22,7 @@ jobs:
       - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
-          key: ${{ runner.os }}-${{ steps.extract_branch.outputs.current_branch }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-${{ env.MC_VERSION }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
