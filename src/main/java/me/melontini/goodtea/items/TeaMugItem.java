@@ -13,12 +13,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -68,8 +68,8 @@ public class TeaMugItem extends BlockItem {
             if (player != null) player.getInventory().offerOrDrop(new ItemStack(TEA_MUG));
         }
 
-        Optional<GameEvent> optional = Registry.GAME_EVENT.getOrEmpty(new Identifier("drink"));
-        GameEvent event = optional.orElseGet(() -> Registry.GAME_EVENT.get(new Identifier("drinking_finish")));
+        Optional<GameEvent> optional = Registries.GAME_EVENT.getOrEmpty(new Identifier("drink"));
+        GameEvent event = optional.orElseGet(() -> Registries.GAME_EVENT.get(new Identifier("drinking_finish")));
         user.emitGameEvent(event, user);
         return stack;
     }

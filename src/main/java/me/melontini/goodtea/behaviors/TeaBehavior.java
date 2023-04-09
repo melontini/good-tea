@@ -36,6 +36,8 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
@@ -49,14 +51,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.*;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
-import net.minecraft.world.explosion.Explosion;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.*;
 
@@ -84,8 +85,8 @@ public class TeaBehavior {
             entity.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 3200, 2));
         });
 
-        addBehavior((entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, Explosion.DestructionType.DESTROY), Items.TNT, Items.TNT_MINECART);
-        addBehavior(Items.GUNPOWDER, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 1.0F, Explosion.DestructionType.DESTROY));
+        addBehavior((entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, World.ExplosionSourceType.MOB), Items.TNT, Items.TNT_MINECART);
+        addBehavior(Items.GUNPOWDER, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 1.0F, World.ExplosionSourceType.MOB));
 
         addBehavior(Items.END_ROD, (entity, stack) -> {
             Random random = new Random();
@@ -243,7 +244,7 @@ public class TeaBehavior {
         addBehavior(Items.GOAT_HORN, (entity, stack) -> {
             ((GoatHornItemAccessor) Items.GOAT_HORN).gt$getInstrument(stack).ifPresent(registryEntry -> {
                 Instrument instrument = (Instrument) ((RegistryEntry<?>) registryEntry).value();
-                SoundEvent soundEvent = instrument.soundEvent();
+                SoundEvent soundEvent = instrument.soundEvent().value();
                 float f = instrument.range() / 16.0F;
                 entity.world.playSoundFromEntity(null, entity, soundEvent, SoundCategory.RECORDS, f, 1.0F);
                 entity.world.emitGameEvent(GameEvent.INSTRUMENT_PLAY, entity.getPos(), GameEvent.Emitter.of(entity));
@@ -254,11 +255,10 @@ public class TeaBehavior {
             FireworkRocketEntity fireworkRocketEntity = new FireworkRocketEntity(entity.world, stack, entity, entity.getX(), entity.getEyeY() - 0.15F, entity.getZ(), true);
 
             Vec3d vec3d = entity.getOppositeRotationVector(1.0F);
-            Quaternion quaternion = new Quaternion(new Vec3f(vec3d), 0, true);
+            Quaternionf quaternion = new Quaternionf().setAngleAxis(0, vec3d.x, vec3d.y, vec3d.z);
             Vec3d vec3d2 = entity.getRotationVec(1.0F);
-            Vec3f vec3f = new Vec3f(vec3d2);
-            vec3f.rotate(quaternion);
-            fireworkRocketEntity.setVelocity(vec3f.getX(), vec3f.getY(), vec3f.getZ(), 1.6f, 1);
+            Vector3f vec3f = vec3d2.toVector3f().rotate(quaternion);
+            fireworkRocketEntity.setVelocity(vec3f.x(), vec3f.y(), vec3f.z(), 1.6f, 1);
 
             entity.world.spawnEntity(fireworkRocketEntity);
             if (entity instanceof PlayerEntity player) {
@@ -280,7 +280,7 @@ public class TeaBehavior {
 
     public void initAuto() {
         if (dynamicInitDone) return;
-        for (Item item : Registry.ITEM) {
+        for (Item item : Registries.ITEM) {
             if (item instanceof SpawnEggItem spawnEggItem) {
                 addBehavior(item, (entity, stack) -> {
                     Entity spawnEggEntity = spawnEggItem.getEntityType(new NbtCompound()).create(entity.world);
@@ -324,7 +324,7 @@ public class TeaBehavior {
                 if (blockItem.getBlock() instanceof BedBlock) {
                     addBehavior(item, (entity, stack) -> {
                         if (!BedBlock.isBedWorking(entity.world))
-                            entity.world.createExplosion(null, DamageSource.badRespawnPoint(), null, entity.getX() + 0.5, entity.getY() + 0.5, entity.getZ() + 0.5, 5.0F, true, Explosion.DestructionType.DESTROY);
+                            entity.world.createExplosion(null, DamageSource.badRespawnPoint(entity.getPos()), null, entity.getX() + 0.5, entity.getY() + 0.5, entity.getZ() + 0.5, 5.0F, true, World.ExplosionSourceType.MOB);
                     });
                 }
             }
@@ -397,7 +397,7 @@ public class TeaBehavior {
 
     public void initAutoTooltips() {
         if (dynamicTooltipInitDone) return;
-        for (Item item : Registry.ITEM) {
+        for (Item item : Registries.ITEM) {
             if (item instanceof MusicDiscItem discItem) {
                 addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(discItem.getDescription().formatted(Formatting.GRAY)));
             }
@@ -412,7 +412,7 @@ public class TeaBehavior {
 
     public void damageEntitiesHurtByWater(PotionEntity entity) {
         Box box = entity.getBoundingBox().expand(4.0, 2.0, 4.0);
-        List<LivingEntity> list = entity.world.getEntitiesByClass(LivingEntity.class, box, PotionEntity.WATER_HURTS);
+        List<LivingEntity> list = entity.world.getEntitiesByClass(LivingEntity.class, box, PotionEntity.AFFECTED_BY_WATER);
         if (!list.isEmpty()) list.stream()
                 .filter(livingEntity -> entity.squaredDistanceTo(livingEntity) < 16.0 && livingEntity.hurtByWater())
                 .forEach(livingEntity -> livingEntity.damage(DamageSource.magic(entity, entity.getOwner()), 1.0F));

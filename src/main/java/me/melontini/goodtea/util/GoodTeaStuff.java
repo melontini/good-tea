@@ -24,18 +24,16 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.math.RotationAxis;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static me.melontini.goodtea.GoodTea.MODID;
 
@@ -44,15 +42,15 @@ public class GoodTeaStuff {
 
     public static EntityAttributeModifier RABBITS_LUCK = new EntityAttributeModifier(UUID.fromString("57c5033e-c071-4b23-8f14-0551eb4c5b0a"), "Tea Modifier", 1, EntityAttributeModifier.Operation.ADDITION);
 
-    public static TagKey<Block> SHOW_SUPPORT = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_kettle_show_support"));
-    public static TagKey<Block> HOT_BLOCKS = TagKey.of(Registry.BLOCK_KEY, new Identifier(MODID, "gt_hot_blocks"));
+    public static TagKey<Block> SHOW_SUPPORT = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_kettle_show_support"));
+    public static TagKey<Block> HOT_BLOCKS = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_hot_blocks"));
     public static TeaMugBlock TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(TeaMugBlock.class, new Identifier(MODID, "mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW))
-            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroup.MISC).maxCount(16))
+            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroups.FOOD_AND_DRINK).maxCount(16))
             .nonOpaque().strength(0.1F).sounds(BlockSoundGroup.CANDLE).build();
     public static BlockItem TEA_MUG = RegistryUtil.asItem(TEA_MUG_BLOCK);
     public static KettleBlock KETTLE_BLOCK = ContentBuilder.BlockBuilder.create(KettleBlock.class, new Identifier(MODID, "kettle"), AbstractBlock.Settings.of(Material.METAL, MapColor.STONE_GRAY))
             .blockEntity((block, id) -> ContentBuilder.BlockEntityBuilder.create(id, KettleBlockEntity::new, block))
-            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroup.DECORATIONS))
+            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroups.FUNCTIONAL))
             .requiresTool().strength(2.0f).nonOpaque().build();
     public static BlockItem KETTLE_BLOCK_ITEM = RegistryUtil.asItem(KETTLE_BLOCK);
     public static BlockEntityType<KettleBlockEntity> KETTLE_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(KETTLE_BLOCK);
@@ -97,7 +95,7 @@ public class GoodTeaStuff {
                     if (angle > 44.9f && lerpPoint == 45f) {
                         lerpPoint = 0f;
                     }
-                    matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(angle));
+                    matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
                     DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, KETTLE, model);
                     matrixStack.pop();
                 }
@@ -113,19 +111,24 @@ public class GoodTeaStuff {
                 teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
                 Utilities.appendStacks(stacks, teaStarterPack);
 
-                var help = DefaultedList.<ItemStack>of();
                 var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
-                for (Item item : list) {
-                    item.appendStacks(ItemGroup.SEARCH, help);
 
-                    for (ItemStack stack : help) {
-                        var mug = TEA_MUG_FILLED.getDefaultStack();
-                        mug.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
-                        stacks.add(mug);
-                        stacks.add(stack);
-                        stacks.add(ItemStack.EMPTY);
+                Set<ItemStack> set = ItemStackSet.create();
+
+                for(ItemGroup itemGroup : ItemGroups.getGroups()) {
+                    if (itemGroup.getType() != ItemGroup.Type.SEARCH) {
+                        set.addAll(itemGroup.getSearchTabStacks());
                     }
-                    help.clear();
+                }
+
+                set.removeIf(itemStack -> !list.contains(itemStack.getItem()));
+
+                for (ItemStack stack : set) {
+                    var mug = TEA_MUG_FILLED.getDefaultStack();
+                    mug.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
+                    stacks.add(mug);
+                    stacks.add(stack);
+                    stacks.add(ItemStack.EMPTY);
                 }
             }).icon(KETTLE).build();
 
