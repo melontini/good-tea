@@ -1,0 +1,30 @@
+{
+    "itemGroup.good-tea.item_group": "馥郁良茶",
+  
+    "tooltip.good-tea.filled_mug": "由%s浸泡而成",
+    "tooltip.good-tea.filled_mug.nothing": "这杯茶没什么特别的",
+    "tooltip.good-tea.filled_mug.something": "这杯茶有些特别之处",
+  
+    "gui.good-tea.kettle": "水壶",
+    "gui.good-tea.water-level.title": "当前水量：",
+    "gui.good-tea.water-level": "%s / 81000",
+  
+    "block.good-tea.kettle": "水壶",
+  
+    "text.good-tea.obsidian_toughness": "味道一言难尽，但你的盔甲韧性永久提高了2点！",
+    "text.good-tea.rabbits_luck": "味道一言难尽，但你的幸运值永久提高了1点！",
+    "text.good-tea.hoglin_repellent": "嗯…看样子接下来的两分钟里，你会散发出诡异菌的气味",
+    "text.good-tea.divine": "你感到图腾的神圣能量充盈体内",
+    "text.good-tea.used_divine": "图腾能量已经从你的体内消散而去",
+    "text.good-tea.chorus-tea": "你略微感到不适…",
+    "text.good-tea.chorus-tea-renew": "不适感不断加重…",
+  
+    "block.good-tea.filled_mug": "盛有茶水的杯子",
+    "block.good-tea.mug": "杯子",
+  
+    "tea-tooltip.good-tea.tea-mug-tea": "这是什么品种的茶？！",
+    "tea-tooltip.good-tea.axolotl_tea": "你这个恶魔！",
+    "tea-tooltip.good-tea.bed-tea": "这只能在主世界饮用！",
+    "tea-tooltip.good-tea.music-disc-tea": "谁要整个音响？",
+    "tea-tooltip.good-tea.wheat_tea": "饮用请适量"
+  }
