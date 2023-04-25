@@ -1,13 +1,12 @@
 package me.melontini.goodtea.behaviors;
 
-import me.melontini.crackerutil.CrackerLog;
 import me.melontini.crackerutil.util.MakeSure;
+import me.melontini.goodtea.GoodTea;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.state.property.Property;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class KettleBehaviour {
         if (!HOT_BLOCKS_WITH_STATE.containsKey(block)) {
             HOT_BLOCKS_WITH_STATE.putIfAbsent(block, propertyMap);
         } else {
-            CrackerLog.error("Tried to add blockstates for the same block twice! {}", block);
+            GoodTea.LOGGER.error("Tried to add blockstates for the same block twice! {}", block);
         }
     }
 

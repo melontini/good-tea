@@ -10,14 +10,12 @@ import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.world.World;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
 
 public class KettleScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final PropertyDelegate propertyDelegate;
-    private final World world;
 
     public KettleScreenHandler(int syncId, PlayerInventory playerInventory) {
         this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(2));
@@ -25,7 +23,7 @@ public class KettleScreenHandler extends ScreenHandler {
 
     public KettleScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
         super(GoodTea.KETTLE_SCREEN_HANDLER, syncId);
-        this.world = playerInventory.player.world;
+        //this.world = playerInventory.player.world;
         this.inventory = inventory;
         this.propertyDelegate = propertyDelegate;
         this.addProperties(propertyDelegate);
