@@ -4,6 +4,8 @@ import me.melontini.crackerutil.CrackerLog;
 import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.crackerutil.util.MathStuff;
 import me.melontini.crackerutil.util.TextUtil;
+import me.melontini.crackerutil.util.Utilities;
+import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.ChorusAccess;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
 import me.melontini.goodtea.ducks.DivineAccess;
@@ -12,7 +14,6 @@ import me.melontini.goodtea.mixin.BucketItemAccessor;
 import me.melontini.goodtea.mixin.GoatHornItemAccessor;
 import me.melontini.goodtea.mixin.PotionEntityAccessor;
 import me.melontini.goodtea.mixin.SpongeBlockAccessor;
-import me.melontini.goodtea.util.JavaRandomUtil;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -94,17 +95,16 @@ public class TeaBehavior {
         });
 
         addBehavior(Items.SPORE_BLOSSOM, (entity, stack) -> {
-            Random random = new Random();
             BlockPos.Mutable mutable = new BlockPos.Mutable();
 
             int i = entity.getBlockPos().getX();
             int j = entity.getBlockPos().getY();
             int k = entity.getBlockPos().getZ();
             for (int l = 0; l < 3; ++l) {
-                mutable.set(i + JavaRandomUtil.nextInt(random, -4, 4), j + 4, k + JavaRandomUtil.nextInt(random, -4, 4));
+                mutable.set(i + MathStuff.nextInt(Utilities.RANDOM, -4, 4), j + 4, k + MathStuff.nextInt(Utilities.RANDOM, -4, 4));
                 BlockState blockState = entity.world.getBlockState(mutable);
                 if (!blockState.isFullCube(entity.world, mutable)) {
-                    ((ServerWorld) entity.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + random.nextDouble(), mutable.getY() + random.nextDouble(), mutable.getZ() + random.nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
+                    ((ServerWorld) entity.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + Utilities.RANDOM.nextDouble(), mutable.getY() + Utilities.RANDOM.nextDouble(), mutable.getZ() + Utilities.RANDOM.nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
                 }
             }
 
@@ -351,7 +351,7 @@ public class TeaBehavior {
     public void addBehavior(Item item, Behavior behavior) {
         MakeSure.notNulls(item, behavior);
         if (!TEA_BEHAVIOR.containsKey(item)) TEA_BEHAVIOR.putIfAbsent(item, behavior);
-        else CrackerLog.error("Tried to add behaviour for the same item twice! {}", item);
+        else GoodTea.LOGGER.error("Tried to add behaviour for the same item twice! {}", item);
     }
 
     public void addBehavior(Behavior behavior, Item... items) {
@@ -382,7 +382,7 @@ public class TeaBehavior {
     public void addTooltip(Item item, Tooltip tooltip) {
         MakeSure.notNull(tooltip);
         if (!TEA_TOOLTIP.containsKey(item)) TEA_TOOLTIP.putIfAbsent(item, tooltip);
-        else CrackerLog.error("Tried to add a tooltip for the same item twice! {}", item);
+        else GoodTea.LOGGER.error("Tried to add a tooltip for the same item twice! {}", item);
     }
 
     public void initTooltips() {

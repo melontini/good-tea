@@ -1,6 +1,6 @@
 package me.melontini.goodtea;
 
-import me.melontini.crackerutil.CrackerLog;
+import me.melontini.crackerutil.util.PrependingLogger;
 import me.melontini.goodtea.behaviors.KahurCompat;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.behaviors.TeaBehavior;
@@ -12,12 +12,14 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.LogManager;
 import net.minecraft.util.registry.Registry;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class GoodTea implements ModInitializer {
+    public static final PrependingLogger LOGGER = new PrependingLogger(LogManager.getLogger("GoodTea"), PrependingLogger.NAME_METHOD_MIX);
     public static final String MODID = "good-tea";
     public static ScreenHandlerType<KettleScreenHandler> KETTLE_SCREEN_HANDLER = Registry.register(Registry.SCREEN_HANDLER, new Identifier(MODID, "kettle"), new ScreenHandlerType<>(KettleScreenHandler::new));
 
@@ -37,7 +39,7 @@ public class GoodTea implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             TeaBehavior.INSTANCE.initAuto();
             TeaBehavior.INSTANCE.initAutoTooltips();
-            CrackerLog.info("Found {} item behaviors", TeaBehavior.INSTANCE.TEA_BEHAVIOR.size());
+            LOGGER.info("Found {} item behaviors", TeaBehavior.INSTANCE.TEA_BEHAVIOR.size());
         });
     }
 }
