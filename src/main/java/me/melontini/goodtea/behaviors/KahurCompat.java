@@ -31,9 +31,9 @@ public class KahurCompat {
                 if (((EntityHitResult) hitResult).getEntity() instanceof LivingEntity livingEntity) {
                     target = livingEntity;
                 }
-            } else if (hitResult.getType() == HitResult.Type.BLOCK){
+            } else if (hitResult.getType() == HitResult.Type.BLOCK) {
                 Vec3d pos = hitResult.getPos();
-                List<LivingEntity> livingEntities = kahurShotEntity.world.getEntitiesByClass(LivingEntity.class, new Box(((BlockHitResult)hitResult).getBlockPos()).expand(0.5), LivingEntity::isAlive);
+                List<LivingEntity> livingEntities = kahurShotEntity.world.getEntitiesByClass(LivingEntity.class, new Box(((BlockHitResult) hitResult).getBlockPos()).expand(0.5), LivingEntity::isAlive);
                 Optional<LivingEntity> winner = livingEntities.stream().min(Comparator.comparingDouble(livingEntity -> livingEntity.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())));
                 if (winner.isPresent()) {
                     target = winner.get();
