@@ -1,3 +1,4 @@
 ## What's new:
 
-- Updated to Minecraft 1.19.3
+* Added Chinese translation. Courtesy of [Rad233](https://github.com/Rad233).
+* Updated CrackerUtil

@@ -38,7 +38,6 @@ public class KettleBlock extends BlockWithEntity {
     public static final BooleanProperty SUPPORT = BooleanProperty.of("support");
     private final VoxelShape BASE_SHAPE = Block.createCuboidShape(3.0, 0.0, 3.0, 13.0, 7.0, 13.0);
     private final VoxelShape LID_SHAPE = Block.createCuboidShape(4.0, 7.0, 4.0, 12.0, 8.0, 12.0);
-
     private final VoxelShape LEG_0 = Block.createCuboidShape(0, -16, 0, 1, -1, 1);
     private final VoxelShape LEG_1 = Block.createCuboidShape(0, -16, 15, 1, -1, 16);
     private final VoxelShape LEG_2 = Block.createCuboidShape(15, -16, 0, 16, -1, 1);
