@@ -29,9 +29,7 @@ import java.util.Objects;
 @SuppressWarnings("deprecation")
 public class FilledTeaMugBlock extends BlockWithEntity implements Waterloggable {
     public static final IntProperty COUNT = IntProperty.of("count", 1, 3);
-
     public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
-
     private final VoxelShape COUNT_1 = Block.createCuboidShape(6.0, 0.0, 6.0, 10.0, 5.0, 10.0);
     private final VoxelShape COUNT_2 = VoxelShapes.union(Block.createCuboidShape(9.0, 0.0, 6.0, 13.0, 5.0, 10.0), Block.createCuboidShape(3.0, 0.0, 6.0, 7.0, 5.0, 10.0));
     private final VoxelShape COUNT_3 = VoxelShapes.union(Block.createCuboidShape(9.0, 0.0, 9.0, 13.0, 5.0, 13.0), Block.createCuboidShape(3.0, 0.0, 9.0, 7.0, 5.0, 13.0), Block.createCuboidShape(6.0, 0.0, 3.0, 10.0, 5.0, 7.0));

@@ -1,6 +1,5 @@
 package me.melontini.goodtea.behaviors;
 
-import me.melontini.crackerutil.CrackerLog;
 import me.melontini.crackerutil.util.MakeSure;
 import me.melontini.crackerutil.util.MathStuff;
 import me.melontini.crackerutil.util.TextUtil;
@@ -64,6 +63,7 @@ import java.util.*;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
+@SuppressWarnings("unused")
 public class TeaBehavior {
     public static TeaBehavior INSTANCE = new TeaBehavior();
     public Map<Item, Behavior> TEA_BEHAVIOR = new LinkedHashMap<>();
