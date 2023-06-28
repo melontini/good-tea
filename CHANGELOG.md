@@ -1,4 +1,4 @@
 ## What's new:
 
-* Added Chinese translation. Courtesy of [Rad233](https://github.com/Rad233).
-* Updated CrackerUtil
+* The kettle now uses cutout rendering instead of translucent.
+* CrackerUtil -> Dark Matter

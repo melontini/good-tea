@@ -1,8 +1,8 @@
 package me.melontini.goodtea.blocks.entity;
 
-import me.melontini.crackerutil.data.NBTUtil;
-import me.melontini.crackerutil.data.NbtBuilder;
-import me.melontini.crackerutil.util.TextUtil;
+import me.melontini.dark_matter.content.data.NBTUtil;
+import me.melontini.dark_matter.content.data.NbtBuilder;
+import me.melontini.dark_matter.minecraft.util.TextUtil;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.screens.KettleScreenHandler;
