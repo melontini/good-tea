@@ -15,7 +15,7 @@ import static me.melontini.goodtea.util.GoodTeaStuff.KETTLE_BLOCK;
 public class GoodTeaClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), KETTLE_BLOCK);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), KETTLE_BLOCK);
         HandledScreens.register(GoodTea.KETTLE_SCREEN_HANDLER, KettleScreen::new);
     }
 }
