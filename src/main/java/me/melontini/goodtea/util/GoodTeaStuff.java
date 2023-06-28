@@ -1,11 +1,11 @@
 package me.melontini.goodtea.util;
 
-import me.melontini.crackerutil.client.util.DrawUtil;
-import me.melontini.crackerutil.content.ContentBuilder;
-import me.melontini.crackerutil.content.RegistryUtil;
-import me.melontini.crackerutil.data.NbtBuilder;
-import me.melontini.crackerutil.interfaces.AnimatedItemGroup;
-import me.melontini.crackerutil.util.Utilities;
+import me.melontini.dark_matter.content.ContentBuilder;
+import me.melontini.dark_matter.content.RegistryUtil;
+import me.melontini.dark_matter.content.data.NbtBuilder;
+import me.melontini.dark_matter.content.interfaces.AnimatedItemGroup;
+import me.melontini.dark_matter.minecraft.client.util.DrawUtil;
+import me.melontini.dark_matter.minecraft.util.MinecraftUtil;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -32,7 +32,10 @@ import net.minecraft.util.Rarity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static me.melontini.goodtea.GoodTea.MODID;
 
@@ -41,20 +44,17 @@ public class GoodTeaStuff {
     public static EntityAttributeModifier RABBITS_LUCK = new EntityAttributeModifier(UUID.fromString("57c5033e-c071-4b23-8f14-0551eb4c5b0a"), "Tea Modifier", 1, EntityAttributeModifier.Operation.ADDITION);
     public static TagKey<Block> SHOW_SUPPORT = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_kettle_show_support"));
     public static TagKey<Block> HOT_BLOCKS = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_hot_blocks"));
-    public static TeaMugBlock TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(TeaMugBlock.class, new Identifier(MODID, "mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW))
-            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroups.FOOD_AND_DRINK).maxCount(16))
-            .nonOpaque().strength(0.1F).sounds(BlockSoundGroup.CANDLE).build();
+    public static TeaMugBlock TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "mug"), () -> new TeaMugBlock(AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW).nonOpaque().strength(0.1F).sounds(BlockSoundGroup.CANDLE)))
+            .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new BlockItem(block, new Item.Settings().maxCount(16))).itemGroup(ItemGroups.FOOD_AND_DRINK)).build();
     public static BlockItem TEA_MUG = RegistryUtil.asItem(TEA_MUG_BLOCK);
-    public static KettleBlock KETTLE_BLOCK = ContentBuilder.BlockBuilder.create(KettleBlock.class, new Identifier(MODID, "kettle"), AbstractBlock.Settings.of(Material.METAL, MapColor.STONE_GRAY))
-            .blockEntity((block, id) -> ContentBuilder.BlockEntityBuilder.create(id, KettleBlockEntity::new, block))
-            .item((block, id) -> ContentBuilder.ItemBuilder.create(BlockItem.class, id, block, new Item.Settings()).group(ItemGroups.FUNCTIONAL))
-            .requiresTool().strength(2.0f).nonOpaque().build();
+    public static KettleBlock KETTLE_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "kettle"), () -> new KettleBlock(AbstractBlock.Settings.of(Material.METAL, MapColor.STONE_GRAY).requiresTool().strength(2f).nonOpaque()))
+            .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new BlockItem(block, new Item.Settings())).itemGroup(ItemGroups.FUNCTIONAL))
+            .blockEntity((block, identifier) -> ContentBuilder.BlockEntityBuilder.create(identifier, KettleBlockEntity::new, block)).build();
     public static BlockItem KETTLE_BLOCK_ITEM = RegistryUtil.asItem(KETTLE_BLOCK);
     public static BlockEntityType<KettleBlockEntity> KETTLE_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(KETTLE_BLOCK);
-    public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(FilledTeaMugBlock.class, new Identifier(MODID, "filled_mug"), AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW))
-            .blockEntity((block, id) -> ContentBuilder.BlockEntityBuilder.create(id, FilledTeaMugBlockEntity::new, block))
-            .item((block, id) -> ContentBuilder.ItemBuilder.create(TeaMugItem.class, id, block, new Item.Settings()).maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG))
-            .sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque().build();
+    public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "filled_mug"), () -> new FilledTeaMugBlock(AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW).sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque()))
+            .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new TeaMugItem(block, new Item.Settings().maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG))))
+            .blockEntity((block, identifier) -> ContentBuilder.BlockEntityBuilder.create(identifier, FilledTeaMugBlockEntity::new, block)).build();
     public static TeaMugItem TEA_MUG_FILLED = RegistryUtil.asItem(FILLED_TEA_MUG_BLOCK);
     public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(FILLED_TEA_MUG_BLOCK);
     public static final ItemStack KETTLE = KETTLE_BLOCK_ITEM.getDefaultStack();
@@ -106,7 +106,7 @@ public class GoodTeaStuff {
                 teaStarterPack.add(Items.CAMPFIRE.getDefaultStack());
                 teaStarterPack.add(Items.SOUL_CAMPFIRE.getDefaultStack());
                 teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
-                Utilities.appendStacks(stacks, teaStarterPack);
+                MinecraftUtil.appendStacks(stacks, teaStarterPack);
 
                 var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
 

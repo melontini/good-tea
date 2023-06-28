@@ -1,6 +1,6 @@
 package me.melontini.goodtea;
 
-import me.melontini.crackerutil.util.PrependingLogger;
+import me.melontini.dark_matter.util.PrependingLogger;
 import me.melontini.goodtea.behaviors.KahurCompat;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.behaviors.TeaBehavior;
@@ -15,9 +15,8 @@ import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import static me.melontini.goodtea.util.GoodTeaStuff.*;
+import static me.melontini.goodtea.util.GoodTeaStuff.KETTLE_BLOCK_ENTITY;
 
 @SuppressWarnings("UnstableApiUsage")
 public class GoodTea implements ModInitializer {
