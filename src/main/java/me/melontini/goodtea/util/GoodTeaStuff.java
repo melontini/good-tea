@@ -6,6 +6,7 @@ import me.melontini.dark_matter.content.data.NbtBuilder;
 import me.melontini.dark_matter.content.interfaces.AnimatedItemGroup;
 import me.melontini.dark_matter.minecraft.client.util.DrawUtil;
 import me.melontini.dark_matter.minecraft.util.MinecraftUtil;
+import me.melontini.dark_matter.minecraft.util.TextUtil;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -16,9 +17,9 @@ import me.melontini.goodtea.items.TeaMugItem;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -44,15 +45,15 @@ public class GoodTeaStuff {
     public static EntityAttributeModifier RABBITS_LUCK = new EntityAttributeModifier(UUID.fromString("57c5033e-c071-4b23-8f14-0551eb4c5b0a"), "Tea Modifier", 1, EntityAttributeModifier.Operation.ADDITION);
     public static TagKey<Block> SHOW_SUPPORT = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_kettle_show_support"));
     public static TagKey<Block> HOT_BLOCKS = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_hot_blocks"));
-    public static TeaMugBlock TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "mug"), () -> new TeaMugBlock(AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW).nonOpaque().strength(0.1F).sounds(BlockSoundGroup.CANDLE)))
-            .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new BlockItem(block, new Item.Settings().maxCount(16))).itemGroup(ItemGroups.FOOD_AND_DRINK)).build();
+    public static TeaMugBlock TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "mug"), () -> new TeaMugBlock(AbstractBlock.Settings.create().mapColor(MapColor.PALE_YELLOW).nonOpaque().strength(0.1F).sounds(BlockSoundGroup.CANDLE)))
+            .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new BlockItem(block, new Item.Settings().maxCount(16))).itemGroup(Registries.ITEM_GROUP.get(ItemGroups.FOOD_AND_DRINK))).build();
     public static BlockItem TEA_MUG = RegistryUtil.asItem(TEA_MUG_BLOCK);
-    public static KettleBlock KETTLE_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "kettle"), () -> new KettleBlock(AbstractBlock.Settings.of(Material.METAL, MapColor.STONE_GRAY).requiresTool().strength(2f).nonOpaque()))
-            .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new BlockItem(block, new Item.Settings())).itemGroup(ItemGroups.FUNCTIONAL))
+    public static KettleBlock KETTLE_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "kettle"), () -> new KettleBlock(AbstractBlock.Settings.create().mapColor(MapColor.STONE_GRAY).requiresTool().strength(2f).nonOpaque()))
+            .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new BlockItem(block, new Item.Settings())).itemGroup(Registries.ITEM_GROUP.get(ItemGroups.FUNCTIONAL)))
             .blockEntity((block, identifier) -> ContentBuilder.BlockEntityBuilder.create(identifier, KettleBlockEntity::new, block)).build();
     public static BlockItem KETTLE_BLOCK_ITEM = RegistryUtil.asItem(KETTLE_BLOCK);
     public static BlockEntityType<KettleBlockEntity> KETTLE_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(KETTLE_BLOCK);
-    public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "filled_mug"), () -> new FilledTeaMugBlock(AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW).sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque()))
+    public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "filled_mug"), () -> new FilledTeaMugBlock(AbstractBlock.Settings.create().mapColor(MapColor.PALE_YELLOW).sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque()))
             .item((block, identifier) -> ContentBuilder.ItemBuilder.create(identifier, () -> new TeaMugItem(block, new Item.Settings().maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG))))
             .blockEntity((block, identifier) -> ContentBuilder.BlockEntityBuilder.create(identifier, FilledTeaMugBlockEntity::new, block)).build();
     public static TeaMugItem TEA_MUG_FILLED = RegistryUtil.asItem(FILLED_TEA_MUG_BLOCK);
@@ -63,12 +64,13 @@ public class GoodTeaStuff {
             .animatedIcon(() -> new AnimatedItemGroup() {
                 float angle = 45f, lerpPoint = 0;
                 @Override
-                public void animateIcon(MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
+                public void animateIcon(DrawContext context, int itemX, int itemY, boolean selected, boolean isTopRow) {
                     MinecraftClient client = MinecraftClient.getInstance();
 
                     BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
+                    MatrixStack matrixStack = context.getMatrices();
                     matrixStack.push();
-                    matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F + client.getItemRenderer().zOffset);
+                    matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F);
                     matrixStack.translate(8.0, 8.0, 0.0);
                     matrixStack.scale(1.0F, -1.0F, 1.0F);
                     matrixStack.scale(15.0F, 15.0F, 15.0F);
@@ -79,7 +81,7 @@ public class GoodTeaStuff {
                     BakedModel model = client.getItemRenderer().getModel(KETTLE, null, null, 0);
                     //itemX + 5, itemY - 5
                     matrixStack.push();
-                    matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F + client.getItemRenderer().zOffset);
+                    matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F);
                     matrixStack.translate(8.0, 8.0, 0.0);
                     matrixStack.scale(1.0F, -1.0F, 1.0F);
                     matrixStack.scale(16.0F, 16.0F, 16.0F);
@@ -127,7 +129,7 @@ public class GoodTeaStuff {
                     stacks.add(stack);
                     stacks.add(ItemStack.EMPTY);
                 }
-            }).icon(KETTLE).build();
+            }).icon(KETTLE).displayName(TextUtil.translatable("itemGroup.good-tea.item_group")).build();
 
     public static void init() {
     }

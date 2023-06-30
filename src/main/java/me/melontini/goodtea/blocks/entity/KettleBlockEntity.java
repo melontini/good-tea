@@ -35,6 +35,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Random;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
@@ -209,7 +210,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     }
 
     private boolean canCombine(ItemStack input, ItemStack output) {
-        if (input.isOf(output.getItem()) && ItemStack.areNbtEqual(input, output) && !output.isEmpty() && input.getCount() + output.getCount() <= output.getMaxCount()) {
+        if (input.isOf(output.getItem()) && Objects.equals(input.getNbt(), output.getNbt()) && !output.isEmpty() && input.getCount() + output.getCount() <= output.getMaxCount()) {
             return true;
         } else return output.isEmpty();
     }

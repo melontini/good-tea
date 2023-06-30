@@ -100,9 +100,9 @@ public class KettleBlock extends BlockWithEntity {
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         BlockState state = ctx.getWorld().getBlockState(ctx.getBlockPos().down());
         if (state.isIn(SHOW_SUPPORT)) {
-            return this.getDefaultState().with(FACING, ctx.getPlayerFacing()).with(SUPPORT, true);
+            return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing()).with(SUPPORT, true);
         }
-        return this.getDefaultState().with(FACING, ctx.getPlayerFacing()).with(SUPPORT, false);
+        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing()).with(SUPPORT, false);
     }
 
     @Override //I guess?

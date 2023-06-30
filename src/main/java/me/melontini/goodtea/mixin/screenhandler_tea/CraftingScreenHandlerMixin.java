@@ -17,7 +17,7 @@ public class CraftingScreenHandlerMixin {
         if (((CraftingScreenAllowanceAccess) player).good_tea$isAllowed()) cir.setReturnValue(true);
     }
 
-    @Inject(at = @At("TAIL"), method = "close")
+    @Inject(at = @At("TAIL"), method = "onClosed")
     private void good_tea$close(PlayerEntity player, CallbackInfo ci) {
         ((CraftingScreenAllowanceAccess) player).good_tea$setAllowed(false);
     }

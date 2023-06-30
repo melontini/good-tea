@@ -23,7 +23,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.AxolotlEntity;
@@ -116,7 +115,7 @@ public class TeaBehavior {
 
         addBehavior(Items.AXOLOTL_BUCKET, (entity, stack) -> {
                     entity.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 0));
-                    var bucketEntity = ((BucketItemAccessor) Items.AXOLOTL_BUCKET).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
+                    var bucketEntity = ((BucketItemAccessor) Items.AXOLOTL_BUCKET).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos((int) entity.getX(), (int) entity.getEyePos().y, (int) entity.getZ()), SpawnReason.BUCKET, true, false);
                     if (bucketEntity instanceof Bucketable bucketable) {
                         bucketable.copyDataFromNbt(stack.getOrCreateNbt());
                         bucketable.setFromBucket(true);
@@ -295,7 +294,7 @@ public class TeaBehavior {
             }
             if (item instanceof EntityBucketItem entityBucketItem) {
                 if (item != Items.AXOLOTL_BUCKET) addBehavior(item, (entity, stack) -> {
-                    var bucketEntity = ((BucketItemAccessor) entityBucketItem).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
+                    var bucketEntity = ((BucketItemAccessor) entityBucketItem).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos((int) entity.getX(), (int) entity.getEyePos().y, (int) entity.getZ()), SpawnReason.BUCKET, true, false);
                     if (bucketEntity instanceof Bucketable bucketable) {
                         bucketable.copyDataFromNbt(stack.getOrCreateNbt());
                         bucketable.setFromBucket(true);
@@ -307,7 +306,7 @@ public class TeaBehavior {
             }
             if (item instanceof SwordItem swordItem) {
                 addBehavior(item, (entity, stack) -> {
-                    entity.damage(DamageSource.GENERIC, swordItem.getAttackDamage() * 2);
+                    entity.damage(entity.getWorld().getDamageSources().generic(), swordItem.getAttackDamage() * 2);
                     entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
                     stack.damage(MathStuff.fastCeil(swordItem.getAttackDamage() * 3.0F), entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
                     ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
@@ -326,7 +325,7 @@ public class TeaBehavior {
                 if (blockItem.getBlock() instanceof BedBlock) {
                     addBehavior(item, (entity, stack) -> {
                         if (!BedBlock.isBedWorking(entity.world))
-                            entity.world.createExplosion(null, DamageSource.badRespawnPoint(entity.getPos()), null, entity.getX() + 0.5, entity.getY() + 0.5, entity.getZ() + 0.5, 5.0F, true, World.ExplosionSourceType.MOB);
+                            entity.world.createExplosion(null, entity.world.getDamageSources().badRespawnPoint(entity.getPos()), null, entity.getX() + 0.5, entity.getY() + 0.5, entity.getZ() + 0.5, 5.0F, true, World.ExplosionSourceType.MOB);
                     });
                 }
             }
@@ -339,7 +338,7 @@ public class TeaBehavior {
     }
 
     public Behavior getBehavior(Item item) {
-        return TEA_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(DamageSource.MAGIC, ((SwordItem) Items.WOODEN_SWORD).getAttackDamage()));
+        return TEA_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(entity.world.getDamageSources().magic(), ((SwordItem) Items.WOODEN_SWORD).getAttackDamage()));
     }
 
     public boolean hasBehavior(ItemStack stack) {
@@ -417,7 +416,7 @@ public class TeaBehavior {
         List<LivingEntity> list = entity.world.getEntitiesByClass(LivingEntity.class, box, PotionEntity.AFFECTED_BY_WATER);
         if (!list.isEmpty()) list.stream()
                 .filter(livingEntity -> entity.squaredDistanceTo(livingEntity) < 16.0 && livingEntity.hurtByWater())
-                .forEach(livingEntity -> livingEntity.damage(DamageSource.magic(entity, entity.getOwner()), 1.0F));
+                .forEach(livingEntity -> livingEntity.damage(entity.world.getDamageSources().indirectMagic(entity, entity.getOwner()), 1.0F));
 
         entity.world.getNonSpectatingEntities(AxolotlEntity.class, box)
                 .forEach(AxolotlEntity::hydrateFromPotion);
