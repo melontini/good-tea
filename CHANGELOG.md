@@ -1,4 +1,4 @@
 ## What's new:
 
-* The kettle now uses cutout rendering instead of translucent.
-* CrackerUtil -> Dark Matter
+* Switched from Accessor and Invokers to AWs.
+* Updated Dark Matter, Fabric API and Loader.
