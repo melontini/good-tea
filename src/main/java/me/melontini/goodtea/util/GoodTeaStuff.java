@@ -122,9 +122,9 @@ public class GoodTeaStuff {
                 for (ItemStack stack : set) {
                     var mug = TEA_MUG_FILLED.getDefaultStack();
                     mug.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
-                    stacks.add(mug);
-                    stacks.add(stack);
-                    stacks.add(ItemStack.EMPTY);
+                    stacks.add(mug, DarkMatterEntries.Visibility.TAB);
+                    stacks.add(stack, DarkMatterEntries.Visibility.TAB);
+                    stacks.add(ItemStack.EMPTY, DarkMatterEntries.Visibility.TAB);
                 }
             }).icon(KETTLE).build();
 
