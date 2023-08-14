@@ -1,0 +1,7 @@
+accessWidener  v2	named
+
+accessible field net/minecraft/item/EntityBucketItem entityType Lnet/minecraft/entity/EntityType;
+accessible method net/minecraft/item/GoatHornItem getInstrument (Lnet/minecraft/item/ItemStack;)Ljava/util/Optional;
+accessible method net/minecraft/entity/projectile/thrown/PotionEntity applyLingeringPotion (Lnet/minecraft/item/ItemStack;Lnet/minecraft/potion/Potion;)V
+accessible method net/minecraft/entity/projectile/thrown/PotionEntity applySplashPotion (Ljava/util/List;Lnet/minecraft/entity/Entity;)V
+accessible method net/minecraft/block/SpongeBlock absorbWater (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z

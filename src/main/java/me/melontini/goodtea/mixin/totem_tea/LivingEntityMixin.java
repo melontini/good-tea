@@ -1,6 +1,6 @@
 package me.melontini.goodtea.mixin.totem_tea;
 
-import me.melontini.dark_matter.minecraft.util.TextUtil;
+import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.ducks.DivineAccess;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

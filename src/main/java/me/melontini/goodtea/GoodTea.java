@@ -1,6 +1,6 @@
 package me.melontini.goodtea;
 
-import me.melontini.dark_matter.util.PrependingLogger;
+import me.melontini.dark_matter.api.base.util.PrependingLogger;
 import me.melontini.goodtea.behaviors.KahurCompat;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.behaviors.TeaBehavior;
