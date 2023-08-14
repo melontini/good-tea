@@ -9,14 +9,7 @@ import me.melontini.goodtea.ducks.ChorusAccess;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
 import me.melontini.goodtea.ducks.DivineAccess;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
-import me.melontini.goodtea.mixin.BucketItemAccessor;
-import me.melontini.goodtea.mixin.GoatHornItemAccessor;
-import me.melontini.goodtea.mixin.PotionEntityAccessor;
-import me.melontini.goodtea.mixin.SpongeBlockAccessor;
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowerBlock;
+import net.minecraft.block.*;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.Entity;
@@ -113,7 +106,7 @@ public class TeaBehavior {
 
         addBehavior(Items.AXOLOTL_BUCKET, (entity, stack) -> {
                     entity.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 0));
-                    var bucketEntity = ((BucketItemAccessor) Items.AXOLOTL_BUCKET).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
+                    var bucketEntity = ((EntityBucketItem)Items.AXOLOTL_BUCKET).entityType.spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
                     if (bucketEntity instanceof Bucketable bucketable) {
                         bucketable.copyDataFromNbt(stack.getOrCreateNbt());
                         bucketable.setFromBucket(true);
@@ -177,7 +170,7 @@ public class TeaBehavior {
             boolean bl = potion == Potions.WATER && list1.isEmpty();
 
             if (bl) this.damageEntitiesHurtByWater(potionEntity);
-            else if (!list1.isEmpty()) ((PotionEntityAccessor) potionEntity).gt$applySplashPotion(list1, entity);
+            else if (!list1.isEmpty()) potionEntity.applySplashPotion(list1, entity);
 
             int i = potion.hasInstantEffect() ? WorldEvents.INSTANT_SPLASH_POTION_SPLASHED : WorldEvents.SPLASH_POTION_SPLASHED;
             entity.world.syncWorldEvent(i, entity.getBlockPos(), PotionUtil.getColor(stack));
@@ -200,7 +193,7 @@ public class TeaBehavior {
             boolean bl = potion == Potions.WATER && list1.isEmpty();
 
             if (bl) this.damageEntitiesHurtByWater(potionEntity);
-            else if (!list1.isEmpty()) ((PotionEntityAccessor) potionEntity).gt$applyLingeringPotion(stack, potion);
+            else if (!list1.isEmpty()) potionEntity.applyLingeringPotion(stack, potion);
 
             int i = potion.hasInstantEffect() ? WorldEvents.INSTANT_SPLASH_POTION_SPLASHED : WorldEvents.SPLASH_POTION_SPLASHED;
             entity.world.syncWorldEvent(i, entity.getBlockPos(), PotionUtil.getColor(stack));
@@ -209,7 +202,7 @@ public class TeaBehavior {
         });
 
         addBehavior(Items.SPONGE, (entity, stack) -> {
-            if (((SpongeBlockAccessor) Blocks.SPONGE).gt$absorbWater(entity.world, entity.getBlockPos())) {
+            if (((SpongeBlock) Blocks.SPONGE).absorbWater(entity.world, entity.getBlockPos())) {
                 ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), new ItemStack(Items.WET_SPONGE));
             } else {
                 ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), new ItemStack(Items.SPONGE));
@@ -241,7 +234,7 @@ public class TeaBehavior {
         addBehavior((entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)), Items.OCHRE_FROGLIGHT, Items.PEARLESCENT_FROGLIGHT, Items.VERDANT_FROGLIGHT);
 
         addBehavior(Items.GOAT_HORN, (entity, stack) -> {
-            ((GoatHornItemAccessor) Items.GOAT_HORN).gt$getInstrument(stack).ifPresent(registryEntry -> {
+            ((GoatHornItem)Items.GOAT_HORN).getInstrument(stack).ifPresent(registryEntry -> {
                 Instrument instrument = (Instrument) ((RegistryEntry<?>) registryEntry).value();
                 SoundEvent soundEvent = instrument.soundEvent();
                 float f = instrument.range() / 16.0F;
@@ -293,7 +286,7 @@ public class TeaBehavior {
             }
             if (item instanceof EntityBucketItem entityBucketItem) {
                 if (item != Items.AXOLOTL_BUCKET) addBehavior(item, (entity, stack) -> {
-                    var bucketEntity = ((BucketItemAccessor) entityBucketItem).gt$getEntityType().spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
+                    var bucketEntity = entityBucketItem.entityType.spawnFromItemStack((ServerWorld) entity.world, stack, null, new BlockPos(entity.getX(), entity.getEyePos().y, entity.getZ()), SpawnReason.BUCKET, true, false);
                     if (bucketEntity instanceof Bucketable bucketable) {
                         bucketable.copyDataFromNbt(stack.getOrCreateNbt());
                         bucketable.setFromBucket(true);

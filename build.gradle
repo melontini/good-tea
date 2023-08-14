@@ -49,6 +49,10 @@ dependencies {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/good-tea.accesswidener")
+}
+
 processResources {
     inputs.property "version", project.version
     filteringCharset "UTF-8"
