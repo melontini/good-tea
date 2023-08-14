@@ -1,11 +1,12 @@
 package me.melontini.goodtea.util;
 
-import me.melontini.dark_matter.content.ContentBuilder;
-import me.melontini.dark_matter.content.RegistryUtil;
-import me.melontini.dark_matter.content.data.NbtBuilder;
-import me.melontini.dark_matter.content.interfaces.AnimatedItemGroup;
-import me.melontini.dark_matter.minecraft.client.util.DrawUtil;
-import me.melontini.dark_matter.minecraft.util.MinecraftUtil;
+import me.melontini.dark_matter.api.base.util.MathStuff;
+import me.melontini.dark_matter.api.content.ContentBuilder;
+import me.melontini.dark_matter.api.content.RegistryUtil;
+import me.melontini.dark_matter.api.content.interfaces.AnimatedItemGroup;
+import me.melontini.dark_matter.api.content.interfaces.DarkMatterEntries;
+import me.melontini.dark_matter.api.minecraft.client.util.DrawUtil;
+import me.melontini.dark_matter.api.minecraft.data.NbtBuilder;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -34,6 +35,7 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -106,7 +108,7 @@ public class GoodTeaStuff {
                 teaStarterPack.add(Items.CAMPFIRE.getDefaultStack());
                 teaStarterPack.add(Items.SOUL_CAMPFIRE.getDefaultStack());
                 teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
-                MinecraftUtil.appendStacks(stacks, teaStarterPack);
+                appendStacks(stacks, teaStarterPack, true);
 
                 var help = DefaultedList.<ItemStack>of();
                 var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
@@ -126,4 +128,17 @@ public class GoodTeaStuff {
 
     public static void init() {
     }
+
+    private static void appendStacks(DarkMatterEntries entries, Collection<ItemStack> list, boolean lineBreak) {
+        if (list == null || list.isEmpty()) return; //we shouldn't add line breaks if there are no items.
+
+        int rows = MathStuff.fastCeil(list.size() / 9d);
+        entries.addAll(list, DarkMatterEntries.Visibility.TAB);
+        int left = (rows * 9) - list.size();
+        for (int i = 0; i < left; i++) {
+            entries.add(ItemStack.EMPTY, DarkMatterEntries.Visibility.TAB); //fill the gaps
+        }
+        if (lineBreak) entries.addAll(DefaultedList.ofSize(9, ItemStack.EMPTY), DarkMatterEntries.Visibility.TAB); //line break
+    }
+
 }

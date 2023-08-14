@@ -1,7 +1,7 @@
 package me.melontini.goodtea.items;
 
-import me.melontini.dark_matter.minecraft.util.TextUtil;
-import me.melontini.dark_matter.util.MakeSure;
+import me.melontini.dark_matter.api.base.util.MakeSure;
+import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;

@@ -1,9 +1,9 @@
 package me.melontini.goodtea.behaviors;
 
-import me.melontini.dark_matter.minecraft.util.TextUtil;
-import me.melontini.dark_matter.util.MakeSure;
-import me.melontini.dark_matter.util.MathStuff;
-import me.melontini.dark_matter.util.Utilities;
+import me.melontini.dark_matter.api.base.util.MakeSure;
+import me.melontini.dark_matter.api.base.util.MathStuff;
+import me.melontini.dark_matter.api.base.util.Utilities;
+import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.ChorusAccess;
 import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;

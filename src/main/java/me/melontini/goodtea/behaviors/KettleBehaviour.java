@@ -1,6 +1,6 @@
 package me.melontini.goodtea.behaviors;
 
-import me.melontini.dark_matter.util.MakeSure;
+import me.melontini.dark_matter.api.base.util.MakeSure;
 import me.melontini.goodtea.GoodTea;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
