@@ -1,8 +1,8 @@
 package me.melontini.goodtea.client.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.melontini.dark_matter.minecraft.client.util.DrawUtil;
-import me.melontini.dark_matter.minecraft.util.TextUtil;
+import me.melontini.dark_matter.api.minecraft.client.util.DrawUtil;
+import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.screens.KettleScreenHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;

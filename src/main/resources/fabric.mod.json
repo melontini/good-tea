@@ -10,6 +10,7 @@
   "contact": {},
   "license": "MIT",
   "icon": "assets/good-tea/icon.png",
+  "accessWidener" : "good-tea.accesswidener",
   "environment": "*",
   "entrypoints": {
     "client": [

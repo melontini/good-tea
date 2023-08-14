@@ -4,10 +4,6 @@
   "package": "me.melontini.goodtea.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BucketItemAccessor",
-    "GoatHornItemAccessor",
-    "PotionEntityAccessor",
-    "SpongeBlockAccessor",
     "chorus_tea.LivingEntityMixin",
     "screenhandler_tea.CraftingScreenHandlerMixin",
     "screenhandler_tea.PlayerEntityMixin",

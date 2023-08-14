@@ -1,12 +1,13 @@
 package me.melontini.goodtea.util;
 
-import me.melontini.dark_matter.content.ContentBuilder;
-import me.melontini.dark_matter.content.RegistryUtil;
-import me.melontini.dark_matter.content.data.NbtBuilder;
-import me.melontini.dark_matter.content.interfaces.AnimatedItemGroup;
-import me.melontini.dark_matter.minecraft.client.util.DrawUtil;
-import me.melontini.dark_matter.minecraft.util.MinecraftUtil;
-import me.melontini.dark_matter.minecraft.util.TextUtil;
+import me.melontini.dark_matter.api.base.util.MathStuff;
+import me.melontini.dark_matter.api.content.ContentBuilder;
+import me.melontini.dark_matter.api.content.RegistryUtil;
+import me.melontini.dark_matter.api.content.interfaces.AnimatedItemGroup;
+import me.melontini.dark_matter.api.content.interfaces.DarkMatterEntries;
+import me.melontini.dark_matter.api.minecraft.client.util.DrawUtil;
+import me.melontini.dark_matter.api.minecraft.data.NbtBuilder;
+import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -30,13 +31,11 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static me.melontini.goodtea.GoodTea.MODID;
 
@@ -108,7 +107,7 @@ public class GoodTeaStuff {
                 teaStarterPack.add(Items.CAMPFIRE.getDefaultStack());
                 teaStarterPack.add(Items.SOUL_CAMPFIRE.getDefaultStack());
                 teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
-                MinecraftUtil.appendStacks(stacks, teaStarterPack);
+                appendStacks(stacks, teaStarterPack, true);
 
                 var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
 
@@ -125,12 +124,25 @@ public class GoodTeaStuff {
                 for (ItemStack stack : set) {
                     var mug = TEA_MUG_FILLED.getDefaultStack();
                     mug.setNbt(NbtBuilder.create().put("GT-TeaItem", stack.writeNbt(new NbtCompound())).build());
-                    stacks.add(mug);
-                    stacks.add(stack);
-                    stacks.add(ItemStack.EMPTY);
+                    stacks.add(mug, DarkMatterEntries.Visibility.TAB);
+                    stacks.add(stack, DarkMatterEntries.Visibility.TAB);
+                    stacks.add(ItemStack.EMPTY, DarkMatterEntries.Visibility.TAB);
                 }
             }).icon(KETTLE).displayName(TextUtil.translatable("itemGroup.good-tea.item_group")).build();
 
     public static void init() {
     }
+
+    private static void appendStacks(DarkMatterEntries entries, Collection<ItemStack> list, boolean lineBreak) {
+        if (list == null || list.isEmpty()) return; //we shouldn't add line breaks if there are no items.
+
+        int rows = MathStuff.fastCeil(list.size() / 9d);
+        entries.addAll(list, DarkMatterEntries.Visibility.TAB);
+        int left = (rows * 9) - list.size();
+        for (int i = 0; i < left; i++) {
+            entries.add(ItemStack.EMPTY, DarkMatterEntries.Visibility.TAB); //fill the gaps
+        }
+        if (lineBreak) entries.addAll(DefaultedList.ofSize(9, ItemStack.EMPTY), DarkMatterEntries.Visibility.TAB); //line break
+    }
+
 }

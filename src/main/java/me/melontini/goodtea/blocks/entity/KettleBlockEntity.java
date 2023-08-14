@@ -1,8 +1,8 @@
 package me.melontini.goodtea.blocks.entity;
 
-import me.melontini.dark_matter.content.data.NBTUtil;
-import me.melontini.dark_matter.content.data.NbtBuilder;
-import me.melontini.dark_matter.minecraft.util.TextUtil;
+import me.melontini.dark_matter.api.minecraft.data.NbtBuilder;
+import me.melontini.dark_matter.api.minecraft.data.NbtUtil;
+import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.screens.KettleScreenHandler;
@@ -221,7 +221,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         this.time = nbt.getInt("Time");
         waterStorage.variant = FluidVariant.fromNbt(nbt.getCompound("fluidVariant"));
         waterStorage.amount = nbt.getLong("amount");
-        NBTUtil.readInventoryFromNbt(nbt, this);
+        NbtUtil.readInventoryFromNbt(nbt, this);
     }
 
     @Override
@@ -230,7 +230,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         nbt.putInt("Time", this.time);
         nbt.put("fluidVariant", waterStorage.variant.toNbt());
         nbt.putLong("amount", waterStorage.amount);
-        NBTUtil.writeInventoryToNbt(nbt, this);
+        NbtUtil.writeInventoryToNbt(nbt, this);
     }
 
     @Nullable
