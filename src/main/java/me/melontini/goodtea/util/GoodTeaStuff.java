@@ -21,6 +21,7 @@ import net.minecraft.block.MapColor;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -63,7 +64,7 @@ public class GoodTeaStuff {
             .animatedIcon(() -> new AnimatedItemGroup() {
                 float angle = 45f, lerpPoint = 0;
                 @Override
-                public void animateIcon(DrawContext context, int itemX, int itemY, boolean selected, boolean isTopRow) {
+                public void animateIcon(ItemGroup group, DrawContext context, int itemX, int itemY, boolean selected, boolean isTopRow) {
                     MinecraftClient client = MinecraftClient.getInstance();
 
                     BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
