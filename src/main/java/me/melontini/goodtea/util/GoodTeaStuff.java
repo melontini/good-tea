@@ -62,7 +62,7 @@ public class GoodTeaStuff {
             .animatedIcon(() -> new AnimatedItemGroup() {
                 float angle = 45f, lerpPoint = 0;
                 @Override
-                public void animateIcon(MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
+                public void animateIcon(ItemGroup group, MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
                     MinecraftClient client = MinecraftClient.getInstance();
 
                     BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
