@@ -7,9 +7,10 @@ import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.screens.KettleScreenHandler;
 import me.melontini.goodtea.util.GoodTeaStuff;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.Item;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -36,10 +37,13 @@ public class GoodTea implements ModInitializer {
             KahurCompat.register();
         }
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            TeaBehavior.INSTANCE.initAuto();
-            TeaBehavior.INSTANCE.initAutoTooltips();
-            LOGGER.info("Found {} item behaviors", TeaBehavior.INSTANCE.TEA_BEHAVIOR.size());
+        RegistryEntryAddedCallback.event(Registry.ITEM).register((rawId, id, object) -> {
+            TeaBehavior.INSTANCE.initAuto(object);
+            TeaBehavior.INSTANCE.initAutoTooltips(object);
         });
+        for (Item item : Registry.ITEM) {
+            TeaBehavior.INSTANCE.initAuto(item);
+            TeaBehavior.INSTANCE.initAutoTooltips(item);
+        }
     }
 }
