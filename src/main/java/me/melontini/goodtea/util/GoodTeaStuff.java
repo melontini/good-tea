@@ -66,43 +66,7 @@ public class GoodTeaStuff {
     public static final ItemStack MUG = TEA_MUG.getDefaultStack();
 
     public static ItemGroup GROUP = ContentBuilder.ItemGroupBuilder.create(new Identifier(MODID, "item_group"))
-            .animatedIcon(() -> new AnimatedItemGroup() {
-                float angle = 45f, lerpPoint = 0;
-                @Override
-                public void animateIcon(ItemGroup group, MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
-                    MinecraftClient client = MinecraftClient.getInstance();
-
-                    BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
-                    matrixStack.push();
-                    matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F + client.getItemRenderer().zOffset);
-                    matrixStack.translate(8.0, 8.0, 0.0);
-                    matrixStack.scale(1.0F, -1.0F, 1.0F);
-                    matrixStack.scale(15.0F, 15.0F, 15.0F);
-                    DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, MUG, model1);
-                    matrixStack.pop();
-
-
-                    BakedModel model = client.getItemRenderer().getModel(KETTLE, null, null, 0);
-                    //itemX + 5, itemY - 5
-                    matrixStack.push();
-                    matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F + client.getItemRenderer().zOffset);
-                    matrixStack.translate(8.0, 8.0, 0.0);
-                    matrixStack.scale(1.0F, -1.0F, 1.0F);
-                    matrixStack.scale(16.0F, 16.0F, 16.0F);
-
-
-                    angle = MathHelper.lerp(0.1f * client.getLastFrameDuration(), angle, lerpPoint);
-                    if (angle < 0.1f && lerpPoint == 0f) {
-                        lerpPoint = 45f;
-                    }
-                    if (angle > 44.9f && lerpPoint == 45f) {
-                        lerpPoint = 0f;
-                    }
-                    matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(angle));
-                    DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, KETTLE, model);
-                    matrixStack.pop();
-                }
-            }).entries(stacks -> {
+            .entries(stacks -> {
                 List<ItemStack> teaStarterPack = new ArrayList<>();
                 teaStarterPack.add(KETTLE);
                 teaStarterPack.add(MUG);

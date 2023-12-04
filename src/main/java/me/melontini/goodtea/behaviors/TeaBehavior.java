@@ -1,5 +1,6 @@
 package me.melontini.goodtea.behaviors;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import me.melontini.dark_matter.api.base.util.MakeSure;
 import me.melontini.dark_matter.api.base.util.MathStuff;
 import me.melontini.dark_matter.api.base.util.Utilities;
@@ -57,24 +58,15 @@ import static me.melontini.goodtea.util.GoodTeaStuff.*;
 @SuppressWarnings("unused")
 public class TeaBehavior {
     public static TeaBehavior INSTANCE = new TeaBehavior();
-    public Map<Item, Behavior> TEA_BEHAVIOR = new LinkedHashMap<>();
+    public Map<Item, Behavior> TEA_BEHAVIOR = Utilities.consume(new Object2ObjectLinkedOpenHashMap<>(), map -> {
+        map.defaultReturnValue((entity, stack) -> stack.getItem().finishUsing(stack, entity.world, entity));
+    });
     public Map<Item, Tooltip> TEA_TOOLTIP = new LinkedHashMap<>();
-
-    private boolean initDone = false;
-    private boolean tooltipInitDone = false;
 
     private TeaBehavior() {
     }
 
     public void init() {
-        if (initDone) return;
-        addBehavior(Items.ENCHANTED_GOLDEN_APPLE, (entity, stack) -> {
-            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0));
-            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 8000, 0));
-            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 8000, 0));
-            entity.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 3200, 2));
-        });
-
         addBehavior((entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 4.0F, Explosion.DestructionType.DESTROY), Items.TNT, Items.TNT_MINECART);
         addBehavior(Items.GUNPOWDER, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 1.0F, Explosion.DestructionType.DESTROY));
 
@@ -91,10 +83,10 @@ public class TeaBehavior {
             int j = entity.getBlockPos().getY();
             int k = entity.getBlockPos().getZ();
             for (int l = 0; l < 3; ++l) {
-                mutable.set(i + MathStuff.nextInt(Utilities.RANDOM, -4, 4), j + 4, k + MathStuff.nextInt(Utilities.RANDOM, -4, 4));
+                mutable.set(i + MathStuff.nextInt(-4, 4), j + 4, k + MathStuff.nextInt(-4, 4));
                 BlockState blockState = entity.world.getBlockState(mutable);
                 if (!blockState.isFullCube(entity.world, mutable)) {
-                    ((ServerWorld) entity.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + Utilities.RANDOM.nextDouble(), mutable.getY() + Utilities.RANDOM.nextDouble(), mutable.getZ() + Utilities.RANDOM.nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
+                    ((ServerWorld) entity.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + MathStuff.threadRandom().nextDouble(), mutable.getY() + MathStuff.threadRandom().nextDouble(), mutable.getZ() + MathStuff.threadRandom().nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
                 }
             }
 
@@ -139,17 +131,6 @@ public class TeaBehavior {
                 instance.addPersistentModifier(RABBITS_LUCK);
                 if (entity instanceof PlayerEntity player)
                     player.sendMessage(TextUtil.translatable("text.good-tea.rabbits_luck"), true);
-            }
-        });
-
-        addBehavior(Items.POTION, (entity, stack) -> {
-            for (StatusEffectInstance sei : PotionUtil.getPotionEffects(stack)) {
-                if (sei.getEffectType().isInstant()) {
-                    sei.getEffectType().applyInstantEffect(entity, entity, entity, sei.getAmplifier(), 1.0);
-                } else {
-                    var effect = new StatusEffectInstance(sei.getEffectType(), (int) (sei.getDuration() * 1.2), sei.getAmplifier(), sei.isAmbient(), sei.shouldShowParticles(), sei.shouldShowIcon());
-                    entity.addStatusEffect(new StatusEffectInstance(effect));
-                }
             }
         });
 
@@ -230,15 +211,13 @@ public class TeaBehavior {
 
         addBehavior((entity, stack) -> entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 1200, 0)), Items.OCHRE_FROGLIGHT, Items.PEARLESCENT_FROGLIGHT, Items.VERDANT_FROGLIGHT);
 
-        addBehavior(Items.GOAT_HORN, (entity, stack) -> {
-            ((GoatHornItem) Items.GOAT_HORN).getInstrument(stack).ifPresent(registryEntry -> {
-                Instrument instrument = (Instrument) ((RegistryEntry<?>) registryEntry).value();
-                SoundEvent soundEvent = instrument.soundEvent();
-                float f = instrument.range() / 16.0F;
-                entity.world.playSoundFromEntity(null, entity, soundEvent, SoundCategory.RECORDS, f, 1.0F);
-                entity.world.emitGameEvent(GameEvent.INSTRUMENT_PLAY, entity.getPos(), GameEvent.Emitter.of(entity));
-            });
-        });
+        addBehavior(Items.GOAT_HORN, (entity, stack) -> ((GoatHornItem) Items.GOAT_HORN).getInstrument(stack).ifPresent(registryEntry -> {
+            Instrument instrument = (Instrument) ((RegistryEntry<?>) registryEntry).value();
+            SoundEvent soundEvent = instrument.soundEvent();
+            float f = instrument.range() / 16.0F;
+            entity.world.playSoundFromEntity(null, entity, soundEvent, SoundCategory.RECORDS, f, 1.0F);
+            entity.world.emitGameEvent(GameEvent.INSTRUMENT_PLAY, entity.getPos(), GameEvent.Emitter.of(entity));
+        }));
 
         addBehavior(Items.FIREWORK_ROCKET, (entity, stack) -> {
             FireworkRocketEntity fireworkRocketEntity = new FireworkRocketEntity(entity.world, stack, entity, entity.getX(), entity.getEyeY() - 0.15F, entity.getZ(), true);
@@ -264,8 +243,6 @@ public class TeaBehavior {
             }
             ((ChorusAccess) entity).good_tea$addTeleportingTime(3600);
         });
-
-        this.initDone = true;
     }
 
     public void initAuto(Item item) {
@@ -323,7 +300,7 @@ public class TeaBehavior {
     }
 
     public Behavior getBehavior(Item item) {
-        return TEA_BEHAVIOR.getOrDefault(item, (entity, stack) -> entity.damage(DamageSource.MAGIC, ((SwordItem) Items.WOODEN_SWORD).getAttackDamage()));
+        return TEA_BEHAVIOR.get(item);
     }
 
     public boolean hasBehavior(ItemStack stack) {
@@ -372,13 +349,11 @@ public class TeaBehavior {
     }
 
     public void initTooltips() {
-        if (tooltipInitDone) return;
         addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)), TEA_MUG, KETTLE_BLOCK_ITEM);
         addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)), Items.HAY_BLOCK, Items.WHEAT);
         addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
         addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
-        this.tooltipInitDone = true;
     }
 
     public void initAutoTooltips(Item item) {
