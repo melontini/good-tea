@@ -3,11 +3,9 @@ package me.melontini.goodtea.util;
 import me.melontini.dark_matter.api.base.util.MathStuff;
 import me.melontini.dark_matter.api.content.ContentBuilder;
 import me.melontini.dark_matter.api.content.RegistryUtil;
-import me.melontini.dark_matter.api.content.interfaces.AnimatedItemGroup;
 import me.melontini.dark_matter.api.content.interfaces.DarkMatterEntries;
-import me.melontini.dark_matter.api.minecraft.client.util.DrawUtil;
 import me.melontini.dark_matter.api.minecraft.data.NbtBuilder;
-import me.melontini.goodtea.behaviors.TeaBehavior;
+import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.blocks.TeaMugBlock;
@@ -19,9 +17,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
@@ -30,14 +25,9 @@ import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.registry.Registry;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static me.melontini.goodtea.GoodTea.MODID;
 
@@ -79,7 +69,7 @@ public class GoodTeaStuff {
                 appendStacks(stacks, teaStarterPack, true);
 
                 var help = DefaultedList.<ItemStack>of();
-                var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
+                var list = DataPackBehaviors.INSTANCE.itemsWithBehaviors().stream().sorted(Comparator.comparingInt(Registry.ITEM::getRawId)).toList();
                 for (Item item : list) {
                     item.appendStacks(ItemGroup.SEARCH, help);
 
@@ -108,5 +98,4 @@ public class GoodTeaStuff {
         }
         if (lineBreak) entries.addAll(DefaultedList.ofSize(9, ItemStack.EMPTY), DarkMatterEntries.Visibility.TAB); //line break
     }
-
 }

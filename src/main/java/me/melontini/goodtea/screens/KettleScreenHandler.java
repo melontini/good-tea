@@ -1,6 +1,7 @@
 package me.melontini.goodtea.screens;
 
 import me.melontini.goodtea.GoodTea;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -113,7 +114,7 @@ public class KettleScreenHandler extends ScreenHandler {
 
     public float getWaterLevel() {
         int i = this.propertyDelegate.get(1);
-        int j = 81000;
+        int j = (int) FluidConstants.BUCKET;
         return i > 0 ? i * 54f / j : 0;
     }
 

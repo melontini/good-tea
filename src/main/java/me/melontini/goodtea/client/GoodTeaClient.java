@@ -3,28 +3,53 @@ package me.melontini.goodtea.client;
 import me.melontini.dark_matter.api.content.interfaces.AnimatedItemGroup;
 import me.melontini.dark_matter.api.minecraft.client.util.DrawUtil;
 import me.melontini.goodtea.GoodTea;
+import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import me.melontini.goodtea.client.screens.KettleScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.registry.Registry;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
 @Environment(EnvType.CLIENT)
 public class GoodTeaClient implements ClientModInitializer {
+
     @Override
     public void onInitializeClient() {
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), KETTLE_BLOCK);
         HandledScreens.register(GoodTea.KETTLE_SCREEN_HANDLER, KettleScreen::new);
+
+        ClientPlayNetworking.registerGlobalReceiver(GoodTea.ITEMS_WITH_BEHAVIORS, (client, handler, buf, responseSender) -> {
+            Set<Identifier> disabled = new HashSet<>();
+            int disLength = buf.readVarInt();
+            for (int i = 0; i < disLength; i++) disabled.add(buf.readIdentifier());
+
+            Set<Identifier> ids = new HashSet<>();
+            int length = buf.readVarInt();
+            for (int i = 0; i < length; i++) ids.add(buf.readIdentifier());
+            client.execute(() -> {
+                for (Identifier id : disabled) DataPackBehaviors.INSTANCE
+                        .disable(Registry.ITEM.get(id));
+
+                for (Identifier id : ids) DataPackBehaviors.INSTANCE
+                        .acceptDummy(Registry.ITEM.get(id));
+            });
+        });
 
         GROUP.dm$setIconAnimation(new AnimatedItemGroup() {
             float angle = 45f, lerpPoint = 0;

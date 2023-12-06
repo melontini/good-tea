@@ -3,7 +3,6 @@ package me.melontini.goodtea.behaviors;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import me.melontini.dark_matter.api.base.util.MakeSure;
 import me.melontini.dark_matter.api.base.util.MathStuff;
-import me.melontini.dark_matter.api.base.util.Utilities;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.ChorusAccess;
@@ -11,7 +10,6 @@ import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
 import me.melontini.goodtea.ducks.DivineAccess;
 import me.melontini.goodtea.ducks.HoglinRepellentAccess;
 import net.minecraft.block.*;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -39,31 +37,29 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.*;
 import net.minecraft.util.registry.RegistryEntry;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.Explosion;
 import org.apache.commons.compress.utils.Lists;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static me.melontini.goodtea.util.GoodTeaStuff.*;
+import static me.melontini.goodtea.util.GoodTeaStuff.OBSIDIAN_TOUGHNESS;
+import static me.melontini.goodtea.util.GoodTeaStuff.RABBITS_LUCK;
 
 @SuppressWarnings("unused")
 public class TeaBehavior {
     public static TeaBehavior INSTANCE = new TeaBehavior();
-    public Map<Item, Behavior> TEA_BEHAVIOR = Utilities.consume(new Object2ObjectLinkedOpenHashMap<>(), map -> {
-        map.defaultReturnValue((entity, stack) -> stack.getItem().finishUsing(stack, entity.world, entity));
-    });
-    public Map<Item, Tooltip> TEA_TOOLTIP = new LinkedHashMap<>();
+    private final Map<Item, Behavior> behaviors = new Object2ObjectLinkedOpenHashMap<>();
 
     private TeaBehavior() {
+    }
+
+    public Map<Item, Behavior> getBehaviors() {
+        return Collections.unmodifiableMap(behaviors);
     }
 
     public void init() {
@@ -295,76 +291,14 @@ public class TeaBehavior {
         }
     }
 
-    public Behavior getBehavior(ItemStack stack) {
-        return getBehavior(stack.getItem());
-    }
-
-    public Behavior getBehavior(Item item) {
-        return TEA_BEHAVIOR.get(item);
-    }
-
-    public boolean hasBehavior(ItemStack stack) {
-        return TEA_BEHAVIOR.containsKey(stack.getItem());
-    }
-
-    public boolean hasBehavior(Item item) {
-        return TEA_BEHAVIOR.containsKey(item);
-    }
-
     public void addBehavior(Item item, Behavior behavior) {
         MakeSure.notNulls(item, behavior);
-        if (!TEA_BEHAVIOR.containsKey(item)) TEA_BEHAVIOR.putIfAbsent(item, behavior);
+        if (!behaviors.containsKey(item)) behaviors.putIfAbsent(item, behavior);
         else GoodTea.LOGGER.error("Tried to add behaviour for the same item twice! {}", item);
     }
 
     public void addBehavior(Behavior behavior, Item... items) {
         for (Item item : items) addBehavior(item, behavior);
-    }
-
-
-    public Tooltip getTooltip(ItemStack stack) {
-        return getTooltip(stack.getItem());
-    }
-
-    public Tooltip getTooltip(Item item) {
-        return TEA_TOOLTIP.get(item);
-    }
-
-    public boolean hasTooltip(ItemStack stack) {
-        return TEA_TOOLTIP.containsKey(stack.getItem());
-    }
-
-    public boolean hasTooltip(Item item) {
-        return TEA_TOOLTIP.containsKey(item);
-    }
-
-    public void addTooltip(Tooltip tooltip, Item... items) {
-        for (Item item : items) addTooltip(item, tooltip);
-    }
-
-    public void addTooltip(Item item, Tooltip tooltip) {
-        MakeSure.notNull(tooltip);
-        if (!TEA_TOOLTIP.containsKey(item)) TEA_TOOLTIP.putIfAbsent(item, tooltip);
-        else GoodTea.LOGGER.error("Tried to add a tooltip for the same item twice! {}", item);
-    }
-
-    public void initTooltips() {
-        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)), TEA_MUG, KETTLE_BLOCK_ITEM);
-        addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-        addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)), Items.HAY_BLOCK, Items.WHEAT);
-        addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
-        addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
-    }
-
-    public void initAutoTooltips(Item item) {
-        if (item instanceof MusicDiscItem discItem) {
-            addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(discItem.getDescription().formatted(Formatting.GRAY)));
-        }
-        if (item instanceof BlockItem blockItem) {
-            if (blockItem.getBlock() instanceof BedBlock) {
-                addTooltip(item, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.bed-tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
-            }
-        }
     }
 
     public void damageEntitiesHurtByWater(PotionEntity entity) {
@@ -382,10 +316,5 @@ public class TeaBehavior {
     @FunctionalInterface
     public interface Behavior {
         void run(LivingEntity entity, ItemStack stack);
-    }
-
-    @FunctionalInterface
-    public interface Tooltip {
-        void append(ItemStack stack, ItemStack teaStack, @Nullable World world, List<Text> tooltip, TooltipContext context);
     }
 }
