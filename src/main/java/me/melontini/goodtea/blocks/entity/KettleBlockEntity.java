@@ -1,5 +1,6 @@
 package me.melontini.goodtea.blocks.entity;
 
+import me.melontini.dark_matter.api.base.util.MathStuff;
 import me.melontini.dark_matter.api.minecraft.data.NbtBuilder;
 import me.melontini.dark_matter.api.minecraft.data.NbtUtil;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
@@ -36,7 +37,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.Random;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
@@ -60,15 +60,13 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
             return variant.isOf(Fluids.WATER);
         }
     };
-    private final Random jRandom = new Random();
     public int time = 0;
 
     public final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         public int get(int index) {
             return switch (index) {
                 case 0 -> KettleBlockEntity.this.time;
-                case 1 ->
-                        Math.toIntExact(KettleBlockEntity.this.waterStorage.amount); //I don't think 81000 > 2147483647, soooooo
+                case 1 -> (int) KettleBlockEntity.this.waterStorage.amount; //I don't think 81000 > 2147483647, soooooo
                 default -> 0;
             };
         }
@@ -78,7 +76,6 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
                 case 0 -> KettleBlockEntity.this.time = value;
                 case 1 -> KettleBlockEntity.this.waterStorage.amount = value;
             }
-
         }
 
         public int size() {
@@ -195,9 +192,9 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         if (world.isClient()) {
             BlockState state2 = world.getBlockState(this.pos);
             Direction direction = state2.get(KettleBlock.FACING);
-            if (jRandom.nextInt(120) == 0)
+            if (MathStuff.threadRandom().nextInt(120) == 0)
                 world.playSound(getPos().getX() + .5, getPos().getY() + .5, getPos().getZ() + .5, SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 1.0f, 1.0f, true);
-            if (jRandom.nextInt(16) == 0)
+            if (MathStuff.threadRandom().nextInt(16) == 0)
                 world.addParticle(ParticleTypes.BUBBLE_POP, (pos.offset(direction).getX() + 0.5) - (direction.getOffsetX() * 0.45), pos.getY() + 0.35, (pos.offset(direction).getZ() + 0.5) - (direction.getOffsetZ() * 0.45), 0F, 0.03F, 0F);
         }
     }
