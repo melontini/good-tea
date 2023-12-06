@@ -11,6 +11,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.model.BakedModel;
@@ -54,12 +55,13 @@ public class GoodTeaClient implements ClientModInitializer {
         GROUP.dm$setIconAnimation(new AnimatedItemGroup() {
             float angle = 45f, lerpPoint = 0;
             @Override
-            public void animateIcon(ItemGroup group, MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
+            public void animateIcon(ItemGroup group, DrawContext context, int itemX, int itemY, boolean selected, boolean isTopRow) {
                 MinecraftClient client = MinecraftClient.getInstance();
 
+                MatrixStack matrixStack = context.getMatrices();
                 BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
                 matrixStack.push();
-                matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F + client.getItemRenderer().zOffset);
+                matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F);
                 matrixStack.translate(8.0, 8.0, 0.0);
                 matrixStack.scale(1.0F, -1.0F, 1.0F);
                 matrixStack.scale(15.0F, 15.0F, 15.0F);
@@ -70,7 +72,7 @@ public class GoodTeaClient implements ClientModInitializer {
                 BakedModel model = client.getItemRenderer().getModel(KETTLE, null, null, 0);
                 //itemX + 5, itemY - 5
                 matrixStack.push();
-                matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F + client.getItemRenderer().zOffset);
+                matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F);
                 matrixStack.translate(8.0, 8.0, 0.0);
                 matrixStack.scale(1.0F, -1.0F, 1.0F);
                 matrixStack.scale(16.0F, 16.0F, 16.0F);
