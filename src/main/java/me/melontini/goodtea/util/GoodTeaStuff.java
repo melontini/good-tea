@@ -3,11 +3,9 @@ package me.melontini.goodtea.util;
 import me.melontini.dark_matter.api.base.util.MathStuff;
 import me.melontini.dark_matter.api.content.ContentBuilder;
 import me.melontini.dark_matter.api.content.RegistryUtil;
-import me.melontini.dark_matter.api.content.interfaces.AnimatedItemGroup;
 import me.melontini.dark_matter.api.content.interfaces.DarkMatterEntries;
-import me.melontini.dark_matter.api.minecraft.client.util.DrawUtil;
 import me.melontini.dark_matter.api.minecraft.data.NbtBuilder;
-import me.melontini.goodtea.behaviors.TeaBehavior;
+import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import me.melontini.goodtea.blocks.FilledTeaMugBlock;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.blocks.TeaMugBlock;
@@ -19,9 +17,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
@@ -31,16 +26,16 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 
 import java.util.*;
 
 import static me.melontini.goodtea.GoodTea.MODID;
 
 public class GoodTeaStuff {
+
     public static EntityAttributeModifier OBSIDIAN_TOUGHNESS = new EntityAttributeModifier(UUID.fromString("36dae011-70d8-482a-b3b3-7bb12c871eae"), "Tea Modifier", 2, EntityAttributeModifier.Operation.ADDITION);
     public static EntityAttributeModifier RABBITS_LUCK = new EntityAttributeModifier(UUID.fromString("57c5033e-c071-4b23-8f14-0551eb4c5b0a"), "Tea Modifier", 1, EntityAttributeModifier.Operation.ADDITION);
+
     public static TagKey<Block> SHOW_SUPPORT = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_kettle_show_support"));
     public static TagKey<Block> HOT_BLOCKS = TagKey.of(Registries.BLOCK.getKey(), new Identifier(MODID, "gt_hot_blocks"));
     public static TeaMugBlock TEA_MUG_BLOCK = ContentBuilder.BlockBuilder.create(new Identifier(MODID, "mug"), () -> new TeaMugBlock(AbstractBlock.Settings.of(Material.DECORATION, MapColor.PALE_YELLOW).nonOpaque().strength(0.1F).sounds(BlockSoundGroup.CANDLE)))
@@ -58,44 +53,9 @@ public class GoodTeaStuff {
     public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.getBlockEntityFromBlock(FILLED_TEA_MUG_BLOCK);
     public static final ItemStack KETTLE = KETTLE_BLOCK_ITEM.getDefaultStack();
     public static final ItemStack MUG = TEA_MUG.getDefaultStack();
+
     public static ItemGroup GROUP = ContentBuilder.ItemGroupBuilder.create(new Identifier(MODID, "item_group"))
-            .animatedIcon(() -> new AnimatedItemGroup() {
-                float angle = 45f, lerpPoint = 0;
-                @Override
-                public void animateIcon(ItemGroup group, MatrixStack matrixStack, int itemX, int itemY, boolean selected, boolean isTopRow) {
-                    MinecraftClient client = MinecraftClient.getInstance();
-
-                    BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
-                    matrixStack.push();
-                    matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F + client.getItemRenderer().zOffset);
-                    matrixStack.translate(8.0, 8.0, 0.0);
-                    matrixStack.scale(1.0F, -1.0F, 1.0F);
-                    matrixStack.scale(15.0F, 15.0F, 15.0F);
-                    DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, MUG, model1);
-                    matrixStack.pop();
-
-
-                    BakedModel model = client.getItemRenderer().getModel(KETTLE, null, null, 0);
-                    //itemX + 5, itemY - 5
-                    matrixStack.push();
-                    matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F + client.getItemRenderer().zOffset);
-                    matrixStack.translate(8.0, 8.0, 0.0);
-                    matrixStack.scale(1.0F, -1.0F, 1.0F);
-                    matrixStack.scale(16.0F, 16.0F, 16.0F);
-
-
-                    angle = MathHelper.lerp(0.1f * client.getLastFrameDuration(), angle, lerpPoint);
-                    if (angle < 0.1f && lerpPoint == 0f) {
-                        lerpPoint = 45f;
-                    }
-                    if (angle > 44.9f && lerpPoint == 45f) {
-                        lerpPoint = 0f;
-                    }
-                    matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
-                    DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, KETTLE, model);
-                    matrixStack.pop();
-                }
-            }).entries(stacks -> {
+            .entries(stacks -> {
                 List<ItemStack> teaStarterPack = new ArrayList<>();
                 teaStarterPack.add(KETTLE);
                 teaStarterPack.add(MUG);
@@ -107,7 +67,7 @@ public class GoodTeaStuff {
                 teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
                 appendStacks(stacks, teaStarterPack, true);
 
-                var list = TeaBehavior.INSTANCE.TEA_BEHAVIOR.keySet();
+                var list = DataPackBehaviors.INSTANCE.itemsWithBehaviors().stream().sorted(Comparator.comparingInt(Registry.ITEM::getRawId)).toList();
 
                 Set<ItemStack> set = ItemStackSet.create();
 
@@ -142,5 +102,4 @@ public class GoodTeaStuff {
         }
         if (lineBreak) entries.addAll(DefaultedList.ofSize(9, ItemStack.EMPTY), DarkMatterEntries.Visibility.TAB); //line break
     }
-
 }

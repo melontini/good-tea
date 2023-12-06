@@ -2,7 +2,8 @@ package me.melontini.goodtea.items;
 
 import me.melontini.dark_matter.api.base.util.MakeSure;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
-import me.melontini.goodtea.behaviors.TeaBehavior;
+import me.melontini.goodtea.behaviors.TeaTooltips;
+import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.client.item.TooltipContext;
@@ -16,9 +17,11 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +32,6 @@ import java.util.Optional;
 import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
 
 public class TeaMugItem extends BlockItem {
-    private static final MutableText NOTHING_TEXT = TextUtil.translatable("tooltip.good-tea.filled_mug.nothing").formatted(Formatting.GRAY);
-    private static final MutableText SOMETHING_TEXT = TextUtil.translatable("tooltip.good-tea.filled_mug.something").formatted(Formatting.GRAY);
 
     public TeaMugItem(Block block, Settings settings) {
         super(block, settings);
@@ -52,7 +53,7 @@ public class TeaMugItem extends BlockItem {
             NbtCompound nbt = stack.getNbt();
             ItemStack stack1 = getStackFromNbt(nbt);
             if (stack1 != null) {
-                TeaBehavior.INSTANCE.getBehavior(stack1).run(user, stack1);
+                DataPackBehaviors.INSTANCE.getBehavior(stack1).run(user, stack1);
             }
         }
 
@@ -76,19 +77,13 @@ public class TeaMugItem extends BlockItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        MakeSure.notNulls(stack, world);
         NbtCompound nbt = stack.getNbt();
         ItemStack stack1 = getStackFromNbt(nbt);
         if (stack1 != null) {
             Item item = stack1.getItem();
-            if (item != null) {
-                tooltip.add(TextUtil.translatable("tooltip.good-tea.filled_mug", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
-                if (TeaBehavior.INSTANCE.hasTooltip(item)) {
-                    TeaBehavior.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
-                } else {
-                    if (!TeaBehavior.INSTANCE.hasBehavior(item)) tooltip.add(NOTHING_TEXT);
-                    else tooltip.add(SOMETHING_TEXT);
-                }
+            tooltip.add(TextUtil.translatable("tooltip.good-tea.filled_mug", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
+            if (TeaTooltips.INSTANCE.hasTooltip(item)) {
+                TeaTooltips.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
             }
         }
     }
