@@ -16,10 +16,10 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.math.RotationAxis;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,10 +44,10 @@ public class GoodTeaClient implements ClientModInitializer {
             for (int i = 0; i < length; i++) ids.add(buf.readIdentifier());
             client.execute(() -> {
                 for (Identifier id : disabled) DataPackBehaviors.INSTANCE
-                        .disable(Registry.ITEM.get(id));
+                        .disable(Registries.ITEM.get(id));
 
                 for (Identifier id : ids) DataPackBehaviors.INSTANCE
-                        .acceptDummy(Registry.ITEM.get(id));
+                        .acceptDummy(Registries.ITEM.get(id));
             });
         });
 
@@ -83,7 +83,7 @@ public class GoodTeaClient implements ClientModInitializer {
                 if (angle > 44.9f && lerpPoint == 45f) {
                     lerpPoint = 0f;
                 }
-                matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(angle));
+                matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
                 DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, KETTLE, model);
                 matrixStack.pop();
             }

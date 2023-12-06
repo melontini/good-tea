@@ -8,6 +8,8 @@ import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -17,7 +19,6 @@ import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.profiler.Profiler;
-import net.minecraft.util.registry.Registry;
 
 import java.util.*;
 
@@ -50,9 +51,9 @@ public class DataLoader extends JsonDataLoader implements IdentifiableResourceRe
 
                     JsonElement element = object.get("item_id");
                     if (element.isJsonArray()) {
-                        element.getAsJsonArray().forEach(e -> items.add(parseFromId(e.getAsString(), Registry.ITEM)));
+                        element.getAsJsonArray().forEach(e -> items.add(parseFromId(e.getAsString(), Registries.ITEM)));
                     } else {
-                        items.add(parseFromId(element.getAsString(), Registry.ITEM));
+                        items.add(parseFromId(element.getAsString(), Registries.ITEM));
                     }
 
                     data.disabled = JsonHelper.getBoolean(object, "disabled", false);

@@ -67,7 +67,7 @@ public class GoodTeaStuff {
                 teaStarterPack.add(Items.LAVA_BUCKET.getDefaultStack());
                 appendStacks(stacks, teaStarterPack, true);
 
-                var list = DataPackBehaviors.INSTANCE.itemsWithBehaviors().stream().sorted(Comparator.comparingInt(Registry.ITEM::getRawId)).toList();
+                var list = DataPackBehaviors.INSTANCE.itemsWithBehaviors().stream().sorted(Comparator.comparingInt(Registries.ITEM::getRawId)).toList();
 
                 Set<ItemStack> set = ItemStackSet.create();
 

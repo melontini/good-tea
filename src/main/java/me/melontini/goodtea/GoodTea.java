@@ -17,10 +17,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -51,7 +51,7 @@ public class GoodTea implements ModInitializer {
             KahurCompat.register();
         }
 
-        RegistryEntryAddedCallback.event(Registry.ITEM).register((rawId, id, object) -> {
+        RegistryEntryAddedCallback.event(Registries.ITEM).register((rawId, id, object) -> {
             TeaBehavior.INSTANCE.initAuto(object);
             TeaTooltips.INSTANCE.initAutoTooltips(object);
         });
