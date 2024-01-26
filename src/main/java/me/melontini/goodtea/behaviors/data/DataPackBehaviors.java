@@ -1,5 +1,11 @@
 package me.melontini.goodtea.behaviors.data;
 
+import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -9,8 +15,10 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.util.registry.Registry;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class DataPackBehaviors {
 
@@ -97,14 +105,24 @@ public class DataPackBehaviors {
         }
     }
 
-    public static class Data {
+    public record Data(List<Item> items, boolean disabled, boolean complement, CommandHolder commands) {
+        public static final Codec<Data> CODEC = RecordCodecBuilder.create(data -> data.group(
+                Codec.either(Registry.ITEM.getCodec(), Codec.list(Registry.ITEM.getCodec()))
+                        .fieldOf("item_id").xmap(e -> e.map(ImmutableList::of, Function.identity()), Either::right).forGetter(Data::items),
 
-        public boolean disabled = false;
-        public boolean complement = true;
+                Codec.BOOL.optionalFieldOf("disabled", false).forGetter(Data::disabled),
+                Codec.BOOL.optionalFieldOf("complement", true).forGetter(Data::disabled),
 
-        public CommandHolder commands;
+                CommandHolder.CODEC.optionalFieldOf("commands", CommandHolder.EMPTY).forGetter(Data::commands)
+        ).apply(data, Data::new));
 
         public record CommandHolder(List<String> user_commands, List<String> server_commands) {
+            public static final Codec<CommandHolder> CODEC = RecordCodecBuilder.create(data -> data.group(
+                    Codec.list(Codec.STRING).optionalFieldOf("user_commands", Collections.emptyList()).forGetter(CommandHolder::user_commands),
+                    Codec.list(Codec.STRING).optionalFieldOf("server_commands", Collections.emptyList()).forGetter(CommandHolder::server_commands)
+            ).apply(data, CommandHolder::new));
+
+            public static final CommandHolder EMPTY = CODEC.parse(JsonOps.INSTANCE, new JsonObject()).result().orElseThrow();
         }
     }
 }
