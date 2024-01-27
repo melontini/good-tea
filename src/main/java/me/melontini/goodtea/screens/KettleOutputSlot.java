@@ -37,7 +37,9 @@ public class KettleOutputSlot extends Slot {
     }
 
     protected void onCrafted(ItemStack stack) {
-        stack.onCraft(this.player.world, this.player, this.amount);
+        if (this.amount > 0) {
+            stack.onCraftByPlayer(this.player.getWorld(), this.player, this.amount);
+        }
         this.amount = 0;
     }
 }

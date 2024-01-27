@@ -6,7 +6,6 @@
   "mixins": [
     "chorus_tea.LivingEntityMixin",
     "screenhandler_tea.CraftingScreenHandlerMixin",
-    "screenhandler_tea.PlayerEntityMixin",
     "totem_tea.LivingEntityMixin",
     "warped_fungus_tea.HoglinSensorMixin",
     "warped_fungus_tea.LivingEntityMixin"

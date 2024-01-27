@@ -5,10 +5,7 @@ import me.melontini.dark_matter.api.base.util.MakeSure;
 import me.melontini.dark_matter.api.base.util.MathUtil;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.GoodTea;
-import me.melontini.goodtea.ducks.ChorusAccess;
-import me.melontini.goodtea.ducks.CraftingScreenAllowanceAccess;
-import me.melontini.goodtea.ducks.DivineAccess;
-import me.melontini.goodtea.ducks.HoglinRepellentAccess;
+import me.melontini.goodtea.util.Attachments;
 import net.minecraft.block.*;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.Entity;
@@ -189,14 +186,14 @@ public class TeaBehavior {
         });
 
         addBehavior(Items.WARPED_FUNGUS, (entity, stack) -> {
-            ((HoglinRepellentAccess) entity).good_tea$makeHoglinRepellent(2400);
+            entity.setAttached(Attachments.HOGLIN_REPELLENT, 2400);
             if (entity instanceof PlayerEntity player)
                 player.sendMessage(TextUtil.translatable("text.good-tea.hoglin_repellent"), true);
         });
 
         addBehavior(Items.CRAFTING_TABLE, (entity, stack) -> {
             if (entity instanceof PlayerEntity player) {
-                ((CraftingScreenAllowanceAccess) entity).good_tea$setAllowed(true);
+                player.setAttached(Attachments.CAN_USE_CRAFTING_TABLE, true);
                 player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, entity1) -> new CraftingScreenHandler(syncId, inv, ScreenHandlerContext.create(entity.world, entity.getBlockPos())), TextUtil.translatable("container.crafting")));
             }
         });
@@ -204,7 +201,7 @@ public class TeaBehavior {
         addBehavior(Items.LAVA_BUCKET, (entity, stack) -> entity.setOnFireFor(1200));
 
         addBehavior(Items.TOTEM_OF_UNDYING, (entity, stack) -> {
-            ((DivineAccess) entity).good_tea$setDivine(true);
+            entity.setAttached(Attachments.IS_DIVINE, true);
             if (entity instanceof PlayerEntity player)
                 player.sendMessage(TextUtil.translatable("text.good-tea.divine"), true);
             entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_TOTEM_USE, SoundCategory.AMBIENT, 1.0f, 1.0f);
@@ -237,11 +234,11 @@ public class TeaBehavior {
 
         addBehavior(Items.CHORUS_FRUIT, (entity, stack) -> {
             if (entity instanceof PlayerEntity player) {
-                if (((ChorusAccess) entity).good_tea$isTeleporting()) {
+                if (entity.getAttachedOrElse(Attachments.CHORUS_TELEPORT_TIME, 0) > 0) {
                     player.sendMessage(TextUtil.translatable("text.good-tea.chorus-tea-renew"), true);
                 } else player.sendMessage(TextUtil.translatable("text.good-tea.chorus-tea"), true);
             }
-            ((ChorusAccess) entity).good_tea$addTeleportingTime(3600);
+            entity.setAttached(Attachments.CHORUS_TELEPORT_TIME, entity.getAttachedOrElse(Attachments.CHORUS_TELEPORT_TIME, 0) + 3600);
         });
     }
 
@@ -282,8 +279,10 @@ public class TeaBehavior {
         if (item instanceof BlockItem blockItem) {
             if (blockItem.getBlock() instanceof FlowerBlock flowerBlock) {
                 addBehavior(item, (entity, stack) -> {
-                    StatusEffectInstance effectInstance = new StatusEffectInstance(flowerBlock.getEffectInStew(), flowerBlock.getEffectInStew().isInstant() ? flowerBlock.getEffectInStewDuration() : (flowerBlock.getEffectInStewDuration() * 2));
-                    entity.addStatusEffect(effectInstance);
+                    for (SuspiciousStewIngredient.StewEffect stewEffect : flowerBlock.getStewEffects()) {
+                        StatusEffectInstance effectInstance = new StatusEffectInstance(stewEffect.effect(), stewEffect.effect().isInstant() ? stewEffect.duration() : (stewEffect.duration() * 2));
+                        entity.addStatusEffect(effectInstance);
+                    }
                 });
             }
             if (blockItem.getBlock() instanceof BedBlock) {

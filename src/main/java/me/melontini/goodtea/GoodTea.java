@@ -27,7 +27,6 @@ import org.apache.logging.log4j.LogManager;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.KETTLE_BLOCK_ENTITY;
 
-@SuppressWarnings("UnstableApiUsage")
 public class GoodTea implements ModInitializer {
 
     public static final PrependingLogger LOGGER = new PrependingLogger(LogManager.getLogger("GoodTea"), PrependingLogger.NAME_METHOD_MIX);
