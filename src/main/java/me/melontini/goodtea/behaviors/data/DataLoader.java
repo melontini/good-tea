@@ -48,18 +48,18 @@ public class DataLoader extends JsonDataLoader implements IdentifiableResourceRe
                         }
 
                         DataPackBehaviors.INSTANCE.addBehavior(item, (entity, stack) -> {
-                            ServerWorld serverWorld = (ServerWorld) entity.world;
+                            ServerWorld serverWorld = (ServerWorld) entity.getWorld();
 
-                            if (!data.commands().user_commands().isEmpty()) {
+                            if (!data.user_commands().isEmpty()) {
                                 ServerCommandSource source = new ServerCommandSource(
                                         serverWorld.getServer(), entity.getPos(), new Vec2f(entity.getPitch(), entity.getYaw()), serverWorld, 4, entity.getEntityName(), TextUtil.literal(entity.getEntityName()), serverWorld.getServer(), entity).withSilent();
-                                for (String command : data.commands().user_commands()) {
+                                for (String command : data.user_commands()) {
                                     serverWorld.getServer().getCommandManager().executeWithPrefix(source, command);
                                 }
                             }
 
-                            if (!data.commands().server_commands().isEmpty()) {
-                                for (String command : data.commands().server_commands()) {
+                            if (!data.server_commands().isEmpty()) {
+                                for (String command : data.server_commands()) {
                                     serverWorld.getServer().getCommandManager().executeWithPrefix(serverWorld.getServer().getCommandSource().withSilent(), command);
                                 }
                             }
