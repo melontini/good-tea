@@ -1,5 +1,6 @@
 package me.melontini.goodtea.blocks;
 
+import com.mojang.serialization.MapCodec;
 import me.melontini.goodtea.blocks.entity.KettleBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -45,15 +46,22 @@ public class KettleBlock extends BlockWithEntity {
     private final VoxelShape TOP = Block.createCuboidShape(0, -1, 0, 16, 0, 16);
     private final VoxelShape SUPPORT_SHAPE = VoxelShapes.union(TOP, LEG_0, LEG_1, LEG_2, LEG_3);
 
+    private static final MapCodec<KettleBlock> CODEC = createCodec(KettleBlock::new);
+
     public KettleBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
 
     @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
+
+    @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, KETTLE_BLOCK_ENTITY, KettleBlockEntity::tick);
+        return validateTicker(type, KETTLE_BLOCK_ENTITY, KettleBlockEntity::tick);
     }
 
     @Override

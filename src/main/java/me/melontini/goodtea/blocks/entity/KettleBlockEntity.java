@@ -40,7 +40,6 @@ import java.util.Objects;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
-@SuppressWarnings("UnstableApiUsage")
 public class KettleBlockEntity extends BlockEntity implements SidedInventory, NamedScreenHandlerFactory {
     private static final MutableText KETTLE_GUI_KEY = TextUtil.translatable("gui.good-tea.kettle");
 

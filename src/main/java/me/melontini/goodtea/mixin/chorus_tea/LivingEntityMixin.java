@@ -1,11 +1,10 @@
 package me.melontini.goodtea.mixin.chorus_tea;
 
-import me.melontini.goodtea.ducks.ChorusAccess;
+import me.melontini.goodtea.util.Attachments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.FoxEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -15,18 +14,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity implements ChorusAccess {
-
-    @Unique
-    private int good_tea$chorusTeleport = 0;
-    @Unique
-    private int good_tea$ticksSinceLastTeleport = 0;
+public abstract class LivingEntityMixin extends Entity {
 
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
@@ -36,18 +29,21 @@ public abstract class LivingEntityMixin extends Entity implements ChorusAccess {
     private void tick(CallbackInfo ci) {
         if (!world.isClient()) {
             LivingEntity user = (LivingEntity) (Object) this;
-            if (this.good_tea$chorusTeleport > 0) {
-                this.good_tea$chorusTeleport--;
-                this.good_tea$ticksSinceLastTeleport = Math.min(this.good_tea$ticksSinceLastTeleport + 1, this.good_tea$chorusTeleport / 2);
+            int i = this.getAttachedOrElse(Attachments.CHORUS_TELEPORT_TIME, 0);
+            if (i > 0) {
+                this.setAttached(Attachments.CHORUS_TELEPORT_TIME, i - 1 == 0 ? null : i - 1);
 
-                if (world.random.nextInt(Math.max((int) ((this.good_tea$chorusTeleport * 0.7) - good_tea$ticksSinceLastTeleport) / 2, 1)) == 0) {
-                    this.good_tea$ticksSinceLastTeleport = 0;
+                int sinceLast = Math.min(this.getAttachedOrElse(Attachments.CHORUS_LAST_TELEPORT_TIME, 0) + 1, (i - 1) / 2);
+                this.setAttached(Attachments.CHORUS_LAST_TELEPORT_TIME, sinceLast);
+
+                if (world.random.nextInt(Math.max((int) (((i - 1) * 0.7) - sinceLast) / 2, 1)) == 0) {
+                    this.setAttached(Attachments.CHORUS_LAST_TELEPORT_TIME, null);
 
                     double d = user.getX();
                     double e = user.getY();
                     double f = user.getZ();
 
-                    for (int i = 0; i < 16; ++i) {
+                    for (int l = 0; l < 16; ++l) {
                         double g = user.getX() + (user.getRandom().nextDouble() - 0.5) * 16.0;
                         double h = MathHelper.clamp(
                                 user.getY() + (double) (user.getRandom().nextInt(16) - 8),
@@ -71,27 +67,5 @@ public abstract class LivingEntityMixin extends Entity implements ChorusAccess {
                 }
             }
         }
-    }
-
-    @Inject(at = @At("TAIL"), method = "readCustomDataFromNbt")
-    private void good_tea$readNbt(NbtCompound nbt, CallbackInfo ci) {
-        if (nbt.contains("GT-ChorusTeleport")) this.good_tea$chorusTeleport = nbt.getInt("GT-ChorusTeleport");
-        if (nbt.contains("GT-ChorusTeleportTicks")) this.good_tea$ticksSinceLastTeleport = nbt.getInt("GT-ChorusTeleportTicks");
-    }
-
-    @Inject(at = @At("TAIL"), method = "writeCustomDataToNbt")
-    private void good_tea$writeNbt(NbtCompound nbt, CallbackInfo ci) {
-        if (this.good_tea$chorusTeleport > 0) nbt.putInt("GT-ChorusTeleport", this.good_tea$chorusTeleport);
-        if (this.good_tea$ticksSinceLastTeleport > 0) nbt.putInt("GT-ChorusTeleportTicks", this.good_tea$ticksSinceLastTeleport);
-    }
-
-    @Override
-    public boolean good_tea$isTeleporting() {
-        return this.good_tea$chorusTeleport > 0;
-    }
-
-    @Override
-    public void good_tea$addTeleportingTime(int timeInTicks) {
-        this.good_tea$chorusTeleport += timeInTicks;
     }
 }

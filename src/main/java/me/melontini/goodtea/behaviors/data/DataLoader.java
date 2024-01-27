@@ -52,7 +52,7 @@ public class DataLoader extends JsonDataLoader implements IdentifiableResourceRe
 
                             if (!data.user_commands().isEmpty()) {
                                 ServerCommandSource source = new ServerCommandSource(
-                                        serverWorld.getServer(), entity.getPos(), new Vec2f(entity.getPitch(), entity.getYaw()), serverWorld, 4, entity.getEntityName(), TextUtil.literal(entity.getEntityName()), serverWorld.getServer(), entity).withSilent();
+                                        serverWorld.getServer(), entity.getPos(), new Vec2f(entity.getPitch(), entity.getYaw()), serverWorld, 4, entity.getNameForScoreboard(), TextUtil.literal(entity.getNameForScoreboard()), serverWorld.getServer(), entity).withSilent();
                                 for (String command : data.user_commands()) {
                                     serverWorld.getServer().getCommandManager().executeWithPrefix(source, command);
                                 }
