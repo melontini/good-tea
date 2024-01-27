@@ -17,4 +17,6 @@ public class Attachments {
 
     public static final AttachmentType<Integer> CHORUS_TELEPORT_TIME = AttachmentRegistry.createPersistent(new Identifier(GoodTea.MODID, "chorus_time"), Codec.INT);
     public static final AttachmentType<Integer> CHORUS_LAST_TELEPORT_TIME = AttachmentRegistry.createPersistent(new Identifier(GoodTea.MODID, "chorus_last_time"), Codec.INT);
+
+    public static void init() {}
 }

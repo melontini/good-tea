@@ -6,6 +6,7 @@ import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.behaviors.TeaTooltips;
 import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import me.melontini.goodtea.screens.KettleScreenHandler;
+import me.melontini.goodtea.util.Attachments;
 import me.melontini.goodtea.util.GoodTeaStuff;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -40,6 +41,8 @@ public class GoodTea implements ModInitializer {
         TeaBehavior.INSTANCE.init();
         TeaTooltips.INSTANCE.initTooltips();
         KettleBehaviour.INSTANCE.init();
+
+        Attachments.init();
 
         DataPackBehaviors.register();
 
