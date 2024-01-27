@@ -13,9 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class FilledTeaMugBlockEntity extends BlockEntity {
 
-    private ItemStack SLOT_0 = ItemStack.EMPTY;
-    private ItemStack SLOT_1 = ItemStack.EMPTY;
-    private ItemStack SLOT_2 = ItemStack.EMPTY;
+    private final ItemStack[] stacks = new ItemStack[] {ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
 
     public FilledTeaMugBlockEntity(BlockPos pos, BlockState state) {
         super(GoodTeaStuff.FILLED_TEA_MUG_BLOCK_ENTITY, pos, state);
@@ -26,14 +24,7 @@ public class FilledTeaMugBlockEntity extends BlockEntity {
 
         ItemStack newStack = stack.copy();
         newStack.setCount(1);
-        switch (blockState.get(FilledTeaMugBlock.COUNT)) {
-            case 1 -> SLOT_0 = newStack;
-            case 2 -> SLOT_1 = newStack;
-            case 3 -> SLOT_2 = newStack;
-            default -> {
-                return false;
-            }
-        }
+        stacks[blockState.get(FilledTeaMugBlock.COUNT) - 1] = newStack;
         update();
         return true;
     }
@@ -53,35 +44,25 @@ public class FilledTeaMugBlockEntity extends BlockEntity {
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        var slot0 = nbt.getCompound("slot0");
-        if (slot0 != null) SLOT_0 = ItemStack.fromNbt(slot0);
 
-        var slot1 = nbt.getCompound("slot1");
-        if (slot1 != null) SLOT_1 = ItemStack.fromNbt(slot1);
-
-        var slot2 = nbt.getCompound("slot2");
-        if (slot2 != null) SLOT_2 = ItemStack.fromNbt(slot2);
+        for (int i = 0; i < stacks.length; i++) {
+            var slot = nbt.getCompound("slot" + i);
+            if (slot != null) stacks[i] = ItemStack.fromNbt(slot);
+        }
     }
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
 
-        if (SLOT_0 != null) nbt.put("slot0", SLOT_0.writeNbt(new NbtCompound()));
-        if (SLOT_1 != null) nbt.put("slot1", SLOT_1.writeNbt(new NbtCompound()));
-        if (SLOT_2 != null) nbt.put("slot2", SLOT_2.writeNbt(new NbtCompound()));
+        for (int i = 0; i < stacks.length; i++) {
+            var stack = stacks[i];
+            nbt.put("slot" + i, stack.writeNbt(new NbtCompound()));
+        }
     }
 
-    public ItemStack getSLOT_0() {
-        return SLOT_0;
-    }
-
-    public ItemStack getSLOT_1() {
-        return SLOT_1;
-    }
-
-    public ItemStack getSLOT_2() {
-        return SLOT_2;
+    public ItemStack getSlot(int slot) {
+        return slot >= 0 && slot < stacks.length ? stacks[slot] : ItemStack.EMPTY;
     }
 
     public void update() {

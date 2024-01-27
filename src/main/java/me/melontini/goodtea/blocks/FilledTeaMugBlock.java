@@ -73,9 +73,7 @@ public class FilledTeaMugBlock extends BlockWithEntity implements Waterloggable 
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof FilledTeaMugBlockEntity filledTeaMugBlock) {
                 if (!world.isClient) {
-                    ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), filledTeaMugBlock.getSLOT_0());
-                    ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), filledTeaMugBlock.getSLOT_1());
-                    ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), filledTeaMugBlock.getSLOT_2());
+                    for (int i = 0; i < 3; i++) ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), filledTeaMugBlock.getSlot(i));
                 }
 
                 world.updateComparators(pos, this);
