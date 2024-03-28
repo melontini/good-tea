@@ -18,6 +18,7 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -66,23 +67,24 @@ public class GoodTeaClient implements ClientModInitializer {
         });
 
         ItemGroupAnimaton.setIconAnimation(GROUP, new ItemGroupAnimaton() {
-            float angle = 45f, lerpPoint = 0;
+            private float angle = 45f, lerpPoint = 0;
+            private final ItemStack kettle = KETTLE_BLOCK_ITEM.getDefaultStack(), mug = TEA_MUG.getDefaultStack();
             @Override
             public void animateIcon(ItemGroup group, DrawContext context, int itemX, int itemY, boolean selected, boolean isTopRow) {
                 MinecraftClient client = MinecraftClient.getInstance();
 
                 MatrixStack matrixStack = context.getMatrices();
-                BakedModel model1 = client.getItemRenderer().getModel(MUG, null, null, 0);
+                BakedModel model1 = client.getItemRenderer().getModel(mug, null, null, 0);
                 matrixStack.push();
                 matrixStack.translate(itemX - 3.5, itemY + 4, 100.0F);
                 matrixStack.translate(8.0, 8.0, 0.0);
                 matrixStack.scale(1.0F, -1.0F, 1.0F);
                 matrixStack.scale(15.0F, 15.0F, 15.0F);
-                DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, MUG, model1);
+                DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, mug, model1);
                 matrixStack.pop();
 
 
-                BakedModel model = client.getItemRenderer().getModel(KETTLE, null, null, 0);
+                BakedModel model = client.getItemRenderer().getModel(kettle, null, null, 0);
                 //itemX + 5, itemY - 5
                 matrixStack.push();
                 matrixStack.translate(itemX + 2.5, itemY - 5, 100.0F);
@@ -99,7 +101,7 @@ public class GoodTeaClient implements ClientModInitializer {
                     lerpPoint = 0f;
                 }
                 matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
-                DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, KETTLE, model);
+                DrawUtil.renderGuiItemModelCustomMatrixNoTransform(matrixStack, kettle, model);
                 matrixStack.pop();
             }
         });

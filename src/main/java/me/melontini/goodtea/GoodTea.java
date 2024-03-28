@@ -1,11 +1,12 @@
 package me.melontini.goodtea;
 
 import me.melontini.dark_matter.api.base.util.PrependingLogger;
+import me.melontini.dark_matter.api.base.util.Support;
 import me.melontini.dark_matter.api.data.loading.ServerReloadersEvent;
+import me.melontini.goodtea.behaviors.CommanderBehaviors;
 import me.melontini.goodtea.behaviors.KettleBlockStates;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.behaviors.TeaBehaviorProvider;
-import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import me.melontini.goodtea.screens.KettleScreenHandler;
 import me.melontini.goodtea.util.Attachments;
 import me.melontini.goodtea.util.GoodTeaStuff;
@@ -44,9 +45,10 @@ public class GoodTea implements ModInitializer {
 
         ServerReloadersEvent.EVENT.register(context -> context.register(new KettleBlockStates()));
 
-        Attachments.init();
+        Runnable commander = Support.fallback("commander", () -> CommanderBehaviors::init, () -> () -> {});
+        commander.run();
 
-        DataPackBehaviors.register();
+        Attachments.init();
 
         FluidStorage.SIDED.registerForBlockEntity((kettle, direction) -> kettle.waterStorage, KETTLE_BLOCK_ENTITY);
 

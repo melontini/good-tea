@@ -10,6 +10,7 @@ group = project.maven_group
 
 apply from: "https://raw.githubusercontent.com/constellation-mc/artifacts/main/artifacts.groovy"
 constellationRepo(project, "dark-matter")
+constellationRepo(project, "commander")
 
 repositories {
     // Add repositories to retrieve artifacts from in here.
@@ -51,6 +52,8 @@ dependencies {
     for (final def module in dmModules) {
         modApi include("me.melontini:dark-matter-${module}:${project.dark_matter}")
     }
+
+    modApi "me.melontini:commander:${project.commander_version}"
 }
 
 loom {

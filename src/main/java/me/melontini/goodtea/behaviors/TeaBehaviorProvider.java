@@ -1,5 +1,6 @@
 package me.melontini.goodtea.behaviors;
 
+import me.melontini.commander.data.DynamicEventManager;
 import me.melontini.dark_matter.api.base.util.Support;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -12,7 +13,7 @@ import java.util.function.Function;
 public interface TeaBehaviorProvider {
 
     Function<MinecraftServer, TeaBehaviorProvider> PROVIDER = Support.fallback("commander",
-            () -> server -> TeaBehavior.INSTANCE,
+            () -> server -> DynamicEventManager.getData(server, CommanderBehaviors.EVENT_TYPE),
             () -> server -> TeaBehavior.INSTANCE);
 
     default Behavior getBehavior(ItemStack stack) {

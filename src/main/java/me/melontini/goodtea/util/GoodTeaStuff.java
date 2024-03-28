@@ -14,6 +14,7 @@ import me.melontini.goodtea.blocks.entity.KettleBlockEntity;
 import me.melontini.goodtea.client.GoodTeaClient;
 import me.melontini.goodtea.items.TeaMugItem;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.entity.BlockEntityType;
@@ -43,16 +44,14 @@ public class GoodTeaStuff {
     public static FilledTeaMugBlock FILLED_TEA_MUG_BLOCK = RegistryUtil.register(Registries.BLOCK, id("filled_mug"), () -> new FilledTeaMugBlock(AbstractBlock.Settings.create().mapColor(MapColor.PALE_YELLOW).sounds(BlockSoundGroup.CANDLE).strength(0.1f).nonOpaque()));
     public static TeaMugItem TEA_MUG_FILLED = RegistryUtil.register(Registries.ITEM, id("filled_mug"), () -> new TeaMugItem(FILLED_TEA_MUG_BLOCK, new Item.Settings().maxCount(16).rarity(Rarity.RARE).recipeRemainder(TEA_MUG)));
     public static BlockEntityType<FilledTeaMugBlockEntity> FILLED_TEA_MUG_BLOCK_ENTITY = RegistryUtil.register(Registries.BLOCK_ENTITY_TYPE, id("filled_mug"), RegistryUtil.blockEntityType(FilledTeaMugBlockEntity::new, FILLED_TEA_MUG_BLOCK));
-    public static final ItemStack KETTLE = KETTLE_BLOCK_ITEM.getDefaultStack();
-    public static final ItemStack MUG = TEA_MUG.getDefaultStack();
 
     public static final Supplier<List<Item>> ITEMS_WITH_BEHAVIORS = Support.fallback(EnvType.CLIENT, () -> GoodTeaClient::getItemsWithBehaviors, () -> Collections::emptyList);
 
     public static ItemGroup GROUP = ItemGroupBuilder.create(id("item_group"))
             .entries(stacks -> {
                 List<ItemStack> teaStarterPack = new ArrayList<>();
-                teaStarterPack.add(KETTLE);
-                teaStarterPack.add(MUG);
+                teaStarterPack.add(KETTLE_BLOCK_ITEM.getDefaultStack());
+                teaStarterPack.add(TEA_MUG.getDefaultStack());
 
                 teaStarterPack.add(ItemStack.EMPTY);
 
@@ -80,12 +79,14 @@ public class GoodTeaStuff {
                     stacks.add(stack, DarkMatterEntries.Visibility.TAB);
                     stacks.add(ItemStack.EMPTY, DarkMatterEntries.Visibility.TAB);
                 }
-            }).icon(KETTLE).displayName(TextUtil.translatable("itemGroup.good-tea.item_group")).build();
+            }).icon(TEA_MUG.getDefaultStack()).displayName(TextUtil.translatable("itemGroup.good-tea.item_group")).build();
 
     public static Identifier id(String s) {
         return new Identifier(MODID, s);
     }
 
     public static void init() {
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(entries -> entries.add(TEA_MUG));
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(KETTLE_BLOCK_ITEM));
     }
 }
