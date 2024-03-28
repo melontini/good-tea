@@ -7,34 +7,28 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import me.melontini.goodtea.behaviors.TeaBehavior;
+import me.melontini.goodtea.behaviors.TeaBehaviorProvider;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourceType;
 
 import java.util.*;
 import java.util.function.Function;
 
-public class DataPackBehaviors {
+public class DataPackBehaviors implements TeaBehaviorProvider {
 
     public static final DataPackBehaviors INSTANCE = new DataPackBehaviors();
 
     final Map<Item, Holder> behaviors = new Object2ObjectLinkedOpenHashMap<>();
     final Set<Item> disabled = new ObjectOpenHashSet<>();
 
-    public TeaBehavior.Behavior getBehavior(ItemStack stack) {
-        return getBehavior(stack.getItem());
+    public TeaBehaviorProvider.Behavior getBehavior(Item item) {
+        return Optional.ofNullable(behaviors.get(item)).map(Holder::getBehavior).orElseGet(this::defaultBehavior);
     }
 
-    public TeaBehavior.Behavior getBehavior(Item item) {
-        return Optional.ofNullable(behaviors.get(item)).map(Holder::getBehavior)
-                .orElseGet(() -> (entity, stack) -> stack.getItem().finishUsing(stack, entity.world, entity));
-    }
-
-    public void addBehavior(Item item, TeaBehavior.Behavior behavior, boolean complement) {
+    public void addBehavior(Item item, TeaBehaviorProvider.Behavior behavior, boolean complement) {
         if (disabled.contains(item)) return;
 
         Holder holder = behaviors.computeIfAbsent(item, Holder::new);
@@ -76,8 +70,8 @@ public class DataPackBehaviors {
     }
 
     private static class Holder {
-        private final List<TeaBehavior.Behavior> behaviors = new ObjectArrayList<>();
-        private final TeaBehavior.Behavior behavior = (entity, stack) -> behaviors.forEach(behavior1 -> behavior1.run(entity, stack));
+        private final List<TeaBehaviorProvider.Behavior> behaviors = new ObjectArrayList<>();
+        private final TeaBehaviorProvider.Behavior behavior = (entity, stack) -> behaviors.forEach(behavior1 -> behavior1.run(entity, stack));
         private final Item item;
         private boolean locked;
 
@@ -85,7 +79,7 @@ public class DataPackBehaviors {
             this.item = item;
         }
 
-        public void addBehavior(TeaBehavior.Behavior behavior, boolean complement) {
+        public void addBehavior(TeaBehaviorProvider.Behavior behavior, boolean complement) {
             if (!this.locked) {
                 if (!complement) this.behaviors.clear();
                 this.behaviors.add(behavior);
@@ -97,7 +91,7 @@ public class DataPackBehaviors {
             return item;
         }
 
-        public TeaBehavior.Behavior getBehavior() {
+        public TeaBehaviorProvider.Behavior getBehavior() {
             return behavior;
         }
     }

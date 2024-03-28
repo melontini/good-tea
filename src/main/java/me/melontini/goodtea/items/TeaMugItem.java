@@ -2,8 +2,8 @@ package me.melontini.goodtea.items;
 
 import me.melontini.dark_matter.api.base.util.MakeSure;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
-import me.melontini.goodtea.behaviors.TeaTooltips;
-import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
+import me.melontini.goodtea.behaviors.TeaBehaviorProvider;
+import me.melontini.goodtea.client.TeaTooltips;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Block;
 import net.minecraft.client.item.TooltipContext;
@@ -12,12 +12,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.ClickType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.TEA_MUG;
@@ -77,7 +78,7 @@ public class TeaMugItem extends BlockItem {
             NbtCompound nbt = stack.getNbt();
             ItemStack stack1 = getStackFromNbt(nbt);
             if (stack1 != null) {
-                DataPackBehaviors.INSTANCE.getBehavior(stack1).run(user, stack1);
+                TeaBehaviorProvider.PROVIDER.apply(world.getServer()).getBehavior(stack1).run(user, stack1);
             }
         }
 
@@ -88,19 +89,20 @@ public class TeaMugItem extends BlockItem {
             }
         }
 
+        user.emitGameEvent(GameEvent.DRINK, user);
+
         if (player == null || !player.getAbilities().creativeMode) {
             if (stack.isEmpty()) return new ItemStack(TEA_MUG);
             if (player != null) player.getInventory().offerOrDrop(new ItemStack(TEA_MUG));
         }
 
-        Optional<GameEvent> optional = Registries.GAME_EVENT.getOrEmpty(new Identifier("drink"));
-        GameEvent event = optional.orElseGet(() -> Registries.GAME_EVENT.get(new Identifier("drinking_finish")));
-        user.emitGameEvent(event, user);
         return stack;
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        if (world == null || !world.isClient()) return;
+
         NbtCompound nbt = stack.getNbt();
         ItemStack stack1 = getTooltipStackFromNbt(nbt);
         if (stack1 != null) {

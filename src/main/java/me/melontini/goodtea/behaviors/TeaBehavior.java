@@ -45,23 +45,20 @@ import org.apache.commons.compress.utils.Lists;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.OBSIDIAN_TOUGHNESS;
 import static me.melontini.goodtea.util.GoodTeaStuff.RABBITS_LUCK;
 
 @SuppressWarnings("unused")
-public class TeaBehavior {
+public class TeaBehavior implements TeaBehaviorProvider {
     public static TeaBehavior INSTANCE = new TeaBehavior();
-    private final Map<Item, Behavior> behaviors = new Object2ObjectLinkedOpenHashMap<>();
+    private final Map<Item, TeaBehaviorProvider.Behavior> behaviors = new Object2ObjectLinkedOpenHashMap<>();
 
     private TeaBehavior() {
     }
 
-    public Map<Item, Behavior> getBehaviors() {
+    public Map<Item, TeaBehaviorProvider.Behavior> getBehaviors() {
         return Collections.unmodifiableMap(behaviors);
     }
 
@@ -292,13 +289,13 @@ public class TeaBehavior {
         }
     }
 
-    public void addBehavior(Item item, Behavior behavior) {
+    public void addBehavior(Item item, TeaBehaviorProvider.Behavior behavior) {
         MakeSure.notNulls(item, behavior);
         if (!behaviors.containsKey(item)) behaviors.putIfAbsent(item, behavior);
         else GoodTea.LOGGER.error("Tried to add behaviour for the same item twice! {}", item);
     }
 
-    public void addBehavior(Behavior behavior, Item... items) {
+    public void addBehavior(TeaBehaviorProvider.Behavior behavior, Item... items) {
         for (Item item : items) addBehavior(item, behavior);
     }
 
@@ -313,9 +310,13 @@ public class TeaBehavior {
                 .forEach(AxolotlEntity::hydrateFromPotion);
     }
 
+    @Override
+    public Behavior getBehavior(Item item) {
+        return Optional.ofNullable(behaviors.get(item)).orElseGet(this::defaultBehavior);
+    }
 
-    @FunctionalInterface
-    public interface Behavior {
-        void run(LivingEntity entity, ItemStack stack);
+    @Override
+    public Set<Item> itemsWithBehaviors() {
+        return Collections.unmodifiableSet(behaviors.keySet());
     }
 }

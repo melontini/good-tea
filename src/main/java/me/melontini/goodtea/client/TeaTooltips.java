@@ -1,9 +1,8 @@
-package me.melontini.goodtea.behaviors;
+package me.melontini.goodtea.client;
 
 import me.melontini.dark_matter.api.base.util.MakeSure;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.GoodTea;
-import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import net.minecraft.block.BedBlock;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.*;
@@ -27,14 +26,14 @@ public class TeaTooltips {
     private final Map<Item, Tooltip> tooltips = new LinkedHashMap<>();
 
     public Tooltip getTooltip(Item item) {
-        if (DataPackBehaviors.INSTANCE.disabled(item))
+        if (!GoodTeaClient.hasBehavior(item))
             return null;
 
         return tooltips.get(item);
     }
 
     public boolean hasTooltip(Item item) {
-        if (DataPackBehaviors.INSTANCE.disabled(item))
+        if (!GoodTeaClient.hasBehavior(item))
             return false;
 
         return tooltips.containsKey(item);

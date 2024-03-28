@@ -4,7 +4,7 @@ import me.melontini.dark_matter.api.base.util.PrependingLogger;
 import me.melontini.dark_matter.api.data.loading.ServerReloadersEvent;
 import me.melontini.goodtea.behaviors.KettleBlockStates;
 import me.melontini.goodtea.behaviors.TeaBehavior;
-import me.melontini.goodtea.behaviors.TeaTooltips;
+import me.melontini.goodtea.behaviors.TeaBehaviorProvider;
 import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
 import me.melontini.goodtea.screens.KettleScreenHandler;
 import me.melontini.goodtea.util.Attachments;
@@ -23,6 +23,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +41,6 @@ public class GoodTea implements ModInitializer {
     public void onInitialize() {
         GoodTeaStuff.init();
         TeaBehavior.INSTANCE.init();
-        TeaTooltips.INSTANCE.initTooltips();
 
         ServerReloadersEvent.EVENT.register(context -> context.register(new KettleBlockStates()));
 
@@ -50,37 +50,28 @@ public class GoodTea implements ModInitializer {
 
         FluidStorage.SIDED.registerForBlockEntity((kettle, direction) -> kettle.waterStorage, KETTLE_BLOCK_ENTITY);
 
-        RegistryEntryAddedCallback.event(Registries.ITEM).register((rawId, id, object) -> {
-            TeaBehavior.INSTANCE.initAuto(object);
-            TeaTooltips.INSTANCE.initAutoTooltips(object);
-        });
+        RegistryEntryAddedCallback.event(Registries.ITEM).register((rawId, id, object) -> TeaBehavior.INSTANCE.initAuto(object));
         for (Item item : Registries.ITEM) {
             TeaBehavior.INSTANCE.initAuto(item);
-            TeaTooltips.INSTANCE.initAutoTooltips(item);
         }
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            var packet = sendItemsS2CPacket();
+            var packet = sendItemsS2CPacket(server);
             sender.sendPacket(ITEMS_WITH_BEHAVIORS, packet);
         });
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
-            var packet = sendItemsS2CPacket();
+            var packet = sendItemsS2CPacket(server);
             for (ServerPlayerEntity player : PlayerLookup.all(server)) {
                 ServerPlayNetworking.send(player, ITEMS_WITH_BEHAVIORS, packet);
             }
         });
     }
 
-    private static PacketByteBuf sendItemsS2CPacket() {
+    private static PacketByteBuf sendItemsS2CPacket(MinecraftServer server) {
         var packet = PacketByteBufs.create();
+        packet.writeVarInt(0);
 
-        var disabled = DataPackBehaviors.INSTANCE.disabled();
-        packet.writeVarInt(disabled.size());
-        for (Item item : disabled) {
-            packet.writeIdentifier(Registries.ITEM.getId(item));
-        }
-
-        var items = DataPackBehaviors.INSTANCE.itemsWithBehaviors();
+        var items = TeaBehaviorProvider.PROVIDER.apply(server).itemsWithBehaviors();
         packet.writeVarInt(items.size());
         for (Item item : items) {
             packet.writeIdentifier(Registries.ITEM.getId(item));
