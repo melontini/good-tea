@@ -2,7 +2,7 @@ package me.melontini.goodtea.behaviors;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import me.melontini.dark_matter.api.base.util.MakeSure;
-import me.melontini.dark_matter.api.base.util.MathStuff;
+import me.melontini.dark_matter.api.base.util.MathUtil;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.ducks.ChorusAccess;
@@ -48,7 +48,10 @@ import org.apache.commons.compress.utils.Lists;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.OBSIDIAN_TOUGHNESS;
 import static me.melontini.goodtea.util.GoodTeaStuff.RABBITS_LUCK;
@@ -70,8 +73,7 @@ public class TeaBehavior {
         addBehavior(Items.GUNPOWDER, (entity, stack) -> entity.world.createExplosion(null, entity.getX(), entity.getY(), entity.getZ(), 1.0F, World.ExplosionSourceType.MOB));
 
         addBehavior(Items.END_ROD, (entity, stack) -> {
-            Random random = new Random();
-            ((ServerWorld) entity.world).spawnParticles(ParticleTypes.END_ROD, entity.getX(), entity.getY() + 1.6, entity.getZ(), 35, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, random.nextDouble(0.4) - 0.2, 0.3);
+            ((ServerWorld) entity.world).spawnParticles(ParticleTypes.END_ROD, entity.getX(), entity.getY() + 1.6, entity.getZ(), 35, MathUtil.nextDouble(-0.2, 0.2), MathUtil.nextDouble(-0.2, 0.2), MathUtil.nextDouble(-0.2, 0.2), 0.3);
             entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 600, 0));
         });
 
@@ -82,10 +84,10 @@ public class TeaBehavior {
             int j = entity.getBlockPos().getY();
             int k = entity.getBlockPos().getZ();
             for (int l = 0; l < 3; ++l) {
-                mutable.set(i + MathStuff.nextInt(-4, 4), j + 4, k + MathStuff.nextInt(-4, 4));
+                mutable.set(i + MathUtil.nextInt(-4, 4), j + 4, k + MathUtil.nextInt(-4, 4));
                 BlockState blockState = entity.world.getBlockState(mutable);
                 if (!blockState.isFullCube(entity.world, mutable)) {
-                    ((ServerWorld) entity.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + MathStuff.threadRandom().nextDouble(), mutable.getY() + MathStuff.threadRandom().nextDouble(), mutable.getZ() + MathStuff.threadRandom().nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
+                    ((ServerWorld) entity.world).spawnParticles(ParticleTypes.SPORE_BLOSSOM_AIR, mutable.getX() + MathUtil.threadRandom().nextDouble(), mutable.getY() + MathUtil.threadRandom().nextDouble(), mutable.getZ() + MathUtil.threadRandom().nextDouble(), 7, 0.0, 0.0, 0.0, 0.0);
                 }
             }
 
@@ -270,7 +272,7 @@ public class TeaBehavior {
             addBehavior(item, (entity, stack) -> {
                 entity.damage(entity.getWorld().getDamageSources().generic(), swordItem.getAttackDamage() * 2);
                 entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.AMBIENT, 1.0f, 1.0f);
-                stack.damage(MathStuff.fastCeil(swordItem.getAttackDamage() * 3.0F), entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
+                stack.damage((int) Math.ceil(swordItem.getAttackDamage() * 3.0F), entity.world.random, entity instanceof ServerPlayerEntity player ? player : null);
                 ItemScatterer.spawn(entity.world, entity.getX(), entity.getY(), entity.getZ(), stack);
             });
         }

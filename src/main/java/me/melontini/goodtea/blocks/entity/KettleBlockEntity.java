@@ -1,8 +1,8 @@
 package me.melontini.goodtea.blocks.entity;
 
-import me.melontini.dark_matter.api.base.util.MathStuff;
-import me.melontini.dark_matter.api.minecraft.data.NbtBuilder;
-import me.melontini.dark_matter.api.minecraft.data.NbtUtil;
+import me.melontini.dark_matter.api.base.util.MathUtil;
+import me.melontini.dark_matter.api.data.nbt.NbtBuilder;
+import me.melontini.dark_matter.api.data.nbt.NbtUtil;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.blocks.KettleBlock;
@@ -192,9 +192,9 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         if (world.isClient()) {
             BlockState state2 = world.getBlockState(this.pos);
             Direction direction = state2.get(KettleBlock.FACING);
-            if (MathStuff.threadRandom().nextInt(120) == 0)
+            if (MathUtil.threadRandom().nextInt(120) == 0)
                 world.playSound(getPos().getX() + .5, getPos().getY() + .5, getPos().getZ() + .5, SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.BLOCKS, 1.0f, 1.0f, true);
-            if (MathStuff.threadRandom().nextInt(16) == 0)
+            if (MathUtil.threadRandom().nextInt(16) == 0)
                 world.addParticle(ParticleTypes.BUBBLE_POP, (pos.offset(direction).getX() + 0.5) - (direction.getOffsetX() * 0.45), pos.getY() + 0.35, (pos.offset(direction).getZ() + 0.5) - (direction.getOffsetZ() * 0.45), 0F, 0.03F, 0F);
         }
     }

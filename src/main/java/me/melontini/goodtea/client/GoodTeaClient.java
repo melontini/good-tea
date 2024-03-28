@@ -1,6 +1,6 @@
 package me.melontini.goodtea.client;
 
-import me.melontini.dark_matter.api.content.interfaces.AnimatedItemGroup;
+import me.melontini.dark_matter.api.item_group.ItemGroupAnimaton;
 import me.melontini.dark_matter.api.minecraft.client.util.DrawUtil;
 import me.melontini.goodtea.GoodTea;
 import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
@@ -52,7 +52,7 @@ public class GoodTeaClient implements ClientModInitializer {
             });
         });
 
-        GROUP.dm$setIconAnimation(new AnimatedItemGroup() {
+        ItemGroupAnimaton.setIconAnimation(GROUP, new ItemGroupAnimaton() {
             float angle = 45f, lerpPoint = 0;
             @Override
             public void animateIcon(ItemGroup group, DrawContext context, int itemX, int itemY, boolean selected, boolean isTopRow) {

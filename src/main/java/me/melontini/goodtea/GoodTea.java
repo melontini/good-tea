@@ -1,7 +1,6 @@
 package me.melontini.goodtea;
 
 import me.melontini.dark_matter.api.base.util.PrependingLogger;
-import me.melontini.goodtea.behaviors.KahurCompat;
 import me.melontini.goodtea.behaviors.KettleBehaviour;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.behaviors.TeaTooltips;
@@ -16,7 +15,6 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
@@ -47,10 +45,6 @@ public class GoodTea implements ModInitializer {
         DataPackBehaviors.register();
 
         FluidStorage.SIDED.registerForBlockEntity((kettle, direction) -> kettle.waterStorage, KETTLE_BLOCK_ENTITY);
-
-        if (FabricLoader.getInstance().isModLoaded("kahur")) {
-            KahurCompat.register();
-        }
 
         RegistryEntryAddedCallback.event(Registries.ITEM).register((rawId, id, object) -> {
             TeaBehavior.INSTANCE.initAuto(object);

@@ -78,7 +78,6 @@ public class DataPackBehaviors {
     private static class Holder {
         private final List<TeaBehavior.Behavior> behaviors = new ObjectArrayList<>();
         private final TeaBehavior.Behavior behavior = (entity, stack) -> behaviors.forEach(behavior1 -> behavior1.run(entity, stack));
-        ;
         private final Item item;
         private boolean locked;
 
