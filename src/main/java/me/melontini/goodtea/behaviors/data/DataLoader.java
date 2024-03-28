@@ -23,7 +23,7 @@ import static me.melontini.goodtea.GoodTea.MODID;
 public class DataLoader extends JsonDataLoader implements IdentifiableResourceReloadListener {
 
     public DataLoader() {
-        super(new Gson(), "good_tea/behaviors");
+        super(new Gson(), "good-tea/behaviors");
     }
 
     @Override

@@ -1,7 +1,8 @@
 package me.melontini.goodtea;
 
 import me.melontini.dark_matter.api.base.util.PrependingLogger;
-import me.melontini.goodtea.behaviors.KettleBehaviour;
+import me.melontini.dark_matter.api.data.loading.ServerReloadersEvent;
+import me.melontini.goodtea.behaviors.KettleBlockStates;
 import me.melontini.goodtea.behaviors.TeaBehavior;
 import me.melontini.goodtea.behaviors.TeaTooltips;
 import me.melontini.goodtea.behaviors.data.DataPackBehaviors;
@@ -40,7 +41,8 @@ public class GoodTea implements ModInitializer {
         GoodTeaStuff.init();
         TeaBehavior.INSTANCE.init();
         TeaTooltips.INSTANCE.initTooltips();
-        KettleBehaviour.INSTANCE.init();
+
+        ServerReloadersEvent.EVENT.register(context -> context.register(new KettleBlockStates()));
 
         Attachments.init();
 

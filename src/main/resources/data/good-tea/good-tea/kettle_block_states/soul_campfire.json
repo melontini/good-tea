@@ -1,0 +1,6 @@
+{
+  "block": "minecraft:soul_campfire",
+  "predicate": {
+    "lit": "true"
+  }
+}

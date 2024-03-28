@@ -4,7 +4,7 @@ import me.melontini.dark_matter.api.base.util.MathUtil;
 import me.melontini.dark_matter.api.data.nbt.NbtBuilder;
 import me.melontini.dark_matter.api.data.nbt.NbtUtil;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
-import me.melontini.goodtea.behaviors.KettleBehaviour;
+import me.melontini.goodtea.behaviors.KettleBlockStates;
 import me.melontini.goodtea.blocks.KettleBlock;
 import me.melontini.goodtea.screens.KettleScreenHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -26,6 +26,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
@@ -40,6 +41,7 @@ import java.util.Objects;
 
 import static me.melontini.goodtea.util.GoodTeaStuff.*;
 
+@SuppressWarnings("UnstableApiUsage")
 public class KettleBlockEntity extends BlockEntity implements SidedInventory, NamedScreenHandlerFactory {
     private static final MutableText KETTLE_GUI_KEY = TextUtil.translatable("gui.good-tea.kettle");
 
@@ -89,106 +91,93 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
     @SuppressWarnings("unused")
     public static void tick(World world, BlockPos pos, BlockState state, KettleBlockEntity kettleBlockEntity) {
-        kettleBlockEntity.tick();
+        if (world.isClient()) {
+            kettleBlockEntity.tickClient();
+        } else {
+            kettleBlockEntity.tickServer((ServerWorld) world);
+        }
     }
 
     private ItemStack teaMugStack = ItemStack.EMPTY;
     private ItemStack lastInputStack = ItemStack.EMPTY;
 
-    private void tick() {
-        assert world != null;
+    private void tickServer(ServerWorld world) {
         ItemStack input = this.inventory.get(0);
         ItemStack mug = this.inventory.get(1);
         ItemStack output = this.inventory.get(2);
 
         if (this.time > 0) {
             BlockState state = world.getBlockState(this.pos.down());
-            if (state.isIn(HOT_BLOCKS)) {
-                this.tickTime();
-            } else {
-                KettleBehaviour.INSTANCE.getProperties(state.getBlock()).ifPresent(propertyMap -> {
-                    if (state.getProperties().containsAll(propertyMap.keySet())) {
-                        if (state.getProperties().stream().filter(propertyMap::containsKey).allMatch(property -> state.get(property).equals(propertyMap.get(property)))) {
-                            tickTime();
-                        }
-                    }
-                });
+            world.getServer().dm$getReloader(KettleBlockStates.RELOADER_TYPE).getProperties(state.getBlock()).ifPresent(predicate -> {
+                if (predicate.stream().anyMatch(p -> p.test(state))) {
+                    --this.time;
+                    markDirty();
+                }
+            });
+        }
+
+        if (!ItemStack.areEqual(input, lastInputStack)) {
+            lastInputStack = input.copy();
+
+            teaMugStack = new ItemStack(TEA_MUG_FILLED);
+            ItemStack teaStack = input.copy();
+            teaStack.setCount(1);
+            teaMugStack.setNbt(NbtBuilder.create()
+                    .put("GT-TeaItem", teaStack.writeNbt(new NbtCompound()))
+                    .build());
+        }
+
+        if (this.time == -1) {
+            if ((!input.isEmpty() && !input.isOf(TEA_MUG_FILLED)) && !mug.isEmpty() && canCombine(teaMugStack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
+                switch (input.getItem().getRarity(input)) {
+                    case COMMON -> this.time = 400;
+                    case UNCOMMON -> this.time = 550;
+                    case RARE -> this.time = 600;
+                    case EPIC -> this.time = 650;
+                    default -> this.time = 500;
+                }
+                update();
             }
         }
-        if (!world.isClient) {
-            if (!ItemStack.areEqual(input, lastInputStack)) {
-                lastInputStack = input.copy();
 
-                teaMugStack = new ItemStack(TEA_MUG_FILLED);
-                ItemStack teaStack = input.copy();
-                teaStack.setCount(1);
-                teaMugStack.setNbt(NbtBuilder.create()
-                        .put("GT-TeaItem", teaStack.writeNbt(new NbtCompound()))
-                        .build());
-            }
-
-            if (this.time == -1) {
-                if ((!input.isEmpty() && !input.isOf(TEA_MUG_FILLED)) && !mug.isEmpty() && canCombine(teaMugStack, output) && this.waterStorage.amount >= FluidConstants.BOTTLE) {
-                    switch (input.getItem().getRarity(input)) {
-                        case COMMON -> this.time = 400;
-                        case UNCOMMON -> this.time = 550;
-                        case RARE -> this.time = 600;
-                        case EPIC -> this.time = 650;
-                        default -> this.time = 500;
-                    }
-                    update();
-                }
-            }
-
-            if (this.time != -1) {
-                if (input.isEmpty() || input.isOf(TEA_MUG_FILLED)) {
-                    this.time = -1;
-                    update();
-                } else if (mug.isEmpty()) {
-                    this.time = -1;
-                    update();
-                } else if (!canCombine(teaMugStack, output)) {
-                    this.time = -1;
-                    update();
-                } else if (this.waterStorage.amount < FluidConstants.BOTTLE) {
-                    this.time = -1;
-                    update();
-                }
-            }
-            if (this.time == 0) {
-                if (output.isEmpty()) {
-                    if (input.getItem().hasRecipeRemainder()) {
-                        ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), new ItemStack(input.getItem().getRecipeRemainder()));
-                    }
-                    input.decrement(1);
-                    mug.decrement(1);
-                    this.inventory.set(2, teaMugStack.copy());
-                } else if (canCombine(teaMugStack, output)) {
-                    int a = teaMugStack.getCount();
-                    int b = output.getCount();
-                    output.setCount(a + b);
-                    if (input.getItem().hasRecipeRemainder()) {
-                        ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), new ItemStack(input.getItem().getRecipeRemainder()));
-                    }
-                    input.decrement(1);
-                    mug.decrement(1);
-                }
-                try (Transaction transaction = Transaction.openOuter()) {
-                    long amount = this.waterStorage.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BOTTLE, transaction);
-                    if (amount == FluidConstants.BOTTLE) transaction.commit();
-                }
+        if (this.time != -1) {
+            if ((input.isEmpty() || input.isOf(TEA_MUG_FILLED)) || mug.isEmpty() ||
+                    !canCombine(teaMugStack, output) ||
+                    this.waterStorage.amount < FluidConstants.BOTTLE) {
                 this.time = -1;
                 update();
             }
         }
+
+        if (this.time == 0) {
+            if (output.isEmpty()) {
+                if (input.getItem().hasRecipeRemainder()) {
+                    ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), input.getRecipeRemainder());
+                }
+                input.decrement(1);
+                mug.decrement(1);
+                this.inventory.set(2, teaMugStack.copy());
+            } else if (canCombine(teaMugStack, output)) {
+                int a = teaMugStack.getCount();
+                int b = output.getCount();
+                output.setCount(a + b);
+                if (input.getItem().hasRecipeRemainder()) {
+                    ItemScatterer.spawn(world, getPos().getX(), getPos().up().getY(), getPos().getZ(), input.getRecipeRemainder());
+                }
+                input.decrement(1);
+                mug.decrement(1);
+            }
+            try (Transaction transaction = Transaction.openOuter()) {
+                long amount = this.waterStorage.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BOTTLE, transaction);
+                if (amount == FluidConstants.BOTTLE) transaction.commit();
+            }
+            this.time = -1;
+            update();
+        }
     }
 
-    private void tickTime() {
-        if (!world.isClient()) {
-            --this.time;
-            markDirty();
-        }
-        if (world.isClient()) {
+    private void tickClient() {
+        if (this.time != -1) {
             BlockState state2 = world.getBlockState(this.pos);
             Direction direction = state2.get(KettleBlock.FACING);
             if (MathUtil.threadRandom().nextInt(120) == 0)
@@ -200,7 +189,6 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
 
     public void update() {
         markDirty();
-        assert world != null;
         var state = world.getBlockState(pos);
         world.updateListeners(pos, state, state, Block.NOTIFY_LISTENERS);
     }
@@ -239,6 +227,11 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
         NbtCompound nbt = new NbtCompound();
         this.writeNbt(nbt);
         return nbt;
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
     }
 
     @Override
@@ -290,6 +283,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     public void setStack(int slot, ItemStack stack) {
         this.inventory.set(slot, stack);
         if (stack.getCount() > this.getMaxCountPerStack()) stack.setCount(this.getMaxCountPerStack());
+        this.markDirty();
     }
 
     @Override
@@ -300,6 +294,7 @@ public class KettleBlockEntity extends BlockEntity implements SidedInventory, Na
     @Override
     public void clear() {
         this.inventory.clear();
+        this.markDirty();
     }
 
     @Override

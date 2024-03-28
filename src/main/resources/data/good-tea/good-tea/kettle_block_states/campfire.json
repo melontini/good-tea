@@ -1,0 +1,6 @@
+{
+  "block": "minecraft:campfire",
+  "predicate": {
+    "lit": "true"
+  }
+}
