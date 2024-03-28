@@ -9,6 +9,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -65,6 +66,7 @@ public class GoodTeaClient implements ClientModInitializer {
                 for (Identifier id : ids) ITEMS_WITH_BEHAVIORS.add(Registries.ITEM.get(id));
             });
         });
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ITEMS_WITH_BEHAVIORS.clear());
 
         ItemGroupAnimaton.setIconAnimation(GROUP, new ItemGroupAnimaton() {
             private float angle = 45f, lerpPoint = 0;
