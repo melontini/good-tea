@@ -54,8 +54,8 @@ public class TeaTooltips {
         addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.tea-mug-tea").formatted(Formatting.GRAY, Formatting.ITALIC)), TEA_MUG, KETTLE_BLOCK_ITEM);
         addTooltip(Items.AXOLOTL_BUCKET, (stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.axolotl_tea").formatted(Formatting.GRAY, Formatting.ITALIC)));
         addTooltip((stack, teaStack, world, tooltip, context) -> tooltip.add(TextUtil.translatable("tea-tooltip.good-tea.wheat_tea").formatted(Formatting.GRAY, Formatting.ITALIC)), Items.HAY_BLOCK, Items.WHEAT);
-        addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F, world == null ? 20f : world.getTickManager().getTickRate()), Items.POTION, Items.SPLASH_POTION);
-        addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F, world == null ? 20f : world.getTickManager().getTickRate()));
+        addTooltip((stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 1.2F), Items.POTION, Items.SPLASH_POTION);
+        addTooltip(Items.LINGERING_POTION, (stack, teaStack, world, tooltip, context) -> PotionUtil.buildTooltip(teaStack, tooltip, 0.3125F));
     }
 
     public void initAutoTooltips(Item item) {

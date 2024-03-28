@@ -1,6 +1,5 @@
 package me.melontini.goodtea.blocks;
 
-import com.mojang.serialization.MapCodec;
 import me.melontini.goodtea.blocks.entity.FilledTeaMugBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -38,11 +37,6 @@ public class FilledTeaMugBlock extends BlockWithEntity implements Waterloggable 
     public FilledTeaMugBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(COUNT, 1).with(WATERLOGGED, false));
-    }
-
-    @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return null;
     }
 
     @Override
