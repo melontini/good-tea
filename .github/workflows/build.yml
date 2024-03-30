@@ -59,6 +59,11 @@ jobs:
           java: |
             17
 
+          github-tag: ${{ env.VERSION_PLAIN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-commitish: ${{ github.sha }}
+          github-prerelease: false
+
           modrinth-id: fLAsXzkA
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-featured: true
