@@ -108,9 +108,8 @@ public class TeaMugItem extends BlockItem {
         if (stack1 != null) {
             Item item = stack1.getItem();
             tooltip.add(TextUtil.translatable("tooltip.good-tea.filled_mug", item.getName()).formatted(item.getRarity(item.getDefaultStack()).formatting));
-            if (TeaTooltips.INSTANCE.hasTooltip(item)) {
-                TeaTooltips.INSTANCE.getTooltip(item).append(stack, stack1, world, tooltip, context);
-            }
+            var tip = TeaTooltips.INSTANCE.getTooltip(item);
+            if (tip != null) tip.append(stack, stack1, world, tooltip, context);
         }
     }
 

@@ -26,17 +26,7 @@ public class TeaTooltips {
     private final Map<Item, Tooltip> tooltips = new LinkedHashMap<>();
 
     public Tooltip getTooltip(Item item) {
-        if (!GoodTeaClient.hasBehavior(item))
-            return null;
-
-        return tooltips.get(item);
-    }
-
-    public boolean hasTooltip(Item item) {
-        if (!GoodTeaClient.hasBehavior(item))
-            return false;
-
-        return tooltips.containsKey(item);
+        return GoodTeaClient.hasBehavior(item) ? tooltips.get(item) : null;
     }
 
     public void addTooltip(Tooltip tooltip, Item... items) {
