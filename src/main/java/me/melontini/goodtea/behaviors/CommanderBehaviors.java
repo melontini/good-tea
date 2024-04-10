@@ -5,11 +5,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import me.melontini.commander.command.ConditionedCommand;
-import me.melontini.commander.data.Subscription;
-import me.melontini.commander.data.types.EventTypes;
-import me.melontini.commander.event.EventContext;
-import me.melontini.commander.event.EventType;
+import me.melontini.commander.api.command.Command;
+import me.melontini.commander.api.event.EventContext;
+import me.melontini.commander.api.event.EventKey;
+import me.melontini.commander.api.event.EventType;
+import me.melontini.commander.api.event.Subscription;
 import me.melontini.dark_matter.api.data.codecs.ExtraCodecs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -27,8 +27,8 @@ import static net.minecraft.loot.context.LootContextParameters.*;
 
 public class CommanderBehaviors implements TeaBehaviorProvider {
 
-    public static final EventType EVENT_TYPE = EventTypes.register(id("drank_tea"), EventType.builder()
-            .extension(Data.CODEC, s -> new CommanderBehaviors(s).apply()).build());
+    public static final EventType EVENT_TYPE = EventType.builder()
+            .extension(Data.CODEC, s -> new CommanderBehaviors(s).apply()).build(id("drank_tea"));
 
     final Map<Item, Holder> behaviors = new Object2ObjectLinkedOpenHashMap<>();
     final Set<Item> disabled = new ObjectOpenHashSet<>();
@@ -78,7 +78,7 @@ public class CommanderBehaviors implements TeaBehaviorProvider {
                     continue;
                 }
                 addBehavior(item, (entity, stack, context) -> {
-                    for (ConditionedCommand cc : subscription.list()) {
+                    for (Command.Conditioned cc : subscription.list()) {
                         cc.execute(context);
                     }
                 }, subscription.parameters().complement());
@@ -95,7 +95,7 @@ public class CommanderBehaviors implements TeaBehaviorProvider {
             LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder((ServerWorld) entity.getWorld())
                     .add(THIS_ENTITY, entity).add(ORIGIN, entity.getPos()).add(TOOL, stack);
             LootContext lootContext = new LootContext.Builder(builder.build(LootContextTypes.FISHING)).build(null);
-            EventContext context = new EventContext(lootContext, EVENT_TYPE);
+            EventContext context = EventContext.builder(EVENT_TYPE).addParameter(EventKey.LOOT_CONTEXT, lootContext).build();
 
             behaviors.forEach(behavior1 -> behavior1.run(entity, stack, context));
         };
