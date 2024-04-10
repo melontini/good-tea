@@ -1,5 +1,7 @@
 package me.melontini.goodtea.mixin.totem_tea;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import me.melontini.dark_matter.api.minecraft.util.TextUtil;
 import me.melontini.goodtea.util.Attachments;
 import net.minecraft.entity.Entity;
@@ -11,7 +13,8 @@ import net.minecraft.item.Items;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -20,16 +23,14 @@ public abstract class LivingEntityMixin extends Entity {
         super(type, world);
     }
 
-    @SuppressWarnings("InvalidInjectorMethodSignature")
-    @ModifyVariable(method = "tryUseTotem", at = @At(value = "STORE", ordinal = 0), ordinal = 0)
-    private ItemStack good_tea$setFakeTotem(ItemStack value) {
+    @Inject(method = "tryUseTotem", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Hand;values()[Lnet/minecraft/util/Hand;"))
+    private void good_tea$setFakeTotem(CallbackInfoReturnable<Boolean> cir, @Local LocalRef<ItemStack> totem) {
         if (this.getAttachedOrElse(Attachments.IS_DIVINE, false)) {
             this.setAttached(Attachments.IS_DIVINE, null);
             if ((LivingEntity) (Object) this instanceof PlayerEntity player) {
                 player.sendMessage(TextUtil.translatable("text.good-tea.used_divine"), true);
             }
-            return new ItemStack(Items.TOTEM_OF_UNDYING);
+            totem.set(new ItemStack(Items.TOTEM_OF_UNDYING));
         }
-        return value;
     }
 }
